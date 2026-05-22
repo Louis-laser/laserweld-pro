@@ -3,21 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LaserWeld Pro · 激光焊接参数查询工具</title>
-<meta name="description" content="免费激光焊接参数查询工具。输入材料、厚度、接头类型，一键获取焊接可行性评估与工艺参数推荐。支持不锈钢304、碳钢、铝、铜、钛合金。">
-<meta name="keywords" content="激光焊接,焊接参数,不锈钢焊接,铝焊接,铜焊接,钛焊接,工艺参数,焊接工具">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2F5496">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="LaserWeld Pro">
-<meta property="og:image" content="assets/og-preview.png">
-<meta property="og:title" content="LaserWeld Pro · 激光焊接参数查询">
-<meta property="og:description" content="一键评估焊接可行性，获取推荐工艺参数。免费激光焊接工具。">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
+<title>LaserWeld Pro · 激光焊接参数查询</title>
 <style>
 /* ============ Reset & Base ============ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,7 +26,6 @@
   --red: #f85149;
   --red-bg: rgba(248,81,73,0.15);
   --purple: #a371f7;
-  --warn: #d29922;
   --radius: 12px;
   --radius-sm: 8px;
 }
@@ -220,11 +205,6 @@ body {
   transition: all 0.2s;
   text-align: center;
   position: relative;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .material-card:hover { border-color: var(--accent); transform: translateY(-1px); }
 .material-card.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); box-shadow: 0 0 0 1px rgba(88,166,255,0.3); }
@@ -279,10 +259,6 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 500;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .same-toggle button:hover { border-color: var(--accent); }
 .same-toggle button.active { border-color: var(--accent); background: rgba(88,166,255,0.1); color: var(--accent); }
@@ -290,6 +266,7 @@ body {
 
 /* ============ Sub-Material Modal ============ */
 .sub-modal-overlay {
+  display: none;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6);
@@ -297,15 +274,8 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
-  display: flex;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
-.sub-modal-overlay.visible {
-  opacity: 1;
-  visibility: visible;
-}
+.sub-modal-overlay.visible { display: flex; }
 .sub-modal {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -315,13 +285,7 @@ body {
   max-height: 80vh;
   overflow-y: auto;
   padding: 20px;
-  transform: scale(0.95);
-  opacity: 0;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.sub-modal-overlay.visible .sub-modal {
-  transform: scale(1);
-  opacity: 1;
+  animation: fadeIn 0.2s ease;
 }
 .sub-modal-title {
   font-size: 16px;
@@ -343,11 +307,6 @@ body {
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .sub-option:hover { border-color: var(--accent); }
 .sub-option.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
@@ -382,11 +341,6 @@ body {
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .toggle-opt:hover { border-color: var(--accent); }
 .toggle-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
@@ -408,11 +362,6 @@ body {
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .process-opt:hover { border-color: var(--accent); }
 .process-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
@@ -486,10 +435,6 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text2);
   cursor: pointer;
   transition: all 0.2s;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 .thickness-presets button:hover { border-color: var(--accent); color: var(--accent); }
 .thickness-presets button.active { background: var(--accent2); border-color: var(--accent2); color: #fff; }
@@ -508,11 +453,6 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .joint-opt:hover { border-color: var(--accent); }
 .joint-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
@@ -536,10 +476,6 @@ input[type="range"]::-moz-range-thumb {
   transition: all 0.2s;
   font-size: 13px;
   font-weight: 500;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .gas-opt:hover { border-color: var(--accent); }
 .gas-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
@@ -573,29 +509,6 @@ input[type="range"]::-moz-range-thumb {
 /* ============ Results ============ */
 .results-section { display: none; }
 .results-section.visible { display: block; }
-
-.inline-tip {
-  background: var(--orange-bg);
-  border: 1px solid var(--orange);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  margin-bottom: 14px;
-  font-size: 13px;
-  color: var(--orange);
-  text-align: center;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px dashed var(--border);
-  margin-bottom: 14px;
-}
-.empty-state .empty-icon { font-size: 44px; margin-bottom: 10px; }
-.empty-state .empty-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-.empty-state .empty-desc { font-size: 12px; color: var(--text2); line-height: 1.6; max-width: 280px; margin: 0 auto; }
 
 .query-summary {
   background: linear-gradient(135deg, var(--accent2) 0%, #0d4192 100%);
@@ -668,18 +581,8 @@ input[type="range"]::-moz-range-thumb {
   background: linear-gradient(135deg, rgba(168, 113, 247, 0.15), rgba(88, 166, 255, 0.15));
   border: 1px solid var(--purple);
   border-radius: var(--radius);
-  text-align: center;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease, margin-bottom 0.3s ease;
-  opacity: 0;
-  padding: 0 20px;
-  margin-bottom: 0;
-}
-.sub-gate.open {
-  max-height: 800px;
-  opacity: 1;
   padding: 20px;
+  text-align: center;
   margin-bottom: 14px;
 }
 .sub-gate .icon { font-size: 40px; margin-bottom: 8px; }
@@ -777,14 +680,7 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
-.plan-opt:hover { border-color: var(--green); }
-.plan-opt.selected { border-color: var(--green); background: rgba(63,185,80,0.08); box-shadow: 0 0 0 1px var(--green); }
 .pay-opt:hover { border-color: var(--accent); }
 .pay-opt.selected { border-color: var(--green); background: rgba(63,185,80,0.08); }
 .pay-opt .pay-icon { font-size: 28px; margin-bottom: 4px; }
@@ -823,22 +719,6 @@ input[type="range"]::-moz-range-thumb {
   border: 1px dashed #aaa;
   padding: 2px 8px;
   border-radius: 4px;
-}
-
-/* ============ Payment Panel Transition ============ */
-#paymentPanel {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.35s ease, opacity 0.35s ease, padding 0.35s ease, margin 0.35s ease;
-  padding: 0 0;
-  margin: 0;
-}
-#paymentPanel.open {
-  max-height: 700px;
-  opacity: 1;
-  padding: 16px 0 0 0;
-  margin-top: 16px;
 }
 
 /* ============ Result Cards ============ */
@@ -897,16 +777,6 @@ input[type="range"]::-moz-range-thumb {
 .extra-recs .title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
 .extra-recs .item { font-size: 12px; color: var(--text2); margin-bottom: 4px; padding-left: 12px; position: relative; }
 .extra-recs .item::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
-.laser-param-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-.laser-param-grid .lparam {
-  background: var(--surface2);
-  border-radius: var(--radius-sm);
-  padding: 10px 8px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-.laser-param-grid .lparam .lplabel { display: block; font-size: 10px; color: var(--text2); margin-bottom: 4px; }
-.laser-param-grid .lparam .lpval { display: block; font-size: 14px; font-weight: 700; color: var(--accent); }
 
 /* ============ Mat Sub Tag ============ */
 .mat-sub-tag {
@@ -949,9 +819,6 @@ input[type="range"]::-moz-range-thumb {
   .material-card .name { font-size: 12px; }
 }
 </style>
-  <script src="data/params.js"></script>
-  <script src="data/sub-factors.js"></script>
-  <script src="data/articles.js"></script>
 </head>
 <body>
 
@@ -970,34 +837,31 @@ input[type="range"]::-moz-range-thumb {
 <div class="banner" id="bannerSection">
   <div class="banner-slider" id="bannerSlider">
     <div class="banner-slide active" data-index="0">
-      <img src="banners/banner-1.jpg" alt="激光器全家福 ①" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="placeholder" style="display:none;">
+      <div class="placeholder">
         <span>🔦</span>
-        <span>图片读取中</span>
-        <span class="p-tag">请将图片放入 banners/ 文件夹</span>
+        <span>激光器全家福 ①</span>
+        <span class="p-tag">可替换此图片</span>
       </div>
     </div>
     <div class="banner-slide" data-index="1">
-      <img src="banners/banner-2.jpg" alt="激光器全家福 ②" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="placeholder" style="display:none;">
+      <div class="placeholder">
         <span>🔦</span>
-        <span>图片读取中</span>
-        <span class="p-tag">请将图片放入 banners/ 文件夹</span>
+        <span>激光器全家福 ②</span>
+        <span class="p-tag">可替换此图片</span>
       </div>
     </div>
     <div class="banner-slide" data-index="2">
-      <img src="banners/banner-3.jpg" alt="激光器全家福 ③" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="placeholder" style="display:none;">
+      <div class="placeholder">
         <span>🔦</span>
-        <span>图片读取中</span>
-        <span class="p-tag">请将图片放入 banners/ 文件夹</span>
+        <span>激光器全家福 ③</span>
+        <span class="p-tag">可替换此图片</span>
       </div>
     </div>
   </div>
   <div class="banner-dots" id="bannerDots">
-    <span class="dot active" data-index="0" tabindex="0" role="button" aria-label="切换到第1张banner图片"></span>
-    <span class="dot" data-index="1" tabindex="0" role="button" aria-label="切换到第2张banner图片"></span>
-    <span class="dot" data-index="2" tabindex="0" role="button" aria-label="切换到第3张banner图片"></span>
+    <span class="dot active" data-index="0"></span>
+    <span class="dot" data-index="1"></span>
+    <span class="dot" data-index="2"></span>
   </div>
 </div>
 
@@ -1009,21 +873,19 @@ input[type="range"]::-moz-range-thumb {
     <div class="section-title"><span class="step-num">1</span> 选择材料</div>
     <!-- 同种/异种 toggle -->
     <div class="same-toggle" id="sameToggle">
-      <button class="active" data-val="same" onclick="setSameMaterial(true)" aria-label="选择同种材料焊接">🔗 同种材料</button>
-      <button data-val="diff" onclick="setSameMaterial(false)" aria-label="选择异种材料焊接">🔀 异种材料</button>
+      <button class="active" data-val="same" onclick="setSameMaterial(true)">🔗 同种材料</button>
+      <button data-val="diff" onclick="setSameMaterial(false)">🔀 异种材料</button>
     </div>
     <!-- Material A + B pair display -->
     <div class="mat-pair" id="matPair">
       <div class="slot" id="slotA">
         <div class="label">⬤ 材料 A</div>
         <div class="mat-name" style="color:var(--accent2);">—</div>
-        <div class="mat-sub" style="font-size:11px;color:var(--text2);"></div>
       </div>
       <div class="vs" id="vsSymbol" style="display:none;">⟷</div>
       <div class="slot" id="slotB" style="display:none;">
         <div class="label">⬤ 材料 B</div>
         <div class="mat-name" style="color:var(--purple);">—</div>
-        <div class="mat-sub" style="font-size:11px;color:var(--text2);"></div>
       </div>
     </div>
     <!-- Material grid -->
@@ -1035,12 +897,12 @@ input[type="range"]::-moz-range-thumb {
   <div class="section">
     <div class="section-title"><span class="step-num">2</span> 是否送丝</div>
     <div class="toggle-options" id="wireGrid">
-      <div class="toggle-opt selected" data-value="self" onclick="selectWire('self')" tabindex="0" role="button" aria-label="选择自熔焊接，不加焊丝">
+      <div class="toggle-opt selected" data-value="self" onclick="selectWire('self')">
         <span class="emoji">🔗</span>
         <span class="label">自熔</span>
         <span class="desc">不加焊丝，靠母材熔化</span>
       </div>
-      <div class="toggle-opt" data-value="feed" onclick="selectWire('feed')" tabindex="0" role="button" aria-label="选择送丝焊接，添加焊丝填充">
+      <div class="toggle-opt" data-value="feed" onclick="selectWire('feed')">
         <span class="emoji">📎</span>
         <span class="label">送丝</span>
         <span class="desc">添加焊丝填充</span>
@@ -1052,12 +914,12 @@ input[type="range"]::-moz-range-thumb {
   <div class="section">
     <div class="section-title"><span class="step-num">3</span> 是否增加摆头</div>
     <div class="toggle-options" id="oscGrid">
-      <div class="toggle-opt selected" data-value="no" onclick="selectOsc('no')" tabindex="0" role="button" aria-label="选择无摆头焊接，固定光束">
+      <div class="toggle-opt selected" data-value="no" onclick="selectOsc('no')">
         <span class="emoji">➖</span>
         <span class="label">无摆头</span>
         <span class="desc">固定光束焊接</span>
       </div>
-      <div class="toggle-opt" data-value="yes" onclick="selectOsc('yes')" tabindex="0" role="button" aria-label="选择有摆头焊接，光束摆动">
+      <div class="toggle-opt" data-value="yes" onclick="selectOsc('yes')">
         <span class="emoji">🌀</span>
         <span class="label">有摆头</span>
         <span class="desc">光束摆动焊接</span>
@@ -1069,12 +931,12 @@ input[type="range"]::-moz-range-thumb {
   <div class="section">
     <div class="section-title"><span class="step-num">4</span> 焊接模式</div>
     <div class="process-options" id="processGrid">
-      <div class="process-opt selected" data-value="cw" onclick="selectProcess('cw')" tabindex="0" role="button" aria-label="选择连续激光焊接模式">
+      <div class="process-opt selected" data-value="cw" onclick="selectProcess('cw')">
         <span class="emoji">🔥</span>
         <span class="label">连续激光 (CW)</span>
         <span class="desc">恒定功率输出</span>
       </div>
-      <div class="process-opt" data-value="pulse" onclick="selectProcess('pulse')" tabindex="0" role="button" aria-label="选择脉冲激光焊接模式">
+      <div class="process-opt" data-value="pulse" onclick="selectProcess('pulse')">
         <span class="emoji">⚡</span>
         <span class="label">脉冲激光 (Pulse)</span>
         <span class="desc">脉冲能量输出</span>
@@ -1100,22 +962,22 @@ input[type="range"]::-moz-range-thumb {
   <div class="section">
     <div class="section-title"><span class="step-num">6</span> 接头类型</div>
     <div class="joint-options" id="jointGrid">
-      <div class="joint-opt selected" data-value="butt" onclick="selectJoint('butt')" tabindex="0" role="button" aria-label="选择对接接头">
+      <div class="joint-opt selected" data-value="butt" onclick="selectJoint('butt')">
         <span class="emoji">⬜</span>
         <span class="label">对接</span>
         <span class="desc">Butt Joint</span>
       </div>
-      <div class="joint-opt" data-value="lap" onclick="selectJoint('lap')" tabindex="0" role="button" aria-label="选择搭接接头">
+      <div class="joint-opt" data-value="lap" onclick="selectJoint('lap')">
         <span class="emoji">▬</span>
         <span class="label">搭接</span>
         <span class="desc">Lap Joint</span>
       </div>
-      <div class="joint-opt" data-value="fillet" onclick="selectJoint('fillet')" tabindex="0" role="button" aria-label="选择角接接头">
+      <div class="joint-opt" data-value="fillet" onclick="selectJoint('fillet')">
         <span class="emoji">◤</span>
         <span class="label">角接</span>
         <span class="desc">Fillet Joint</span>
       </div>
-      <div class="joint-opt" data-value="edge" onclick="selectJoint('edge')" tabindex="0" role="button" aria-label="选择边接接头">
+      <div class="joint-opt" data-value="edge" onclick="selectJoint('edge')">
         <span class="emoji">▰</span>
         <span class="label">边接</span>
         <span class="desc">Edge Joint</span>
@@ -1127,11 +989,11 @@ input[type="range"]::-moz-range-thumb {
   <div class="section">
     <div class="section-title"><span class="step-num">7</span> 保护气体</div>
     <div class="gas-options" id="gasGrid">
-      <div class="gas-opt selected" data-value="Ar" onclick="selectGas('Ar')" tabindex="0" role="button" aria-label="选择保护气体：氩气">Ar 氩气</div>
-      <div class="gas-opt" data-value="N2" onclick="selectGas('N2')" tabindex="0" role="button" aria-label="选择保护气体：氮气">N₂ 氮气</div>
-      <div class="gas-opt" data-value="He" onclick="selectGas('He')" tabindex="0" role="button" aria-label="选择保护气体：氦气">He 氦气</div>
-      <div class="gas-opt" data-value="vacuum" onclick="selectGas('vacuum')" tabindex="0" role="button" aria-label="选择保护环境：真空">🧲 真空</div>
-      <div class="gas-opt" data-value="air" onclick="selectGas('air')" tabindex="0" role="button" aria-label="选择保护环境：空气">🌬️ 空气</div>
+      <div class="gas-opt selected" data-value="Ar" onclick="selectGas('Ar')">Ar 氩气</div>
+      <div class="gas-opt" data-value="N2" onclick="selectGas('N2')">N₂ 氮气</div>
+      <div class="gas-opt" data-value="He" onclick="selectGas('He')">He 氦气</div>
+      <div class="gas-opt" data-value="vacuum" onclick="selectGas('vacuum')">🧲 真空</div>
+      <div class="gas-opt" data-value="air" onclick="selectGas('air')">🌬️ 空气</div>
     </div>
   </div>
 
@@ -1145,24 +1007,60 @@ input[type="range"]::-moz-range-thumb {
   <!-- Step 9: 技术文章专栏 -->
   <div class="section" id="articleSection">
     <div class="section-title"><span class="step-num">9</span> 技术文章专栏</div>
-    <div class="articles-list" id="articlesList"></div>
+    <div class="articles-list" id="articlesList">
+      <div class="article-card" onclick="openArticle('art1')">
+        <div class="a-icon">📘</div>
+        <div class="a-body">
+          <div class="a-title">激光焊接常见缺陷分析与对策</div>
+          <div class="a-desc">气孔、裂纹、飞溅、咬边——四大激光焊接缺陷的成因、判定方法与工艺优化方向。</div>
+          <div class="a-meta"><span class="tag">工艺基础</span> <span>5 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art2')">
+        <div class="a-icon">🔬</div>
+        <div class="a-body">
+          <div class="a-title">铜材激光焊接：纯铜 vs 黄铜 vs 青铜</div>
+          <div class="a-desc">铜及铜合金的激光吸收率差异、关键工艺参数推荐及常见问题处理方案。</div>
+          <div class="a-meta"><span class="tag">材料专题</span> <span>8 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art3')">
+        <div class="a-icon">⚡</div>
+        <div class="a-body">
+          <div class="a-title">薄板精密焊接工艺要点（≤0.5mm）</div>
+          <div class="a-desc">超薄板材激光焊接的功率控制、工装夹具要求、热变形控制策略。</div>
+          <div class="a-meta"><span class="tag">精密焊接</span> <span>6 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art4')">
+        <div class="a-icon">🛡️</div>
+        <div class="a-body">
+          <div class="a-title">保护气体选择指南：Ar / N₂ / He / 真空 / 空气</div>
+          <div class="a-desc">不同气体对焊缝成形、熔深、氧化控制的影响对比及选型建议。</div>
+          <div class="a-meta"><span class="tag">辅助工艺</span> <span>7 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art5')">
+        <div class="a-icon">🤖</div>
+        <div class="a-body">
+          <div class="a-title">异种材料激光焊接：组合评估与工艺设计</div>
+          <div class="a-desc">不锈钢-铜、钢-铝、钛-铝等常见异种组合的焊接性、过渡层设计及工艺窗口。</div>
+          <div class="a-meta"><span class="tag">异种焊接</span> <span>10 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+    </div>
     <div style="text-align:center; margin-top:10px;">
-      <span style="font-size:11px; color:var(--text2);">📚 文章持续更新中</span>
+      <span style="font-size:11px; color:var(--text2); cursor:pointer;" onclick="alert('更多技术文章即将上线')">📚 查看全部文章 →</span>
     </div>
   </div>
 
   <!-- ============ Results ============ -->
   <div class="results-section" id="resultsSection">
-    <!-- Inline tip (validation warnings) -->
-    <div id="inlineTip" class="inline-tip" style="display:none;"></div>
-
-    <!-- Empty state placeholder -->
-    <div id="emptyState" class="empty-state">
-      <div class="empty-icon">🔍</div>
-      <div class="empty-title">请先选择焊接材料</div>
-      <div class="empty-desc">选择焊接材料后自动计算参数</div>
-    </div>
-
     <div class="query-summary" id="querySummary">
       <div class="mat" id="summaryMat">请选择材料</div>
       <div class="detail" id="summaryDetail"></div>
@@ -1172,64 +1070,42 @@ input[type="range"]::-moz-range-thumb {
     <div id="weldabilityCard" style="display:none;"></div>
 
     <!-- Subscription Gate -->
-    <div id="subGate" class="sub-gate">
+    <div id="subGate" class="sub-gate" style="display:none;">
       <div class="icon">🔒</div>
       <div class="title">高难度焊接参数</div>
       <div class="desc" id="subDesc">当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。</div>
-      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">🔑 单次¥20 · 📅 月度¥6/月</div>
-      <button class="btn-sub" onclick="showPayment()" aria-label="订阅解锁高级焊接参数">🔓 订阅解锁</button>
+      <button class="btn-sub" onclick="showPayment()">🔓 订阅解锁</button>
       <div class="sub-status" id="subStatus" style="display:none;">✅ 已订阅 · 全部参数已解锁</div>
 
       <!-- 支付窗口 -->
-      <div id="paymentPanel" style="border-top:1px solid var(--border);">
-        <div style="font-size:14px; font-weight:700; margin-bottom:2px; color:var(--green);">💰 选择订阅方案</div>
-        <div style="font-size:11px; color:var(--text2); margin-bottom:10px;">订阅后解锁全部焊接参数与深度工艺指导</div>
-        <!-- Plan selector -->
-        <div id="planSelector" style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
-          <div class="plan-opt" id="planOnce" onclick="selectPlan('once')" tabindex="0" role="button" aria-label="单次解锁20元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
-            <div style="font-size:22px;margin-bottom:2px;">🔑</div>
-            <div style="font-size:13px;font-weight:600;">单次解锁</div>
-            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥20</div>
-            <div style="font-size:10px;color:var(--text2);">永久有效</div>
-          </div>
-          <div class="plan-opt" id="planMonthly" onclick="selectPlan('monthly')" tabindex="0" role="button" aria-label="月度订阅6元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
-            <div style="font-size:22px;margin-bottom:2px;">📅</div>
-            <div style="font-size:13px;font-weight:600;">月度订阅</div>
-            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥6<small style="font-size:12px;font-weight:400;">/月</small></div>
-            <div style="font-size:10px;color:var(--text2);">随时取消</div>
-          </div>
-        </div>
-        <!-- Payment methods -->
-        <div id="payMethodArea" style="display:none;">
-          <div style="font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent);">💳 选择支付方式</div>
-          <div style="display:flex; gap:10px; justify-content:center;">
-            <div class="pay-opt" onclick="selectPay('wechat')" id="payWechat" tabindex="0" role="button" aria-label="选择微信支付">
-              <div class="pay-icon">💚</div>
-              <div class="pay-name">微信支付</div>
-              <div class="pay-qr" id="qrWechat">
-                <div class="qr-placeholder">
-                  <span>📱 微信收款码</span>
-                  <span class="qr-hint">上线后替换</span>
-                </div>
-              </div>
-            </div>
-            <div class="pay-opt" onclick="selectPay('alipay')" id="payAlipay" tabindex="0" role="button" aria-label="选择支付宝支付">
-              <div class="pay-icon">💙</div>
-              <div class="pay-name">支付宝</div>
-              <div class="pay-qr" id="qrAlipay">
-                <div class="qr-placeholder">
-                  <span>📱 支付宝收款码</span>
-                  <span class="qr-hint">上线后替换</span>
-                </div>
+      <div id="paymentPanel" style="display:none; margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+        <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:var(--accent);">💳 选择支付方式</div>
+        <div style="display:flex; gap:10px; justify-content:center;">
+          <div class="pay-opt" onclick="selectPay('wechat')" id="payWechat">
+            <div class="pay-icon">💚</div>
+            <div class="pay-name">微信支付</div>
+            <div class="pay-qr" id="qrWechat">
+              <div class="qr-placeholder">
+                <span>📱 微信收款码</span>
+                <span class="qr-hint">上传图片替换</span>
               </div>
             </div>
           </div>
-          <div id="payActions" style="margin-top:10px; display:flex; gap:8px; justify-content:center;">
-            <button class="btn-sub" style="padding:10px 24px; font-size:13px; flex:1;" onclick="confirmPay()" id="payConfirmBtn" aria-label="确认已支付，解锁订阅">✅ 我已支付</button>
-            <button class="btn-sub" style="padding:10px 16px; font-size:13px; background:transparent; border:1px solid var(--border); color:var(--text2);" onclick="cancelPay()" id="payCancelBtn" aria-label="取消支付">取消</button>
+          <div class="pay-opt" onclick="selectPay('alipay')" id="payAlipay">
+            <div class="pay-icon">💙</div>
+            <div class="pay-name">支付宝</div>
+            <div class="pay-qr" id="qrAlipay">
+              <div class="qr-placeholder">
+                <span>📱 支付宝收款码</span>
+                <span class="qr-hint">上传图片替换</span>
+              </div>
+            </div>
           </div>
-          <div id="payStatusMsg" style="font-size:11px; color:var(--text2); margin-top:8px; text-align:center; min-height:16px;">请先选择订阅方案</div>
         </div>
+        <div style="margin-top:10px;">
+          <button class="btn-sub" style="padding:10px 24px; font-size:13px;" onclick="confirmPay()">✅ 我已支付</button>
+        </div>
+        <div style="font-size:10px; color:var(--text2); margin-top:8px;">8元/月 · 订阅后随时取消，支持跨设备使用</div>
       </div>
     </div>
 
@@ -1254,18 +1130,13 @@ input[type="range"]::-moz-range-thumb {
       <div id="reqAdviceArea" style="display:none;">
         <div class="extra-recs" id="reqAdviceContent"></div>
       </div>
-
-      <!-- 高级参数（订阅后显示） -->
-      <div id="laserParamArea" style="display:none;">
-        <div class="extra-recs" style="margin-top:12px;" id="laserParamContent"></div>
-      </div>
     </div>
 
     <div style="font-size:10px;color:var(--text2);text-align:center;margin-top:16px;border-top:1px solid var(--border);padding-top:12px;">
       本数据仅供参考，实际工艺需结合设备能力验证 · Demo v1.2
     </div>
 
-    <button class="btn-reset" onclick="resetAll()" aria-label="重置所有参数，重新查询">⟳ 重新查询</button>
+    <button class="btn-reset" onclick="resetAll()">⟳ 重新查询</button>
   </div>
 
 </div>
@@ -1275,7 +1146,7 @@ input[type="range"]::-moz-range-thumb {
   <div class="sub-modal">
     <div class="sub-modal-title" id="subModalTitle">选择子材料</div>
     <div class="sub-grid" id="subModalGrid"></div>
-    <button class="btn-close" onclick="closeSubModal()" aria-label="关闭子材料选择弹窗">取消</button>
+    <button class="btn-close" onclick="closeSubModal()">取消</button>
   </div>
 </div>
 
@@ -1417,16 +1288,191 @@ function assessWeldability(matA, subA, matB, subB) {
 }
 
 // ====================================================================
-// SUB_FACTORS loaded from data/sub-factors.js
+// 子材料调节因子
 // ====================================================================
+const SUB_FACTORS = {
+  al_1xxx: { power: 0.95, speed: 1.05, note: '纯铝，导热极快，需注意热输入控制' },
+  al_2xxx: { power: 1.10, speed: 0.90, note: '铝铜系，热裂纹敏感，建议脉冲模式' },
+  al_3xxx: { power: 1.00, speed: 1.00, note: '铝锰系，焊接性较好' },
+  al_4xxx: { power: 0.95, speed: 1.05, note: '铝硅系，流动性好，适合填丝焊' },
+  al_5xxx: { power: 1.00, speed: 1.00, note: '铝镁系，最佳焊接性，推荐首选' },
+  al_6xxx: { power: 1.05, speed: 0.95, note: '铝镁硅系，常用，需清理氧化层' },
+  al_7xxx: { power: 1.15, speed: 0.85, note: '铝锌系，焊接难度大，高温裂纹风险' },
+  pure_cu:      { power: 1.00, speed: 1.00, note: '纯铜，高反材料，建议高功率+摆头' },
+  brass:        { power: 0.90, speed: 1.05, note: '黄铜，注意锌蒸发，需良好通风' },
+  bronze:       { power: 1.05, speed: 0.95, note: '青铜，含锡元素，热裂敏感' },
+  phos_bronze:  { power: 1.10, speed: 0.90, note: '磷铜，含磷元素，流动性好但脆性' },
+  cupronickel:  { power: 1.00, speed: 1.00, note: '白铜，含镍，焊接性中等' },
+};
 
 // ====================================================================
 // 激光参数数据库（完整）
 // ====================================================================
-// PARAMS loaded from data/params.js
-(function() {
-  Object.assign(PARAMS, PARAMS_DATA);
+(function fillParams() {
+  const p = {
+    ss304: {
+      cw: {
+        0.1: { power:[200,350], speed:[60,90], focus:[0,0.5], gas_flow:[10,12] },
+        0.2: { power:[300,500], speed:[40,70], focus:[0,0.5], gas_flow:[12,15] },
+        0.3: { power:[400,650], speed:[35,60], focus:[0,0.5], gas_flow:[12,15] },
+        0.5: { power:[500,800], speed:[30,50], focus:[0,0], gas_flow:[12,15] },
+        0.8: { power:[800,1200], speed:[25,40], focus:[-0.5,0], gas_flow:[15,18] },
+        1.0: { power:[1000,1500], speed:[20,35], focus:[-0.5,0], gas_flow:[15,18] },
+        1.5: { power:[1500,2200], speed:[15,28], focus:[-0.5,-0.5], gas_flow:[18,20] },
+        2.0: { power:[2000,3000], speed:[10,22], focus:[-1,-0.5], gas_flow:[18,20] },
+        3.0: { power:[3000,4000], speed:[8,15], focus:[-1.5,-1], gas_flow:[20,25] },
+        4.0: { power:[3500,5000], speed:[6,12], focus:[-2,-1.5], gas_flow:[20,25] },
+        5.0: { power:[4000,6000], speed:[5,10], focus:[-2.5,-2], gas_flow:[22,28] },
+        6.0: { power:[5000,8000], speed:[4,8], focus:[-3,-2.5], gas_flow:[25,30] },
+        8.0: { power:[6000,10000], speed:[3,6], focus:[-4,-3], gas_flow:[25,35] },
+        10.0:{ power:[8000,12000], speed:[2,5], focus:[-5,-4], gas_flow:[30,40] },
+      },
+      pulse: {
+        0.2: { power:[800,1200], speed:[25,40], focus:[0,0.5], gas_flow:[12,15], freq:[30,50], duty:[40,60], ppk:[1200,2000] },
+        0.5: { power:[1000,1500], speed:[20,35], focus:[0,0], gas_flow:[12,15], freq:[25,40], duty:[40,60], ppk:[1500,2500] },
+        1.0: { power:[1500,2500], speed:[15,28], focus:[-0.5,0], gas_flow:[15,18], freq:[20,35], duty:[45,55], ppk:[2500,3500] },
+        2.0: { power:[2500,4000], speed:[8,18], focus:[-1,-0.5], gas_flow:[18,20], freq:[15,30], duty:[40,50], ppk:[3500,5000] },
+        3.0: { power:[3500,5500], speed:[6,12], focus:[-1.5,-1], gas_flow:[20,25], freq:[10,20], duty:[35,50], ppk:[4500,6500] },
+        4.0: { power:[4500,6500], speed:[4,10], focus:[-2,-1.5], gas_flow:[22,28], freq:[8,15], duty:[30,45], ppk:[5500,8000] },
+        5.0: { power:[5500,8000], speed:[3,7], focus:[-2.5,-2], gas_flow:[25,30], freq:[5,12], duty:[30,40], ppk:[7000,10000] },
+      },
+    },
+    carbon: {
+      cw: {
+        0.1: { power:[180,300], speed:[50,80], focus:[0,0.5], gas_flow:[8,10] },
+        0.2: { power:[250,450], speed:[40,65], focus:[0,0.5], gas_flow:[8,10] },
+        0.5: { power:[400,700], speed:[35,55], focus:[0,0.5], gas_flow:[10,12] },
+        0.8: { power:[600,1000], speed:[25,45], focus:[0,0], gas_flow:[10,12] },
+        1.0: { power:[800,1200], speed:[20,35], focus:[-0.5,0], gas_flow:[12,15] },
+        1.5: { power:[1200,1800], speed:[15,28], focus:[-0.5,-0.5], gas_flow:[12,15] },
+        2.0: { power:[1500,2500], speed:[10,22], focus:[-1,-0.5], gas_flow:[15,18] },
+        3.0: { power:[2500,4000], speed:[8,15], focus:[-1.5,-1], gas_flow:[18,20] },
+        4.0: { power:[3000,5000], speed:[6,12], focus:[-2,-1.5], gas_flow:[18,22] },
+        5.0: { power:[4000,6000], speed:[5,10], focus:[-2.5,-2], gas_flow:[20,25] },
+        6.0: { power:[5000,8000], speed:[4,8], focus:[-3,-2.5], gas_flow:[22,28] },
+        8.0: { power:[6000,10000], speed:[3,6], focus:[-4,-3], gas_flow:[25,32] },
+        10.0:{ power:[8000,12000], speed:[2,4], focus:[-5,-4], gas_flow:[28,35] },
+      },
+      pulse: {
+        0.5: { power:[800,1200], speed:[25,40], focus:[0,0], gas_flow:[10,12], freq:[30,50], duty:[45,60], ppk:[1200,2000] },
+        1.0: { power:[1200,2000], speed:[15,30], focus:[-0.5,0], gas_flow:[12,15], freq:[20,40], duty:[40,55], ppk:[2000,3500] },
+        2.0: { power:[2000,3500], speed:[8,18], focus:[-1,-0.5], gas_flow:[15,18], freq:[15,30], duty:[40,50], ppk:[3500,5000] },
+        3.0: { power:[3000,5000], speed:[5,12], focus:[-1.5,-1], gas_flow:[18,20], freq:[10,20], duty:[35,45], ppk:[5000,7000] },
+        5.0: { power:[4500,7000], speed:[3,8], focus:[-2.5,-2], gas_flow:[20,25], freq:[5,15], duty:[30,40], ppk:[7000,10000] },
+      },
+    },
+    galvanized: {
+      cw: {
+        0.2: { power:[300,450], speed:[40,60], focus:[0,0.5], gas_flow:[10,12] },
+        0.3: { power:[400,600], speed:[35,55], focus:[0,0.5], gas_flow:[10,12] },
+        0.5: { power:[500,800], speed:[30,50], focus:[0,0], gas_flow:[12,15] },
+        0.8: { power:[700,1200], speed:[25,40], focus:[-0.5,0], gas_flow:[12,15] },
+        1.0: { power:[1000,1500], speed:[20,35], focus:[-0.5,0], gas_flow:[12,15] },
+        1.2: { power:[1200,1800], speed:[18,30], focus:[-0.5,0], gas_flow:[15,18] },
+        1.5: { power:[1500,2200], speed:[15,25], focus:[-0.5,-0.5], gas_flow:[15,18] },
+        2.0: { power:[2000,3000], speed:[10,20], focus:[-1,-0.5], gas_flow:[15,18] },
+        2.5: { power:[2500,3500], speed:[8,16], focus:[-1,-0.5], gas_flow:[18,20] },
+        3.0: { power:[3000,4500], speed:[6,12], focus:[-1.5,-1], gas_flow:[18,22] },
+      },
+      pulse: {
+        0.5: { power:[800,1200], speed:[25,40], focus:[0,0], gas_flow:[12,15], freq:[30,50], duty:[40,55], ppk:[1200,2000] },
+        0.8: { power:[1000,1800], speed:[18,32], focus:[-0.5,0], gas_flow:[12,15], freq:[25,40], duty:[40,55], ppk:[1500,2800] },
+        1.0: { power:[1500,2200], speed:[15,28], focus:[-0.5,0], gas_flow:[15,18], freq:[20,35], duty:[40,50], ppk:[2500,3500] },
+        1.5: { power:[2000,3000], speed:[10,20], focus:[-0.5,-0.5], gas_flow:[15,18], freq:[15,30], duty:[35,50], ppk:[3000,4500] },
+        2.0: { power:[2500,4000], speed:[7,15], focus:[-1,-0.5], gas_flow:[18,20], freq:[12,25], duty:[35,45], ppk:[4000,6000] },
+      },
+    },
+    copper: {
+      cw: {
+        0.1: { power:[600,900], speed:[45,65], focus:[0,0.5], gas_flow:[10,12] },
+        0.2: { power:[800,1200], speed:[35,55], focus:[0,0.5], gas_flow:[12,15] },
+        0.3: { power:[1200,1800], speed:[30,50], focus:[0,0.5], gas_flow:[12,15] },
+        0.5: { power:[1800,2500], speed:[25,40], focus:[0,0], gas_flow:[15,18] },
+        0.8: { power:[2500,3500], speed:[18,30], focus:[-0.5,0], gas_flow:[15,18] },
+        1.0: { power:[3000,4500], speed:[12,25], focus:[-0.5,-0.5], gas_flow:[18,20] },
+        1.5: { power:[3500,5500], speed:[10,20], focus:[-1,-0.5], gas_flow:[18,22] },
+        2.0: { power:[4500,6500], speed:[8,18], focus:[-1,-0.5], gas_flow:[20,25] },
+        3.0: { power:[6000,8000], speed:[5,12], focus:[-1.5,-1], gas_flow:[22,28] },
+        4.0: { power:[7000,10000], speed:[4,10], focus:[-2,-1.5], gas_flow:[25,30] },
+        5.0: { power:[8000,12000], speed:[3,7], focus:[-2.5,-2], gas_flow:[28,35] },
+      },
+      pulse: {
+        0.2: { power:[1000,1500], speed:[30,50], focus:[0,0.5], gas_flow:[12,15], freq:[40,60], duty:[30,50], ppk:[2000,3000] },
+        0.3: { power:[1500,2500], speed:[25,40], focus:[0,0], gas_flow:[12,15], freq:[35,55], duty:[30,50], ppk:[3000,4000] },
+        0.5: { power:[2000,3500], speed:[20,35], focus:[0,0], gas_flow:[15,18], freq:[25,45], duty:[30,45], ppk:[3500,5000] },
+        1.0: { power:[3500,5000], speed:[12,25], focus:[-0.5,0], gas_flow:[18,20], freq:[20,35], duty:[30,45], ppk:[5000,7000] },
+        1.5: { power:[4000,6000], speed:[8,18], focus:[-0.5,-0.5], gas_flow:[18,22], freq:[15,30], duty:[30,40], ppk:[6000,8000] },
+        2.0: { power:[5000,7500], speed:[7,15], focus:[-1,-0.5], gas_flow:[20,25], freq:[15,25], duty:[30,40], ppk:[7000,10000] },
+        3.0: { power:[6500,9000], speed:[4,10], focus:[-1.5,-1], gas_flow:[22,28], freq:[10,20], duty:[25,35], ppk:[9000,12000] },
+      },
+    },
+    brass: {
+      cw: {
+        0.3: { power:[800,1200], speed:[30,50], focus:[0,0.5], gas_flow:[12,15] },
+        0.5: { power:[1200,1800], speed:[25,40], focus:[0,0], gas_flow:[12,15] },
+        0.8: { power:[1800,2500], speed:[18,30], focus:[-0.5,0], gas_flow:[15,18] },
+        1.0: { power:[2200,3500], speed:[15,25], focus:[-0.5,0], gas_flow:[15,18] },
+        1.5: { power:[2800,4500], speed:[10,20], focus:[-0.5,-0.5], gas_flow:[18,22] },
+        2.0: { power:[3500,5500], speed:[8,18], focus:[-1,-0.5], gas_flow:[18,22] },
+      },
+      pulse: {
+        0.3: { power:[1000,1500], speed:[28,45], focus:[0,0.5], gas_flow:[12,15], freq:[35,55], duty:[35,50], ppk:[2000,3000] },
+        0.5: { power:[1500,2500], speed:[20,35], focus:[0,0], gas_flow:[12,15], freq:[30,45], duty:[35,50], ppk:[3000,4500] },
+        1.0: { power:[2500,4000], speed:[12,22], focus:[-0.5,0], gas_flow:[15,18], freq:[20,35], duty:[30,45], ppk:[4500,6500] },
+      },
+    },
+    aluminum: {
+      cw: {
+        0.1: { power:[500,800], speed:[50,70], focus:[0,0.5], gas_flow:[12,15] },
+        0.2: { power:[700,1100], speed:[40,60], focus:[0,0.5], gas_flow:[12,15] },
+        0.3: { power:[800,1300], speed:[38,58], focus:[0,0.5], gas_flow:[15,18] },
+        0.5: { power:[1000,1500], speed:[35,55], focus:[0,0.5], gas_flow:[15,18] },
+        0.8: { power:[1500,2200], speed:[28,45], focus:[0,0], gas_flow:[15,18] },
+        1.0: { power:[2000,3000], speed:[22,38], focus:[-0.5,0], gas_flow:[18,20] },
+        1.5: { power:[2500,4000], speed:[18,30], focus:[-0.5,-0.5], gas_flow:[18,22] },
+        2.0: { power:[3000,4500], speed:[15,25], focus:[-1,-0.5], gas_flow:[20,22] },
+        3.0: { power:[4000,6000], speed:[10,18], focus:[-1.5,-1], gas_flow:[22,25] },
+        4.0: { power:[5000,8000], speed:[6,12], focus:[-2,-1.5], gas_flow:[25,30] },
+        5.0: { power:[6000,10000], speed:[5,10], focus:[-2.5,-2], gas_flow:[25,32] },
+        6.0: { power:[6000,10000], speed:[4,8], focus:[-3,-2.5], gas_flow:[28,35] },
+        8.0: { power:[8000,12000], speed:[3,6], focus:[-4,-3], gas_flow:[30,40] },
+        10.0:{ power:[10000,15000], speed:[2,4], focus:[-5,-4], gas_flow:[35,45] },
+      },
+      pulse: {
+        0.5: { power:[1500,2200], speed:[28,45], focus:[0,0.5], gas_flow:[15,18], freq:[30,50], duty:[40,55], ppk:[2500,3500] },
+        1.0: { power:[2500,4000], speed:[18,30], focus:[-0.5,0], gas_flow:[18,20], freq:[20,40], duty:[40,50], ppk:[4000,6000] },
+        1.5: { power:[3000,5000], speed:[12,24], focus:[-0.5,-0.5], gas_flow:[18,22], freq:[18,35], duty:[35,50], ppk:[5000,7000] },
+        2.0: { power:[4000,6000], speed:[10,20], focus:[-1,-0.5], gas_flow:[20,25], freq:[15,30], duty:[35,50], ppk:[6000,8000] },
+        3.0: { power:[5000,8000], speed:[6,14], focus:[-1.5,-1], gas_flow:[22,28], freq:[10,20], duty:[35,45], ppk:[8000,12000] },
+        4.0: { power:[6500,10000], speed:[4,10], focus:[-2,-1.5], gas_flow:[25,30], freq:[8,15], duty:[30,40], ppk:[10000,14000] },
+      },
+    },
+    titanium: {
+      cw: {
+        0.2: { power:[200,350], speed:[40,60], focus:[0,0.5], gas_flow:[15,18] },
+        0.3: { power:[250,400], speed:[35,55], focus:[0,0.5], gas_flow:[18,20] },
+        0.5: { power:[300,500], speed:[30,50], focus:[0,0.5], gas_flow:[18,22] },
+        0.8: { power:[500,800], speed:[25,40], focus:[0,0], gas_flow:[18,22] },
+        1.0: { power:[800,1200], speed:[20,35], focus:[-0.5,0], gas_flow:[20,25] },
+        1.5: { power:[1200,1800], speed:[15,28], focus:[-0.5,-0.5], gas_flow:[20,25] },
+        2.0: { power:[1500,2500], speed:[10,22], focus:[-1,-0.5], gas_flow:[22,28] },
+        3.0: { power:[2500,4000], speed:[8,15], focus:[-1.5,-1], gas_flow:[25,30] },
+        4.0: { power:[3000,5000], speed:[6,12], focus:[-2,-1.5], gas_flow:[25,30] },
+        5.0: { power:[4000,6000], speed:[4,8], focus:[-2.5,-2], gas_flow:[28,35] },
+        6.0: { power:[5000,8000], speed:[3,6], focus:[-3,-2.5], gas_flow:[30,38] },
+      },
+      pulse: {
+        0.5: { power:[500,900], speed:[25,40], focus:[0,0.5], gas_flow:[18,22], freq:[30,50], duty:[40,60], ppk:[900,1500] },
+        1.0: { power:[1000,1800], speed:[15,28], focus:[-0.5,0], gas_flow:[20,25], freq:[20,40], duty:[40,55], ppk:[1800,3000] },
+        1.5: { power:[1500,2500], speed:[10,22], focus:[-0.5,-0.5], gas_flow:[20,25], freq:[18,35], duty:[35,50], ppk:[2500,4000] },
+        2.0: { power:[2000,3500], speed:[8,18], focus:[-1,-0.5], gas_flow:[22,28], freq:[15,30], duty:[35,50], ppk:[3500,5000] },
+        3.0: { power:[3000,5000], speed:[5,12], focus:[-1.5,-1], gas_flow:[25,30], freq:[10,20], duty:[30,45], ppk:[5000,7000] },
+      },
+    },
+  };
+  Object.assign(PARAMS, p);
 })();
+
 // ====================================================================
 // 接头修正
 // ====================================================================
@@ -1604,7 +1650,7 @@ let state = {
   wire: 'self', osc: 'no',
   process: 'cw', thickness: 1.0,
   joint: 'butt', gas: 'Ar',
-  otherReq: '', subscribed: (function(){try{return localStorage.getItem('laserweld_sub')?true:false;}catch(e){return false;}})(),
+  otherReq: '', subscribed: false,
 };
 
 // ====================================================================
@@ -1615,7 +1661,7 @@ function renderMaterials() {
   grid.innerHTML = MATERIALS.map(m => {
     const hasSub = m.hasSub ? 'has-sub' : '';
     const arrow = m.hasSub ? '<span class="arrow">▶</span>' : '';
-    return `<div class="material-card ${hasSub}" data-id="${m.id}" onclick="onMaterialClick('${m.id}')" tabindex="0" role="button" aria-label="选择材料 ${m.name}">
+    return `<div class="material-card ${hasSub}" data-id="${m.id}" onclick="onMaterialClick('${m.id}')">
       <span class="icon">${m.icon}</span>
       <div class="name">${m.name}</div>
       <div class="sub">${m.sub}</div>
@@ -1636,8 +1682,8 @@ function setSameMaterial(val) {
   // Show/hide B slot
   document.getElementById('slotB').style.display = val ? 'none' : 'block';
   document.getElementById('vsSymbol').style.display = val ? 'none' : 'block';
+  // Reset B if same
   if (val) {
-    // 同种模式：B跟随A
     state.materialB = state.materialA;
     state.subB = state.subA;
   }
@@ -1653,132 +1699,41 @@ function onMaterialClick(id) {
   if (!mat) return;
 
   if (mat.hasSub) {
-    // 判断是为A还是B选子材料
-    if (state.sameMaterial) {
-      state.selectingFor = 'A';
-    } else {
-      // 异种模式：A未选 → 选A；A已选且不是当前材料 → 选B；A已选且是当前材料 → 选A
-      if (!state.materialA) {
-        state.selectingFor = 'A';
-      } else if (!state.materialB || state.materialB === state.materialA) {
-        state.selectingFor = 'B';
-      } else if (id === state.materialA) {
-        state.selectingFor = 'A';
-      } else if (id === state.materialB) {
-        state.selectingFor = 'B';
-      } else {
-        // 点了第三个不同材料 → 替换B
-        state.selectingFor = 'B';
-      }
-    }
+    state.selectingFor = state.sameMaterial ? 'A' : 'A'; // always select A first
     showSubModal(mat);
     return;
   }
 
+  // Set material A (always)
+  const oldA = state.materialA;
+  state.materialA = id;
+  state.subA = null;
+
+  // If same material mode, B follows A
   if (state.sameMaterial) {
-    // 同种：A=B
-    state.materialA = id;
-    state.subA = null;
     state.materialB = id;
     state.subB = null;
-    // 视觉：只高亮一个
-    document.querySelectorAll('.material-card').forEach(function(el) {
-      el.classList.remove('selected', 'selected-b');
-      if (el.dataset.id === id) el.classList.add('selected');
-      var label = el.querySelector('.mat-label');
-      if (label) label.remove();
-    });
-    var card = document.querySelector('.material-card[data-id="' + id + '"]');
-    if (card) {
-      removeLabels(card);
-      var lab = document.createElement('span');
-      lab.className = 'mat-label mat-label-a';
-      lab.textContent = 'A';
-      card.style.position = 'relative';
-      card.appendChild(lab);
-    }
-  } else {
-    // 异种模式
-    if (!state.materialA) {
-      // 先选A
-      state.materialA = id;
-      state.subA = null;
-      state.materialB = null;
-      state.subB = null;
-      refreshMaterialVisuals();
-      var cardA = document.querySelector('.material-card[data-id="' + id + '"]');
-      if (cardA) {
-        removeLabels(cardA);
-        var la = document.createElement('span');
-        la.className = 'mat-label mat-label-a';
-        la.textContent = 'A';
-        cardA.style.position = 'relative';
-        cardA.appendChild(la);
-      }
-    } else if (id === state.materialA) {
-      // 点同一个材料A → 取消选择A（恢复到无选择状态）
-      state.materialA = null;
-      state.subA = null;
-      state.materialB = null;
-      state.subB = null;
-      refreshMaterialVisuals();
-    } else if (state.materialB === id) {
-      // 点已选的B → 取消B
-      state.materialB = null;
-      state.subB = null;
-      refreshMaterialVisuals();
-      // 重新标记A
-      var aCard = document.querySelector('.material-card[data-id="' + state.materialA + '"]');
-      if (aCard) {
-        aCard.classList.add('selected');
-        removeLabels(aCard);
-        var la2 = document.createElement('span');
-        la2.className = 'mat-label mat-label-a';
-        la2.textContent = 'A';
-        aCard.style.position = 'relative';
-        aCard.appendChild(la2);
-      }
-    } else if (id !== state.materialA) {
-      // 选不用的材料作为B
-      state.materialB = id;
-      state.subB = null;
-      refreshMaterialVisuals();
-      // 标记A
-      var cA = document.querySelector('.material-card[data-id="' + state.materialA + '"]');
-      if (cA) {
-        cA.classList.add('selected');
-        removeLabels(cA);
-        var l1 = document.createElement('span');
-        l1.className = 'mat-label mat-label-a';
-        l1.textContent = 'A';
-        cA.style.position = 'relative';
-        cA.appendChild(l1);
-      }
-      // 标记B
-      var cB = document.querySelector('.material-card[data-id="' + id + '"]');
-      if (cB) {
-        cB.classList.add('selected-b');
-        removeLabels(cB);
-        var l2 = document.createElement('span');
-        l2.className = 'mat-label mat-label-b';
-        l2.textContent = 'B';
-        cB.style.position = 'relative';
-        cB.appendChild(l2);
-      }
-    }
   }
+
+  // Update visual selection with labels
+  document.querySelectorAll('.material-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === id);
+    // Remove any B labels not for this
+    const label = el.querySelector('.mat-label');
+    if (label && el.dataset.id !== id) label.remove();
+  });
+
+  // Add A label
+  const cardA = document.querySelector(`.material-card[data-id="${id}"]`);
+  removeLabels(cardA);
+  const labelA = document.createElement('span');
+  labelA.className = 'mat-label mat-label-a';
+  labelA.textContent = 'A';
+  cardA.style.position = 'relative';
+  cardA.appendChild(labelA);
 
   updatePairDisplay();
   updateResults();
-}
-
-// 辅助：清除所有材料选中状态
-function refreshMaterialVisuals() {
-  document.querySelectorAll('.material-card').forEach(function(el) {
-    el.classList.remove('selected', 'selected-b');
-    var label = el.querySelector('.mat-label');
-    if (label) label.remove();
-  });
 }
 
 // ====================================================================
@@ -1794,7 +1749,7 @@ function showSubModal(mat) {
     : (state.selectingFor === 'B' ? state.subB : state.subA);
   grid.innerHTML = mat.subMaterials.map(s => {
     const isSelected = state.materialA === mat.id && currentSub === s.id;
-    return `<div class="sub-option ${isSelected ? 'selected' : ''}" data-sub-id="${s.id}" onclick="selectSubMaterial('${s.id}')" tabindex="0" role="button" aria-label="选择${s.name}">
+    return `<div class="sub-option ${isSelected ? 'selected' : ''}" data-sub-id="${s.id}" onclick="selectSubMaterial('${s.id}')">
       <div class="name">${s.name}</div>
       <div class="desc">${s.sub}</div>
     </div>`;
@@ -1809,87 +1764,29 @@ function closeSubModal() {
 function selectSubMaterial(subId) {
   if (!subModalParent) return;
   const matId = subModalParent.id;
-  const isForB = state.selectingFor === 'B';
+
+  // We always set A's sub-material in the same/diff toggle
+  state.materialA = matId;
+  state.subA = subId;
 
   if (state.sameMaterial) {
-    // 同种模式：A=B
-    state.materialA = matId;
-    state.subA = subId;
     state.materialB = matId;
     state.subB = subId;
-    refreshMaterialVisuals();
-    var card = document.querySelector('.material-card[data-id="' + matId + '"]');
-    if (card) {
-      card.classList.add('selected');
-      removeLabels(card);
-      var lab = document.createElement('span');
-      lab.className = 'mat-label mat-label-a';
-      lab.textContent = 'A';
-      card.style.position = 'relative';
-      card.appendChild(lab);
-    }
-  } else if (isForB) {
-    // 异种模式：选B的子材料
-    state.materialB = matId;
-    state.subB = subId;
-    refreshMaterialVisuals();
-    // A标记
-    if (state.materialA) {
-      var cA = document.querySelector('.material-card[data-id="' + state.materialA + '"]');
-      if (cA) {
-        cA.classList.add('selected');
-        removeLabels(cA);
-        var la = document.createElement('span');
-        la.className = 'mat-label mat-label-a';
-        la.textContent = 'A';
-        cA.style.position = 'relative';
-        cA.appendChild(la);
-      }
-    }
-    // B标记
-    var cB = document.querySelector('.material-card[data-id="' + matId + '"]');
-    if (cB) {
-      cB.classList.add('selected-b');
-      removeLabels(cB);
-      var lb = document.createElement('span');
-      lb.className = 'mat-label mat-label-b';
-      lb.textContent = 'B';
-      cB.style.position = 'relative';
-      cB.appendChild(lb);
-    }
-  } else {
-    // 异种模式：选A的子材料
-    state.materialA = matId;
-    state.subA = subId;
-    if (!state.materialB || state.materialB === matId) {
-      state.materialB = matId;
-      state.subB = subId;
-    }
-    refreshMaterialVisuals();
-    // A标记
-    var cA = document.querySelector('.material-card[data-id="' + matId + '"]');
-    if (cA) {
-      cA.classList.add('selected');
-      removeLabels(cA);
-      var la = document.createElement('span');
-      la.className = 'mat-label mat-label-a';
-      la.textContent = 'A';
-      cA.style.position = 'relative';
-      cA.appendChild(la);
-    }
-    // B标记（如果已有且不同）
-    if (state.materialB && state.materialB !== matId) {
-      var cB = document.querySelector('.material-card[data-id="' + state.materialB + '"]');
-      if (cB) {
-        cB.classList.add('selected-b');
-        removeLabels(cB);
-        var lb = document.createElement('span');
-        lb.className = 'mat-label mat-label-b';
-        lb.textContent = 'B';
-        cB.style.position = 'relative';
-        cB.appendChild(lb);
-      }
-    }
+  }
+
+  document.querySelectorAll('.material-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === matId);
+    const label = el.querySelector('.mat-label');
+    if (label && el.dataset.id !== matId) label.remove();
+  });
+  const card = document.querySelector(`.material-card[data-id="${matId}"]`);
+  if (card) {
+    removeLabels(card);
+    const label = document.createElement('span');
+    label.className = 'mat-label mat-label-a';
+    label.textContent = 'A';
+    card.style.position = 'relative';
+    card.appendChild(label);
   }
 
   updatePairDisplay();
@@ -1913,21 +1810,13 @@ function updatePairDisplay() {
   const slotBSub = document.querySelector('#slotB .mat-sub');
 
   const nameA = getMatDisplayName(state.materialA, state.subA);
-  const nameB = getMatDisplayName(state.materialB, state.subB);
-  slotA.textContent = nameA || (state.materialA === null ? '—' : '选择材料');
+  slotA.textContent = nameA || '—';
 
   if (!state.sameMaterial) {
-    slotB.textContent = nameB || (state.materialB === null ? '—' : '选择材料');
+    const nameB = getMatDisplayName(state.materialB, state.subB);
+    slotB.textContent = nameB || '—';
   } else {
     slotB.textContent = nameA || '—';
-  }
-  if (slotASub) {
-    const subNameA = state.subA ? getMatNameShort(state.materialA, state.subA) : '';
-    slotASub.textContent = subNameA || '';
-  }
-  if (slotBSub) {
-    const subNameB = state.subB ? getMatNameShort(state.materialB, state.subB) : '';
-    slotBSub.textContent = subNameB || '';
   }
 }
 
@@ -1988,8 +1877,8 @@ function onThicknessChange(val) {
   updateResults();
 }
 function renderThicknessPresets() {
-  const presets = [0.2, 0.3, 0.5, 0.8, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0];
-  document.getElementById('thicknessPresets').innerHTML = presets.map(t => `<button data-val="${t}" onclick="setThicknessPreset(${t})" aria-label="设置厚度为${t}毫米">${t}</button>`).join('');
+  const presets = [0.2, 0.3, 0.5, 0.8, 1.0, 1.5, 2.0, 3.0, 5.0, 8.0];
+  document.getElementById('thicknessPresets').innerHTML = presets.map(t => `<button data-val="${t}" onclick="setThicknessPreset(${t})">${t}</button>`).join('');
 }
 function setThicknessPreset(val) {
   state.thickness = val;
@@ -2035,131 +1924,40 @@ function startBanner() {
 }
 
 // ====================================================================
-// localStorage Subscription Persistence
+// Payment Functions
 // ====================================================================
-var SUB_STORAGE_KEY = 'laserweld_sub';
-
-function getQueryKey() {
-  return [state.materialA, state.subA || '', state.materialB || '', state.subB || '',
-          state.thickness, state.joint, state.gas, state.wire, state.osc, state.otherReq].join('|');
-}
-
-function saveSubscription(type) {
-  var data = {
-    subscribed: true,
-    type: type || 'once',  // 'once' (单次/按次) or 'monthly' (月度)
-    savedAt: Date.now()
-  };
-  // 单次解锁：保存当前查询指纹
-  if (type === 'once') {
-    data.queryKey = getQueryKey();
-  }
-  try { localStorage.setItem(SUB_STORAGE_KEY, JSON.stringify(data)); }
-  catch(e) { console.warn('localStorage save failed'); }
-}
-
-function loadSubscription() {
-  try { var raw = localStorage.getItem(SUB_STORAGE_KEY); return raw ? JSON.parse(raw) : null; }
-  catch(e) { return null; }
-}
-
-function clearSubscription() {
-  try { localStorage.removeItem(SUB_STORAGE_KEY); } catch(e) {}
-}
-
-function getSubPlanName(type) {
-  return type === 'monthly' ? '📅 月度订阅' : '🔑 单次解锁';
-}
-
-function getSubPrice(type) {
-  return type === 'monthly' ? '¥6/月' : '¥20';
-}
-
-// ====================================================================
-// Payment Functions (State Machine)
-// ====================================================================
-var selectedPayMethod = null;
-var selectedPlan = null;
-var payState = 'IDLE';
+let selectedPayMethod = null;
 
 function showPayment() {
-  payState = 'PLAN_SELECT';
-  selectedPayMethod = null;
-  selectedPlan = null;
-  document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
-  document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
-  document.getElementById('paymentPanel').classList.add('open');
-  document.getElementById('payMethodArea').style.display = 'none';
-  document.getElementById('payConfirmBtn').disabled = false;
-  document.getElementById('payConfirmBtn').textContent = '✅ 我已支付';
-  document.getElementById('payCancelBtn').style.display = '';
-  document.getElementById('payStatusMsg').textContent = '请先选择订阅方案';
-  document.getElementById('payStatusMsg').style.color = 'var(--text2)';
-}
-
-function selectPlan(plan) {
-  if (payState !== 'PLAN_SELECT') return;
-  selectedPlan = plan;
-  document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
-  document.getElementById('plan' + (plan === 'once' ? 'Once' : 'Monthly')).classList.add('selected');
-  // Show payment methods
-  payState = 'PAYMENT_SELECT';
-  document.getElementById('payMethodArea').style.display = 'block';
-  var label = plan === 'once' ? '单次解锁¥20' : '月度订阅¥6/月';
-  document.getElementById('payStatusMsg').textContent = label + ' · 选择支付方式并扫码';
+  document.getElementById('paymentPanel').style.display = 'block';
 }
 
 function selectPay(method) {
-  if (payState !== 'PAYMENT_SELECT') return;
   selectedPayMethod = method;
-  document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
+  document.querySelectorAll('.pay-opt').forEach(el => el.classList.remove('selected'));
   document.getElementById('pay' + (method === 'wechat' ? 'Wechat' : 'Alipay')).classList.add('selected');
-  var label = selectedPlan === 'once' ? '¥20' : '¥6/月';
-  document.getElementById('payStatusMsg').textContent = '扫码支付' + label + '后点击「我已支付」确认';
 }
 
 function confirmPay() {
-  if (payState === 'WAITING') return;
-  if (!selectedPlan) {
-    document.getElementById('payStatusMsg').textContent = '⚠ 请先选择订阅方案（单次或月度）';
-    document.getElementById('payStatusMsg').style.color = 'var(--orange)';
-    return;
-  }
   if (!selectedPayMethod) {
-    document.getElementById('payStatusMsg').textContent = '⚠ 请先选择支付方式';
-    document.getElementById('payStatusMsg').style.color = 'var(--orange)';
+    alert('请先选择支付方式（微信支付或支付宝）');
     return;
   }
-  payState = 'WAITING';
-  document.getElementById('payConfirmBtn').disabled = true;
-  document.getElementById('payConfirmBtn').textContent = '⏳ 验证中...';
-  document.getElementById('payCancelBtn').style.display = 'none';
-  document.getElementById('payStatusMsg').textContent = '验证中，请稍候...';
-  document.getElementById('payStatusMsg').style.color = 'var(--accent)';
-  setTimeout(function(){
-    payState = 'VERIFIED';
-    state.subscribed = true;
-    saveSubscription(selectedPlan);
-    var planName = getSubPlanName(selectedPlan);
-    document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · 全部参数已解锁';
-    document.querySelector('#subGate .btn-sub').style.display = 'none';
-    document.getElementById('paymentPanel').classList.remove('open');
-    document.getElementById('payStatusMsg').textContent = '✅ ' + planName + '成功！刷新后依然有效';
-    document.getElementById('payStatusMsg').style.color = 'var(--green)';
-    updateResults();
-  }, 1200);
+  state.subscribed = true;
+  document.getElementById('subStatus').style.display = 'block';
+  document.querySelector('#subGate .btn-sub').style.display = 'none';
+  document.getElementById('paymentPanel').style.display = 'none';
+  updateResults();
 }
 
-function cancelPay() {
-  payState = 'IDLE';
-  selectedPayMethod = null;
-  selectedPlan = null;
-  document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
-  document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
-  document.getElementById('paymentPanel').classList.remove('open');
-  document.getElementById('payMethodArea').style.display = 'none';
-  document.getElementById('payStatusMsg').textContent = '';
+// ====================================================================
+// Original subscribe (kept for backward compat)
+// ====================================================================
+function subscribeUnlock() {
+  state.subscribed = true;
+  document.getElementById('subStatus').style.display = 'block';
+  document.querySelector('#subGate .btn-sub').style.display = 'none';
+  updateResults();
 }
 
 // ====================================================================
@@ -2194,76 +1992,23 @@ function getMatGroup(id) {
 // ====================================================================
 // Main: Update Results
 // ====================================================================
-function _updateResultsNow() {
+function updateResults() {
   const {
     materialA, materialB, subA, subB, sameMaterial,
-    thickness, joint, gas, wire, osc, otherReq,
+    thickness, joint, gas, wire, osc, otherReq, subscribed,
   } = state;
 
-  // 订阅校验（动态）：区分单次解锁 vs 月度订阅
-  var subscribed = false;
-  var subData = loadSubscription();
-  if (subData) {
-    if (subData.type === 'once') {
-      // 单次解锁：查询指纹必须匹配
-      subscribed = subData.queryKey === getQueryKey();
-    } else if (subData.type === 'monthly') {
-      // 月度订阅：30天内有效
-      subscribed = (Date.now() - (subData.savedAt || 0)) < 30 * 24 * 60 * 60 * 1000;
-    } else {
-      // 兼容旧数据（无type字段视为永久有效）
-      subscribed = true;
-    }
-  }
-
-  // 防小白提示
   if (!materialA) { hideResults(); return; }
-  
-  // 异种模式：需选完A和B才出结果
-  if (!sameMaterial && !materialB) {
-    showInlineTip('请先选择材料A，再选择材料B');
-    hideResults();
-    return;
-  }
-  
-  // 异种模式选了同种材料 → 友好提示并重置材料B
-  if (!sameMaterial && materialB && materialB === materialA && subB === subA) {
-    showInlineTip('两种材料不能相同');
-    // 重置材料B选择
-    state.materialB = null;
-    state.subB = null;
-    document.querySelectorAll('.material-card.selected-b').forEach(el => el.classList.remove('selected-b'));
-    document.querySelectorAll('.material-card .mat-label-b').forEach(l => l.remove());
-    updatePairDisplay();
-    hideResults();
-    return;
-  }
-
   const effKey = getEffectiveMatKey(materialA, subA);
-  if (!effKey || !PARAMS[effKey]) {
-    showInlineTip('该组合缺少评估数据，推荐进行工艺试验');
-    hideResults();
-    return;
-  }
+  if (!effKey || !PARAMS[effKey]) { hideResults(); return; }
 
   // Get primary material params
   const modeData = PARAMS[effKey][state.process];
-  if (!modeData) {
-    showInlineTip('该组合缺少评估数据，推荐进行工艺试验');
-    hideResults();
-    return;
-  }
+  if (!modeData) { hideResults(); return; }
   const avail = Object.keys(modeData).map(Number);
   const closest = findClosestThicknessKey(avail, thickness);
-  // 厚度差距较大时给出提示
-  const thickRatio = Math.abs(closest - thickness) / Math.max(closest, thickness);
-  const thickNote = thickRatio > 0.25 ? `⚠ 当前材料暂不支持该厚度，请参考相近厚度值 (已用 ${closest}mm 替代)` : '';
   const raw = modeData[closest];
-  if (!raw) {
-    showInlineTip('该组合缺少评估数据，推荐进行工艺试验');
-    hideResults();
-    return;
-  }
+  if (!raw) { hideResults(); return; }
 
   // Sub-factor
   let subFactor = { power: 1.0, speed: 1.0, note: '' };
@@ -2298,9 +2043,6 @@ function _updateResultsNow() {
   document.getElementById('summaryMat').textContent = `${pairName} · ${closest}mm`;
   document.getElementById('summaryDetail').textContent =
     `${sameNote} · ${wireName}${oscName} ${procName} · ${jointName} · ${gasInfo.name}`;
-  if (thickNote) {
-    document.getElementById('summaryDetail').textContent += ' · ' + thickNote;
-  }
 
   // ===== Weldability Assessment Card =====
   const wCard = document.getElementById('weldabilityCard');
@@ -2369,28 +2111,20 @@ function _updateResultsNow() {
   if (subReasons.length === 0 && (highDiff || weldAssess.level === 'hard')) subReasons.push('该焊接组合难度较高');
 
   if (needsSub && !subscribed) {
-    subGate.classList.add('open');
-    // 判断是否有旧订阅（单次已过期/改参数）
-    var subDescHtml = '';
-    if (subData && subData.type === 'once' && subData.queryKey) {
-      subDescHtml = '🔒 参数已变更，需重新付费解锁<br><span style="font-size:11px;opacity:0.7;">单次解锁仅覆盖上一次查询参数</span>';
-    } else if (subData && subData.type === 'monthly' && (Date.now() - (subData.savedAt || 0)) >= 30 * 24 * 60 * 60 * 1000) {
-      subDescHtml = '🔒 月度订阅已到期，需续费<br><span style="font-size:11px;opacity:0.7;">每月¥6，随时可取消</span>';
-    } else {
-      subDescHtml = `🔒 需订阅 · 触发条件：${subReasons.join('、')}<br><span style="font-size:11px;opacity:0.7;">订阅后解锁全部焊接参数，含送丝/摆头/工艺建议</span>`;
-    }
-    document.getElementById('subDesc').innerHTML = subDescHtml;
+    subGate.style.display = 'block';
+    document.getElementById('subDesc').innerHTML =
+      `🔒 需订阅 · 触发条件：${subReasons.join('、')}<br><span style="font-size:11px;opacity:0.7;">订阅后解锁全部焊接参数，含送丝/摆头/工艺建议</span>`;
     document.getElementById('subStatus').style.display = 'none';
     document.querySelector('#subGate .btn-sub').style.display = '';
     document.getElementById('resultsInner').style.display = 'none';
   } else {
-    subGate.classList.remove('open');
+    subGate.style.display = 'none';
     document.getElementById('resultsInner').style.display = 'block';
   }
 
-  // ===== Result Cards (增量更新) =====
+  // ===== Result Cards =====
   const grid = document.getElementById('resultGrid');
-  const newHtml = `
+  let html = `
     <div class="result-card param-power">
       <div class="label">激光功率</div>
       <div class="value">${powerMin} <span class="range">~ ${powerMax} W</span></div>
@@ -2412,20 +2146,13 @@ function _updateResultsNow() {
       <div class="hint" style="font-size:11px;color:var(--text2);">${gasInfo.note}</div>
     </div>`;
 
-  let subHtml = '';
   if (subFactor.note) {
-    subHtml += `<div class="result-card full" style="border-left:3px solid var(--accent);">
+    html += `<div class="result-card full" style="border-left:3px solid var(--accent);">
       <div class="label">材料提示</div>
       <div class="value" style="font-size:13px;font-weight:400;">💡 ${subFactor.note}</div>
     </div>`;
   }
-  // 保存当前快照，只替换变动部分
-  const currentHtml = grid.getAttribute('data-html-snapshot') || '';
-  const totalHtml = newHtml + subHtml;
-  if (currentHtml !== totalHtml) {
-    grid.innerHTML = totalHtml;
-    grid.setAttribute('data-html-snapshot', totalHtml);
-  }
+  grid.innerHTML = html;
 
   // ===== Pulse Panel =====
   const pulsePanel = document.getElementById('pulsePanel');
@@ -2495,126 +2222,44 @@ function _updateResultsNow() {
     reqArea.style.display = 'none';
   }
 
-  // ===== 高级激光参数（仅订阅后显示） =====
-  const laserArea = document.getElementById('laserParamArea');
-  const laserContent = document.getElementById('laserParamContent');
-  const effMatId = subA && SUB_TO_PARENT[subA] ? SUB_TO_PARENT[subA] : materialA;
-  
-  function recommendLaserType(t, lvl) {
-    if (t <= 0.5) return '点环';
-    if (t > 5 || lvl === 'hard' || lvl === 'challenging') return '复合';
-    return '普通';
-  }
-  function recommendCoreDia(t, lvl) {
-    if (t <= 0.3) return '14um';
-    if (t <= 0.5) return '20um';
-    if (lvl === 'hard' || lvl === 'challenging') return '50/150um';
-    if (t <= 1.0) return '30um';
-    if (t <= 2.0) return '50um';
-    if (t <= 4.0) return '100um';
-    if (t <= 6.0) return '200um';
-    return '600um';
-  }
-  function recommendRatio(t) {
-    if (t <= 0.5) return '100/200mm';
-    if (t <= 1.5) return '100/300mm';
-    if (t <= 3.0) return '150/300mm';
-    return '150/400mm';
-  }
-  const recLaser = recommendLaserType(closest, weldAssess.level);
-  const recCore  = recommendCoreDia(closest, weldAssess.level);
-  const recRatio = recommendRatio(closest);
-  
-  if (subscribed) {
-    laserArea.style.display = 'block';
-    laserContent.innerHTML = `
-      <div class="title">🔧 高级激光参数</div>
-      <div class="laser-param-grid">
-        <div class="lparam"><span class="lplabel">激光器类型</span><span class="lpval">${recLaser}</span></div>
-        <div class="lparam"><span class="lplabel">芯径</span><span class="lpval">${recCore}</span></div>
-        <div class="lparam"><span class="lplabel">准直聚焦比</span><span class="lpval">${recRatio}</span></div>
-      </div>`;
-  } else {
-    laserArea.style.display = 'block';
-    laserContent.innerHTML = `
-      <div class="title">🔧 高级激光参数</div>
-      <div class="item" style="color:var(--orange);">🔒 订阅后解锁激光器类型 / 芯径 / 准直聚焦比推荐</div>`;
-  }
-
   document.querySelector('.results-section').classList.add('visible');
-  hideEmptyState();
   document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Debounced wrapper (80ms 防抖，避免快速切换时频繁渲染)
-let _updateTimer;
-function updateResults() {
-  clearTimeout(_updateTimer);
-  _updateTimer = setTimeout(_updateResultsNow, 80);
-}
-
-function showInlineTip(msg) {
-  const el = document.getElementById('inlineTip');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
-  document.querySelector('.results-section').classList.add('visible');
-}
-function hideInlineTip() {
-  const el = document.getElementById('inlineTip');
-  if (el) el.style.display = 'none';
-}
-function showEmptyState() {
-  document.getElementById('emptyState').style.display = 'block';
-  document.getElementById('querySummary').style.display = 'none';
-  document.getElementById('weldabilityCard').style.display = 'none';
-  document.getElementById('subGate').classList.remove('open');
-  document.getElementById('resultsInner').style.display = 'none';
-  const lp = document.getElementById('laserParamArea');
-  if (lp) lp.style.display = 'none';
-  hideInlineTip();
-}
-function hideEmptyState() {
-  document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('querySummary').style.display = 'block';
-}
 function hideResults() {
-  document.querySelector('.results-section').classList.add('visible');
-  showEmptyState();
-  hideInlineTip();
+  document.querySelector('.results-section').classList.remove('visible');
+  document.getElementById('weldabilityCard').style.display = 'none';
 }
 
 // ====================================================================
-// 技术文章 → 动态渲染卡片
-// ====================================================================
-function renderArticles() {
-  const list = document.getElementById('articlesList');
-  if (!list) return;
-  const icons = ['📘','🔬','⚡','🛡️','🤖','🔥','💡','📊','🛠️','⚙️'];
-  list.innerHTML = (ARTICLES_DATA || []).map((a, i) => `
-    <div class="article-card" onclick="openArticle('${a.id}')" tabindex="0" role="button" aria-label="打开文章：${a.title}">
-      <div class="a-icon">${a.icon || icons[i % icons.length]}</div>
-      <div class="a-body">
-        <div class="a-title">${a.title}</div>
-        <div class="a-desc">${a.desc || ''}</div>
-        <div class="a-meta">${a.badge ? '<span class="tag">'+a.badge+'</span>' : ''} ${a.url ? '' : '<span style="color:var(--warn);">⏳待设链接</span>'}</div>
-      </div>
-      <div class="a-arrow">${a.url ? '↗' : '→'}</div>
-    </div>
-  `).join('');
-}
-
-// ====================================================================
-// 技术文章 → 打开链接
+// 技术文章点击弹窗
 // ====================================================================
 function openArticle(id) {
-  const a = (ARTICLES_DATA || []).find(x => x.id === id);
+  const articles = {
+    art1: {
+      title: '激光焊接常见缺陷分析与对策',
+      body: '激光焊接过程中常见气孔、裂纹、飞溅、咬边四大缺陷。\n\n气孔：主要由保护气不足或材料表面污染引起，可通过增大气流量、清洁母材表面、降低焊接速度来改善。\n\n裂纹：多源于应力集中或材料成分不当，可通过预热、缓冷、选用匹配焊丝等方式控制。\n\n飞溅：多因功率密度过高或材料表面状态不佳，适当降低峰值功率、调整离焦量可有效减少。\n\n咬边：通常与焊接速度过快或送丝不足有关，适当降低速度、增加送丝量即可改善。'
+    },
+    art2: {
+      title: '铜材激光焊接：纯铜 vs 黄铜 vs 青铜',
+      body: '铜材对近红外激光吸收率极低（约5%），是高反材料焊接的代表性难题。\n\n纯铜：热导率最高，需高功率密度（>1×10⁶ W/cm²），建议使用蓝光/绿光激光器或高频脉冲辅助。\n\n黄铜（铜锌合金）：锌元素低沸点易蒸发造成气孔，需控制热输入，推荐振荡焊接工艺。\n\n青铜（铜锡合金）：焊接性相对较好，流动性适中，适用于中等功率激光器。\n\n磷铜/白铜：含P或Ni，熔池流动性有差异，需针对性调整焊丝成分。'
+    },
+    art3: {
+      title: '薄板精密焊接工艺要点（≤0.5mm）',
+      body: '超薄板材的激光焊接核心挑战是热变形控制和熔透稳定。\n\n功率控制：建议采用脉冲模式或低功率连续模式（≤500W），功率波动需控制在±2%以内。\n\n工装夹具：建议使用真空吸盘或磁性夹具，确保接触面平整，减少间隙。\n\n保护气：流量不宜过大（5-8L/min），避免吹偏熔池。\n\n焊接速度：0.5mm以下推荐30-60mm/s，焊后需进行变形检测。'
+    },
+    art4: {
+      title: '保护气体选择指南',
+      body: '保护气体直接影响焊缝成形、熔深和氧化控制。\n\nAr（氩气）：最常用，电离能低，价格适中，适用于不锈钢、碳钢、铝合金等多数材料。\n\nN₂（氮气）：适用于不锈钢，可提高焊缝强度但可能造成氮气孔。\n\nHe（氦气）：热导率高，适合厚板/铝合金深熔焊，但价格较高。\n\n真空环境：无氧环境，焊接质量最高但设备成本高，适用于铜/铝等高反材料。\n\n空气：仅限非关键件粗焊，焊缝易氧化发黑。'
+    },
+    art5: {
+      title: '异种材料激光焊接：组合评估与工艺设计',
+      body: '异种材料焊接的核心难点在于热物理性能差异和金属间化合物控制。\n\n不锈钢-铜：推荐加Ni基过渡层，采用铜侧偏置光束。\n\n钢-铝：推荐Al-Si焊丝，控制金属间化合物层厚度<10μm。\n\n钛-其他金属：钛与多数金属形成脆性金属间化合物，推荐钎焊或扩散焊。\n\n铜-铝：宜在铜侧镀Ni层，选用铝基焊丝。\n\n设计原则：熔点差<200°C可直接焊，差>200°C需加过渡层。'
+    }
+  };
+  const a = articles[id];
   if (!a) return;
-  if (!a.url) {
-    alert('📎 链接尚未设置，请告知 Louis 补充 URL');
-    return;
-  }
-  window.open(a.url, '_blank');
+  alert(`📖 ${a.title}\n\n${a.body}`);
 }
 
 // ====================================================================
@@ -2657,21 +2302,6 @@ function resetAll() {
   document.getElementById('vsSymbol').style.display = 'none';
   document.querySelector('#slotA .mat-name').textContent = '—';
   document.querySelector('#slotB .mat-name').textContent = '—';
-  document.querySelector('#slotA .mat-sub').textContent = '';
-  document.querySelector('#slotB .mat-sub').textContent = '';
-  // 清除所有B标签
-  document.querySelectorAll('.material-card .mat-label-b').forEach(l => l.remove());
-  document.querySelectorAll('.material-card.selected-b').forEach(el => el.classList.remove('selected-b'));
-
-  // 保留订阅状态（reset只重置表单，不取消订阅）
-  state.subscribed = loadSubscription() !== null;
-  if (state.subscribed) {
-    var subData = loadSubscription();
-    var planName = getSubPlanName(subData && subData.type);
-    document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · 全部参数已解锁';
-    document.querySelector('#subGate .btn-sub').style.display = 'none';
-  }
 
   hideResults();
   setTimeout(() => document.getElementById('materialGrid').scrollIntoView({ behavior: 'smooth' }), 100);
@@ -2683,31 +2313,9 @@ function resetAll() {
 function init() {
   renderMaterials();
   renderThicknessPresets();
-  renderArticles();
   startBanner();
-  
-  // 恢复订阅状态显示
-  if (state.subscribed) {
-    var subData = loadSubscription();
-    var planName = getSubPlanName(subData && subData.type);
-    document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · 全部参数已解锁';
-    document.querySelector('#subGate .btn-sub').style.display = 'none';
-  }
 }
 init();
-</script>
-<script>
-// Register Service Worker for offline support
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js').then(function(reg) {
-      console.log('SW registered:', reg.scope);
-    }).catch(function(e) {
-      console.log('SW reg failed:', e);
-    });
-  });
-}
 </script>
 </body>
 </html>

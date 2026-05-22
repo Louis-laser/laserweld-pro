@@ -2219,13 +2219,6 @@ function _updateResultsNow() {
   // 防小白提示
   if (!materialA) { hideResults(); return; }
   
-  // 异种模式：需选完A和B才出结果
-  if (!sameMaterial && !materialB) {
-    showInlineTip('请先选择材料A，再选择材料B');
-    hideResults();
-    return;
-  }
-  
   // 异种模式选了同种材料 → 友好提示并重置材料B
   if (!sameMaterial && materialB && materialB === materialA && subB === subA) {
     showInlineTip('两种材料不能相同');
