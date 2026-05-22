@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LaserWeld Pro · 激光焊接参数查询</title>
+<style>
+/* ============ Reset & Base ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2333;
+  --surface3: #212d42;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #1f6feb;
+  --green: #3fb950;
+  --green-bg: rgba(63,185,80,0.12);
+  --yellow: #d29922;
+  --yellow-bg: rgba(210,153,34,0.12);
+  --orange: #f0883e;
+  --orange-bg: rgba(240,136,62,0.12);
+  --red: #f85149;
+  --red-bg: rgba(248,81,73,0.15);
+  --purple: #a371f7;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 0 0 80px 0;
+}
+
+/* ============ Header ============ */
+.header {
+  background: linear-gradient(135deg, #161b22 0%, #1c2333 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.header-inner {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.header-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.header-text span {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* ============ Banner Carousel ============ */
+.banner {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 12px 16px 0;
+  position: relative;
+  overflow: hidden;
+}
+.banner-slider {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface2);
+}
+.banner-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1c2333 0%, #0d1117 100%);
+}
+.banner-slide.active {
+  opacity: 1;
+}
+.banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.banner-slide .placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 6px;
+  color: var(--text2);
+  font-size: 22px;
+}
+.banner-slide .placeholder .p-tag {
+  font-size: 11px;
+  color: var(--text2);
+  border: 1px dashed var(--border);
+  padding: 2px 10px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+.banner-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.banner-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.banner-dots .dot.active {
+  background: var(--accent);
+  width: 18px;
+  border-radius: 3px;
+}
+
+/* ============ Container ============ */
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ============ Section Card ============ */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  animation: fadeIn 0.3s ease;
+}
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent2);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ============ Material Grid ============ */
+.material-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.material-card {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  position: relative;
+}
+.material-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.material-card.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); box-shadow: 0 0 0 1px rgba(88,166,255,0.3); }
+.material-card.selected-b { border-color: var(--purple); background: rgba(163,113,247,0.08); box-shadow: 0 0 0 1px var(--purple); }
+.material-card .icon { font-size: 28px; margin-bottom: 4px; display: block; }
+.material-card .name { font-size: 14px; font-weight: 600; }
+.material-card .sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.material-card .sub-level { font-size: 11px; color: var(--accent); margin-top: 1px; font-weight: 500; }
+.material-card .arrow { position: absolute; top: 6px; right: 8px; font-size: 10px; color: var(--text2); }
+.material-card.has-sub .name { color: var(--accent); }
+.material-card .mat-label {
+  position: absolute; top: -8px; left: 6px;
+  font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 6px;
+}
+.mat-label-a { background: var(--accent2); color: #fff; }
+.mat-label-b { background: var(--purple); color: #fff; }
+
+/* ============ Material Pair Display ============ */
+.mat-pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+.mat-pair .slot {
+  text-align: center;
+  min-width: 80px;
+}
+.mat-pair .slot .label { font-size: 10px; color: var(--text2); margin-bottom: 2px; }
+.mat-pair .slot .mat-name { font-size: 14px; font-weight: 600; }
+.mat-pair .slot .mat-sub { font-size: 11px; color: var(--accent); }
+.mat-pair .vs { font-size: 18px; color: var(--text2); font-weight: 700; }
+
+/* ============ Same-Material Toggle ============ */
+.same-toggle {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+.same-toggle button {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.same-toggle button:hover { border-color: var(--accent); }
+.same-toggle button.active { border-color: var(--accent); background: rgba(88,166,255,0.1); color: var(--accent); }
+.same-toggle button.active-b { border-color: var(--purple); background: rgba(163,113,247,0.1); color: var(--purple); }
+
+/* ============ Sub-Material Modal ============ */
+.sub-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.sub-modal-overlay.visible { display: flex; }
+.sub-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+.sub-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  text-align: center;
+  color: var(--accent);
+}
+.sub-modal .sub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.sub-option {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.sub-option:hover { border-color: var(--accent); }
+.sub-option.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+.sub-option .name { font-size: 13px; font-weight: 600; }
+.sub-option .desc { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.sub-modal .btn-close {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+}
+.sub-modal .btn-close:hover { border-color: var(--text2); color: var(--text); }
+
+/* ============ Toggle (送丝/摆头) ============ */
+.toggle-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.toggle-opt {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.toggle-opt:hover { border-color: var(--accent); }
+.toggle-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+.toggle-opt .emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+.toggle-opt .label { font-size: 13px; font-weight: 600; }
+.toggle-opt .desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ============ Process Toggle ============ */
+.process-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.process-opt {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.process-opt:hover { border-color: var(--accent); }
+.process-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+.process-opt .emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+.process-opt .label { font-size: 13px; font-weight: 600; }
+.process-opt .desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ============ Thickness ============ */
+.thickness-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.thickness-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.thickness-display .value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.thickness-display .unit {
+  font-size: 16px;
+  color: var(--text2);
+  margin-top: 14px;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--surface);
+}
+.thickness-presets {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.thickness-presets button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.thickness-presets button:hover { border-color: var(--accent); color: var(--accent); }
+.thickness-presets button.active { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+
+/* ============ Joint Type ============ */
+.joint-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.joint-opt {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.joint-opt:hover { border-color: var(--accent); }
+.joint-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+.joint-opt .emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+.joint-opt .label { font-size: 13px; font-weight: 600; }
+.joint-opt .desc { font-size: 11px; color: var(--text2); }
+
+/* ============ Gas ============ */
+.gas-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.gas-opt {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+}
+.gas-opt:hover { border-color: var(--accent); }
+.gas-opt.selected { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+
+/* ============ Other Requirements Textarea ============ */
+.other-req textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text);
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+  font-family: inherit;
+}
+.other-req textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(88,166,255,0.15);
+}
+.other-req textarea::placeholder { color: var(--text2); }
+.other-req .char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+/* ============ Results ============ */
+.results-section { display: none; }
+.results-section.visible { display: block; }
+
+.query-summary {
+  background: linear-gradient(135deg, var(--accent2) 0%, #0d4192 100%);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.query-summary .mat { font-size: 15px; font-weight: 600; }
+.query-summary .detail { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+/* ============ Weldability Assessment ============ */
+.weldability-card {
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 2px solid;
+}
+.weldability-card .w-icon { font-size: 32px; margin-bottom: 4px; display: block; text-align: center; }
+.weldability-card .w-title { font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.weldability-card .w-desc { font-size: 12px; text-align: center; margin-bottom: 8px; }
+.weldability-card .w-items { list-style: none; padding: 0; margin: 8px 0 0 0; }
+.weldability-card .w-items li {
+  font-size: 12px;
+  padding: 4px 0 4px 20px;
+  position: relative;
+  line-height: 1.6;
+}
+.weldability-card .w-items li::before {
+  content: '•';
+  position: absolute;
+  left: 4px;
+  font-weight: 700;
+}
+
+/* Green - Easy */
+.w-card-green {
+  background: var(--green-bg);
+  border-color: var(--green);
+}
+.w-card-green .w-title { color: var(--green); }
+.w-card-green .w-items li::before { color: var(--green); }
+
+/* Yellow - Good */
+.w-card-yellow {
+  background: var(--yellow-bg);
+  border-color: var(--yellow);
+}
+.w-card-yellow .w-title { color: var(--yellow); }
+.w-card-yellow .w-items li::before { color: var(--yellow); }
+
+/* Orange - Challenging */
+.w-card-orange {
+  background: var(--orange-bg);
+  border-color: var(--orange);
+}
+.w-card-orange .w-title { color: var(--orange); }
+.w-card-orange .w-items li::before { color: var(--orange); }
+
+/* Red - Hard */
+.w-card-red {
+  background: var(--red-bg);
+  border-color: var(--red);
+}
+.w-card-red .w-title { color: var(--red); }
+.w-card-red .w-items li::before { color: var(--red); }
+
+/* ============ Subscription Gate ============ */
+.sub-gate {
+  background: linear-gradient(135deg, rgba(168, 113, 247, 0.15), rgba(88, 166, 255, 0.15));
+  border: 1px solid var(--purple);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.sub-gate .icon { font-size: 40px; margin-bottom: 8px; }
+.sub-gate .title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.sub-gate .desc { font-size: 12px; color: var(--text2); margin-bottom: 14px; }
+.sub-gate .btn-sub {
+  background: linear-gradient(135deg, var(--purple), var(--accent));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sub-gate .btn-sub:hover { transform: scale(1.02); opacity: 0.9; }
+.sub-gate .btn-sub:active { transform: scale(0.98); }
+.sub-gate .sub-status { font-size: 11px; color: var(--green); margin-top: 8px; }
+
+/* ============ 技术文章专栏 ============ */
+.articles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.article-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.article-card:hover {
+  border-color: var(--accent);
+  transform: translateX(2px);
+}
+.article-card .a-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+  line-height: 40px;
+}
+.article-card .a-body {
+  flex: 1;
+  min-width: 0;
+}
+.article-card .a-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.article-card .a-desc {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 3px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.article-card .a-meta {
+  font-size: 10px;
+  color: var(--text2);
+  margin-top: 4px;
+  display: flex;
+  gap: 10px;
+}
+.article-card .a-meta .tag {
+  background: var(--surface3);
+  padding: 0 6px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+.article-card .a-arrow {
+  font-size: 14px;
+  color: var(--text2);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* ============ Payment Options ============ */
+.pay-opt {
+  flex: 1;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.pay-opt:hover { border-color: var(--accent); }
+.pay-opt.selected { border-color: var(--green); background: rgba(63,185,80,0.08); }
+.pay-opt .pay-icon { font-size: 28px; margin-bottom: 4px; }
+.pay-opt .pay-name { font-size: 13px; font-weight: 600; }
+.pay-opt .pay-qr {
+  margin-top: 8px;
+  width: 120px;
+  height: 120px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pay-opt .pay-qr img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pay-opt .qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.pay-opt .qr-placeholder span:first-child {
+  font-size: 20px;
+}
+.pay-opt .qr-placeholder .qr-hint {
+  font-size: 10px;
+  color: #888;
+  border: 1px dashed #aaa;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ============ Result Cards ============ */
+.result-inner { margin-top: 12px; }
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.result-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+.result-card.full { grid-column: 1 / -1; }
+.result-card .label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+.result-card .value { font-size: 15px; font-weight: 700; line-height: 1.3; }
+.result-card .value .range { font-weight: 400; font-size: 12px; color: var(--text2); }
+.result-card .hint { font-size: 11px; margin-top: 4px; }
+.param-power .value { color: var(--red); }
+.param-speed .value { color: var(--green); }
+.param-focus .value { color: var(--accent); }
+.param-gas .value { color: #79c0ff; }
+.param-wire .value { color: var(--yellow); }
+.param-osc .value { color: var(--purple); }
+.param-pulse .value { color: #d2a8ff; }
+
+/* ============ Pulse Panel ============ */
+.pulse-panel {
+  display: none;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 12px;
+}
+.pulse-panel.visible { display: block; }
+.pulse-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.pulse-item .plabel { font-size: 11px; color: var(--text2); }
+.pulse-item .pvalue { font-size: 14px; font-weight: 600; }
+
+/* ============ Additional Recommendations ============ */
+.extra-recs {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 12px;
+}
+.extra-recs .title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.extra-recs .item { font-size: 12px; color: var(--text2); margin-bottom: 4px; padding-left: 12px; position: relative; }
+.extra-recs .item::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+
+/* ============ Mat Sub Tag ============ */
+.mat-sub-tag {
+  display: inline-block;
+  font-size: 10px;
+  background: rgba(88,166,255,0.2);
+  color: var(--accent);
+  padding: 1px 8px;
+  border-radius: 8px;
+  margin-top: 2px;
+}
+
+/* ============ Reset Button ============ */
+.btn-reset {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 14px;
+}
+.btn-reset:hover { border-color: var(--text2); color: var(--text); }
+
+/* ============ Animations ============ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section, .result-card, .sub-gate, .weldability-card { animation: fadeIn 0.3s ease; }
+
+/* ============ Responsive ============ */
+@media (max-width: 380px) {
+  .material-grid, .sub-modal .sub-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .material-card { padding: 10px 8px; }
+  .material-card .icon { font-size: 24px; }
+  .material-card .name { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ Header ============ -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-icon">⚡</div>
+    <div class="header-text">
+      <h1>LaserWeld Pro</h1>
+      <span>激光焊接工艺参数查询 · v1.2</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Banner 激光器全家福 ============ -->
+<div class="banner" id="bannerSection">
+  <div class="banner-slider" id="bannerSlider">
+    <div class="banner-slide active" data-index="0">
+      <div class="placeholder">
+        <span>🔦</span>
+        <span>激光器全家福 ①</span>
+        <span class="p-tag">可替换此图片</span>
+      </div>
+    </div>
+    <div class="banner-slide" data-index="1">
+      <div class="placeholder">
+        <span>🔦</span>
+        <span>激光器全家福 ②</span>
+        <span class="p-tag">可替换此图片</span>
+      </div>
+    </div>
+    <div class="banner-slide" data-index="2">
+      <div class="placeholder">
+        <span>🔦</span>
+        <span>激光器全家福 ③</span>
+        <span class="p-tag">可替换此图片</span>
+      </div>
+    </div>
+  </div>
+  <div class="banner-dots" id="bannerDots">
+    <span class="dot active" data-index="0"></span>
+    <span class="dot" data-index="1"></span>
+    <span class="dot" data-index="2"></span>
+  </div>
+</div>
+
+<!-- ============ Container ============ -->
+<div class="container" id="app">
+
+  <!-- Step 1: 材料选择 (dual) -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">1</span> 选择材料</div>
+    <!-- 同种/异种 toggle -->
+    <div class="same-toggle" id="sameToggle">
+      <button class="active" data-val="same" onclick="setSameMaterial(true)">🔗 同种材料</button>
+      <button data-val="diff" onclick="setSameMaterial(false)">🔀 异种材料</button>
+    </div>
+    <!-- Material A + B pair display -->
+    <div class="mat-pair" id="matPair">
+      <div class="slot" id="slotA">
+        <div class="label">⬤ 材料 A</div>
+        <div class="mat-name" style="color:var(--accent2);">—</div>
+      </div>
+      <div class="vs" id="vsSymbol" style="display:none;">⟷</div>
+      <div class="slot" id="slotB" style="display:none;">
+        <div class="label">⬤ 材料 B</div>
+        <div class="mat-name" style="color:var(--purple);">—</div>
+      </div>
+    </div>
+    <!-- Material grid -->
+    <div class="material-grid" id="materialGrid"></div>
+    <div id="subTagArea" style="margin-top:8px;text-align:center;min-height:0;"></div>
+  </div>
+
+  <!-- Step 2: 是否送丝 -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">2</span> 是否送丝</div>
+    <div class="toggle-options" id="wireGrid">
+      <div class="toggle-opt selected" data-value="self" onclick="selectWire('self')">
+        <span class="emoji">🔗</span>
+        <span class="label">自熔</span>
+        <span class="desc">不加焊丝，靠母材熔化</span>
+      </div>
+      <div class="toggle-opt" data-value="feed" onclick="selectWire('feed')">
+        <span class="emoji">📎</span>
+        <span class="label">送丝</span>
+        <span class="desc">添加焊丝填充</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: 是否增加摆头 -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">3</span> 是否增加摆头</div>
+    <div class="toggle-options" id="oscGrid">
+      <div class="toggle-opt selected" data-value="no" onclick="selectOsc('no')">
+        <span class="emoji">➖</span>
+        <span class="label">无摆头</span>
+        <span class="desc">固定光束焊接</span>
+      </div>
+      <div class="toggle-opt" data-value="yes" onclick="selectOsc('yes')">
+        <span class="emoji">🌀</span>
+        <span class="label">有摆头</span>
+        <span class="desc">光束摆动焊接</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: 焊接模式 -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">4</span> 焊接模式</div>
+    <div class="process-options" id="processGrid">
+      <div class="process-opt selected" data-value="cw" onclick="selectProcess('cw')">
+        <span class="emoji">🔥</span>
+        <span class="label">连续激光 (CW)</span>
+        <span class="desc">恒定功率输出</span>
+      </div>
+      <div class="process-opt" data-value="pulse" onclick="selectProcess('pulse')">
+        <span class="emoji">⚡</span>
+        <span class="label">脉冲激光 (Pulse)</span>
+        <span class="desc">脉冲能量输出</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: 材料厚度 -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">5</span> 材料厚度</div>
+    <div class="thickness-control">
+      <div class="thickness-display">
+        <span class="value" id="thicknessValue">1.0</span>
+        <span class="unit">mm</span>
+      </div>
+      <input type="range" id="thicknessSlider" min="0.1" max="10.0" step="0.1" value="1.0"
+        oninput="onThicknessChange(this.value)">
+      <div class="thickness-presets" id="thicknessPresets"></div>
+    </div>
+  </div>
+
+  <!-- Step 6: 接头类型 -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">6</span> 接头类型</div>
+    <div class="joint-options" id="jointGrid">
+      <div class="joint-opt selected" data-value="butt" onclick="selectJoint('butt')">
+        <span class="emoji">⬜</span>
+        <span class="label">对接</span>
+        <span class="desc">Butt Joint</span>
+      </div>
+      <div class="joint-opt" data-value="lap" onclick="selectJoint('lap')">
+        <span class="emoji">▬</span>
+        <span class="label">搭接</span>
+        <span class="desc">Lap Joint</span>
+      </div>
+      <div class="joint-opt" data-value="fillet" onclick="selectJoint('fillet')">
+        <span class="emoji">◤</span>
+        <span class="label">角接</span>
+        <span class="desc">Fillet Joint</span>
+      </div>
+      <div class="joint-opt" data-value="edge" onclick="selectJoint('edge')">
+        <span class="emoji">▰</span>
+        <span class="label">边接</span>
+        <span class="desc">Edge Joint</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 7: 保护气体 -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">7</span> 保护气体</div>
+    <div class="gas-options" id="gasGrid">
+      <div class="gas-opt selected" data-value="Ar" onclick="selectGas('Ar')">Ar 氩气</div>
+      <div class="gas-opt" data-value="N2" onclick="selectGas('N2')">N₂ 氮气</div>
+      <div class="gas-opt" data-value="He" onclick="selectGas('He')">He 氦气</div>
+      <div class="gas-opt" data-value="vacuum" onclick="selectGas('vacuum')">🧲 真空</div>
+      <div class="gas-opt" data-value="air" onclick="selectGas('air')">🌬️ 空气</div>
+    </div>
+  </div>
+
+  <!-- Step 8: 其他要求说明 -->
+  <div class="section other-req">
+    <div class="section-title"><span class="step-num">8</span> 其他要求说明</div>
+    <textarea id="otherReq" placeholder="例如：焊缝美观要求、气密性要求、焊接变形控制、生产效率优先、特殊环境要求……" maxlength="500" oninput="onOtherReqChange()"></textarea>
+    <div class="char-count"><span id="charCount">0</span>/500</div>
+  </div>
+
+  <!-- Step 9: 技术文章专栏 -->
+  <div class="section" id="articleSection">
+    <div class="section-title"><span class="step-num">9</span> 技术文章专栏</div>
+    <div class="articles-list" id="articlesList">
+      <div class="article-card" onclick="openArticle('art1')">
+        <div class="a-icon">📘</div>
+        <div class="a-body">
+          <div class="a-title">激光焊接常见缺陷分析与对策</div>
+          <div class="a-desc">气孔、裂纹、飞溅、咬边——四大激光焊接缺陷的成因、判定方法与工艺优化方向。</div>
+          <div class="a-meta"><span class="tag">工艺基础</span> <span>5 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art2')">
+        <div class="a-icon">🔬</div>
+        <div class="a-body">
+          <div class="a-title">铜材激光焊接：纯铜 vs 黄铜 vs 青铜</div>
+          <div class="a-desc">铜及铜合金的激光吸收率差异、关键工艺参数推荐及常见问题处理方案。</div>
+          <div class="a-meta"><span class="tag">材料专题</span> <span>8 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art3')">
+        <div class="a-icon">⚡</div>
+        <div class="a-body">
+          <div class="a-title">薄板精密焊接工艺要点（≤0.5mm）</div>
+          <div class="a-desc">超薄板材激光焊接的功率控制、工装夹具要求、热变形控制策略。</div>
+          <div class="a-meta"><span class="tag">精密焊接</span> <span>6 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art4')">
+        <div class="a-icon">🛡️</div>
+        <div class="a-body">
+          <div class="a-title">保护气体选择指南：Ar / N₂ / He / 真空 / 空气</div>
+          <div class="a-desc">不同气体对焊缝成形、熔深、氧化控制的影响对比及选型建议。</div>
+          <div class="a-meta"><span class="tag">辅助工艺</span> <span>7 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+      <div class="article-card" onclick="openArticle('art5')">
+        <div class="a-icon">🤖</div>
+        <div class="a-body">
+          <div class="a-title">异种材料激光焊接：组合评估与工艺设计</div>
+          <div class="a-desc">不锈钢-铜、钢-铝、钛-铝等常见异种组合的焊接性、过渡层设计及工艺窗口。</div>
+          <div class="a-meta"><span class="tag">异种焊接</span> <span>10 min read</span></div>
+        </div>
+        <div class="a-arrow">→</div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:10px;">
+      <span style="font-size:11px; color:var(--text2); cursor:pointer;" onclick="alert('更多技术文章即将上线')">📚 查看全部文章 →</span>
+    </div>
+  </div>
+
+  <!-- ============ Results ============ -->
+  <div class="results-section" id="resultsSection">
+    <div class="query-summary" id="querySummary">
+      <div class="mat" id="summaryMat">请选择材料</div>
+      <div class="detail" id="summaryDetail"></div>
+    </div>
+
+    <!-- Weldability Assessment -->
+    <div id="weldabilityCard" style="display:none;"></div>
+
+    <!-- Subscription Gate -->
+    <div id="subGate" class="sub-gate" style="display:none;">
+      <div class="icon">🔒</div>
+      <div class="title">高难度焊接参数</div>
+      <div class="desc" id="subDesc">当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。</div>
+      <button class="btn-sub" onclick="showPayment()">🔓 订阅解锁</button>
+      <div class="sub-status" id="subStatus" style="display:none;">✅ 已订阅 · 全部参数已解锁</div>
+
+      <!-- 支付窗口 -->
+      <div id="paymentPanel" style="display:none; margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+        <div style="font-size:13px; font-weight:600; margin-bottom:10px; color:var(--accent);">💳 选择支付方式</div>
+        <div style="display:flex; gap:10px; justify-content:center;">
+          <div class="pay-opt" onclick="selectPay('wechat')" id="payWechat">
+            <div class="pay-icon">💚</div>
+            <div class="pay-name">微信支付</div>
+            <div class="pay-qr" id="qrWechat">
+              <div class="qr-placeholder">
+                <span>📱 微信收款码</span>
+                <span class="qr-hint">上传图片替换</span>
+              </div>
+            </div>
+          </div>
+          <div class="pay-opt" onclick="selectPay('alipay')" id="payAlipay">
+            <div class="pay-icon">💙</div>
+            <div class="pay-name">支付宝</div>
+            <div class="pay-qr" id="qrAlipay">
+              <div class="qr-placeholder">
+                <span>📱 支付宝收款码</span>
+                <span class="qr-hint">上传图片替换</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn-sub" style="padding:10px 24px; font-size:13px;" onclick="confirmPay()">✅ 我已支付</button>
+        </div>
+        <div style="font-size:10px; color:var(--text2); margin-top:8px;">8元/月 · 订阅后随时取消，支持跨设备使用</div>
+      </div>
+    </div>
+
+    <div id="resultsInner" style="display:none;">
+      <div class="result-grid" id="resultGrid"></div>
+
+      <!-- Pulse panel -->
+      <div class="pulse-panel" id="pulsePanel">
+        <div style="font-size:13px;font-weight:600;color:var(--orange);">⚡ 脉冲参数</div>
+        <div class="pulse-grid" id="pulseGrid"></div>
+      </div>
+
+      <!-- Wire / Osc -->
+      <div id="wireRecArea" style="display:none;">
+        <div class="extra-recs" id="wireRecContent"></div>
+      </div>
+      <div id="oscRecArea" style="display:none;">
+        <div class="extra-recs" id="oscRecContent"></div>
+      </div>
+
+      <!-- Req advice -->
+      <div id="reqAdviceArea" style="display:none;">
+        <div class="extra-recs" id="reqAdviceContent"></div>
+      </div>
+    </div>
+
+    <div style="font-size:10px;color:var(--text2);text-align:center;margin-top:16px;border-top:1px solid var(--border);padding-top:12px;">
+      本数据仅供参考，实际工艺需结合设备能力验证 · Demo v1.2
+    </div>
+
+    <button class="btn-reset" onclick="resetAll()">⟳ 重新查询</button>
+  </div>
+
+</div>
+
+<!-- ============ Sub-Material Modal ============ -->
+<div class="sub-modal-overlay" id="subModal">
+  <div class="sub-modal">
+    <div class="sub-modal-title" id="subModalTitle">选择子材料</div>
+    <div class="sub-grid" id="subModalGrid"></div>
+    <button class="btn-close" onclick="closeSubModal()">取消</button>
+  </div>
+</div>
+
+<script>
+// ====================================================================
+// 材料定义（含二级目录）
+// ====================================================================
+const MATERIALS = [
+  { id: 'ss304',      name: '不锈钢 304',  icon: '🔩', sub: 'SS304',           group: 'steel' },
+  { id: 'carbon',     name: '碳钢',        icon: '🔧', sub: 'Carbon Steel',     group: 'steel' },
+  { id: 'galvanized', name: '镀锌板',      icon: '🛡️', sub: 'Galvanized',       group: 'steel' },
+  { id: 'copper',     name: '铜',          icon: '🟤', sub: '▼ 选子类',          group: 'copper',
+    hasSub: true,
+    subMaterials: [
+      { id: 'pure_cu',      name: '纯铜',   sub: 'T2 / C1100' },
+      { id: 'brass',        name: '黄铜',   sub: 'H62 / H68' },
+      { id: 'bronze',       name: '青铜',   sub: 'QSn6.5-0.1' },
+      { id: 'phos_bronze',  name: '磷铜',   sub: 'QSn6.5-0.4' },
+      { id: 'cupronickel',  name: '白铜',   sub: 'B10 / B30' },
+    ] },
+  { id: 'aluminum',   name: '铝',          icon: '🪶', sub: '▼ 选牌号系列',      group: 'aluminum',
+    hasSub: true,
+    subMaterials: [
+      { id: 'al_1xxx', name: '1系 纯铝',    sub: '1060 / 1100' },
+      { id: 'al_2xxx', name: '2系 铝铜',    sub: '2024' },
+      { id: 'al_3xxx', name: '3系 铝锰',    sub: '3003' },
+      { id: 'al_4xxx', name: '4系 铝硅',    sub: '4043' },
+      { id: 'al_5xxx', name: '5系 铝镁',    sub: '5052 / 5083' },
+      { id: 'al_6xxx', name: '6系 铝镁硅',  sub: '6061 / 6063' },
+      { id: 'al_7xxx', name: '7系 铝锌',    sub: '7075' },
+    ] },
+  { id: 'titanium',   name: '钛合金',      icon: '💎', sub: 'Ti-6Al-4V',       group: 'ti' },
+];
+
+// 子材料 → 主材料的映射
+const SUB_TO_PARENT = {};
+MATERIALS.forEach(m => {
+  if (m.hasSub && m.subMaterials) {
+    m.subMaterials.forEach(s => { SUB_TO_PARENT[s.id] = m.id; });
+  }
+});
+
+// ====================================================================
+// 焊接参数数据库
+// ====================================================================
+const PARAMS = {
+  ss304: { /* ... see full data below ... */ },
+  carbon: { /* ... */ },
+  galvanized: { /* ... */ },
+  copper: { /* ... */ },
+  brass: { /* ... */ },
+  aluminum: { /* ... */ },
+  titanium: { /* ... */ },
+};
+
+// ====================================================================
+// 焊接可行性评估矩阵
+// 等级: easy(🟢) / moderate(🟡) / challenging(🟠) / hard(🔴)
+// ====================================================================
+const WELDABILITY = {
+  // === 同种材料 ===
+  same: {
+    ss304:      { level: 'easy',       title: '🟢 易焊',   desc: '同种不锈钢304焊接，工艺成熟，易获得优质焊缝。' },
+    carbon:     { level: 'easy',       title: '🟢 易焊',   desc: '同种碳钢焊接，工艺成熟，易获得优质焊缝。' },
+    galvanized: { level: 'easy',       title: '🟢 易焊',   desc: '同种镀锌板焊接，注意控制锌蒸气，一般可获良好焊缝。' },
+    copper:     { level: 'challenging',title: '🟠 困难',   desc: '同种铜材焊接，因高反射率和高热导率，需大功率激光器配合，且注意工艺窗口较窄。' },
+    brass:      { level: 'challenging',title: '🟠 困难',   desc: '黄铜含锌，焊接时锌易蒸发生成气孔，需控制热输入并注意通风。' },
+    aluminum:   { level: 'moderate',   title: '🟡 可焊',   desc: '同种铝合金焊接可行，需清理氧化层并选用高纯度保护气，不同系列工艺性差异较大。' },
+    titanium:   { level: 'moderate',   title: '🟡 可焊',   desc: '同种钛合金焊接需全氩气保护（正反面），严格控制氧/氮/氢污染。' },
+  },
+  // === 异种材料 ===
+  diff: {
+    // 不锈钢 + X
+    'ss304_carbon':     { level: 'moderate',   title: '🟡 可焊',   desc: '不锈钢与碳钢可焊接，推荐选用奥氏体焊丝（ER309L）过渡层，可满足常规强度要求。' },
+    'ss304_galvanized': { level: 'moderate',   title: '🟡 可焊',   desc: '不锈钢与镀锌板可焊，注意锌蒸气问题，搭接接头效果优于对接。' },
+    'ss304_copper':     { level: 'challenging',title: '🟠 困难',   desc: '不锈钢与铜热物性差异大（热导率差10倍），熔合区易产生裂纹，推荐铜侧加过渡层或使用镍基焊丝。' },
+    'ss304_aluminum':   { level: 'hard',       title: '🔴 不推荐', desc: '不锈钢与铝焊接强度极低，界面形成脆性Fe-Al金属间化合物，接头延展性差，不建议激光直接焊接。' },
+    'ss304_titanium':   { level: 'hard',       title: '🔴 不推荐', desc: '不锈钢与钛会形成脆性金属间化合物，焊缝极脆，不建议激光直接焊接。' },
+    // 碳钢 + X
+    'carbon_galvanized':{ level: 'easy',       title: '🟢 易焊',   desc: '碳钢与镀锌板同属铁基材料，焊接性良好，注意锌蒸气防护即可。' },
+    'carbon_copper':    { level: 'challenging',title: '🟠 困难',   desc: '碳钢与铜的线膨胀系数和热导率差异大，易产生热应力裂纹，推荐镍基过渡层。' },
+    'carbon_aluminum':  { level: 'hard',       title: '🔴 不推荐', desc: '碳钢与铝界面形成脆性Fe-Al化合物层，抗拉强度通常低于50MPa，不建议激光直接焊接。' },
+    'carbon_titanium':  { level: 'hard',       title: '🔴 不推荐', desc: '碳钢与钛形成脆性金属间化合物，建议采用扩散焊或钎焊替代。' },
+    // 镀锌板 + X
+    'galvanized_copper':{ level: 'challenging',title: '🟠 困难',   desc: '镀锌板与铜焊接需解决锌蒸发+铜高导热双重难题，摆头焊接可改善工艺稳定性。' },
+    'galvanized_aluminum':{ level: 'hard',     title: '🔴 不推荐', desc: '镀锌层+铝形成脆性相，焊接性极差，不建议直接激光焊接。' },
+    'galvanized_titanium':{ level: 'hard',     title: '🔴 不推荐', desc: '镀锌层中的锌会严重污染钛焊缝，不建议直接焊接。' },
+    // 铜 + X
+    'copper_aluminum':  { level: 'hard',       title: '🔴 不推荐', desc: '铜与铝形成CuAl₂脆性相，接头强度低且易开裂，不建议激光直接焊接，推荐钎焊或固相焊。' },
+    'copper_titanium':  { level: 'hard',       title: '🔴 不推荐', desc: '铜与钛金属间化合物层脆性极高，不建议激光直接焊接。' },
+    // 铝 + X
+    'aluminum_titanium':{ level: 'hard',       title: '🔴 不推荐', desc: '铝与钛形成脆性Ti-Al化合物，焊接性极差，建议固相扩散焊。' },
+  },
+};
+
+// 默认fallback（未在矩阵中的异种组合）
+function getDefaultWeldability(matIdA, matIdB) {
+  const groupA = getMatGroup(matIdA);
+  const groupB = getMatGroup(matIdB);
+  // 同组易焊
+  if (groupA === groupB) {
+    return { level: 'easy', title: '🟢 易焊', desc: `同组材料（${groupA}系），一般具有良好焊接性。` };
+  }
+  // 不同组 default
+  return { level: 'challenging', title: '🟠 困难', desc: '异种材料焊接需评估具体组合，建议先做工艺试验验证。' };
+}
+
+function getMatGroup(matId) {
+  // Resolve sub-material to parent
+  if (SUB_TO_PARENT[matId]) matId = SUB_TO_PARENT[matId];
+  const m = MATERIALS.find(x => x.id === matId);
+  return m ? m.group : '';
+}
+
+// ====================================================================
+// 焊接可行性评估
+// ====================================================================
+function assessWeldability(matA, subA, matB, subB) {
+  const same = (matA === matB && (!subA || !subB || subA === subB));
+
+  if (same) {
+    // 同种材料
+    const key = SUB_TO_PARENT[matA] || matA;
+    const result = WELDABILITY.same[key];
+    if (result) return result;
+    return { level: 'moderate', title: '🟡 可焊', desc: '同种材料焊接，需结合具体牌号和厚度确定工艺。' };
+  }
+
+  // 异种材料 — 解析到父级ID
+  let idA = SUB_TO_PARENT[matA] || matA;
+  let idB = SUB_TO_PARENT[matB] || matB;
+  // 保证顺序一致性
+  const combo1 = `${idA}_${idB}`;
+  const combo2 = `${idB}_${idA}`;
+  const result = WELDABILITY.diff[combo1] || WELDABILITY.diff[combo2];
+  if (result) return result;
+
+  return getDefaultWeldability(idA, idB);
+}
+
+// ====================================================================
+// 子材料调节因子
+// ====================================================================
+const SUB_FACTORS = {
+  al_1xxx: { power: 0.95, speed: 1.05, note: '纯铝，导热极快，需注意热输入控制' },
+  al_2xxx: { power: 1.10, speed: 0.90, note: '铝铜系，热裂纹敏感，建议脉冲模式' },
+  al_3xxx: { power: 1.00, speed: 1.00, note: '铝锰系，焊接性较好' },
+  al_4xxx: { power: 0.95, speed: 1.05, note: '铝硅系，流动性好，适合填丝焊' },
+  al_5xxx: { power: 1.00, speed: 1.00, note: '铝镁系，最佳焊接性，推荐首选' },
+  al_6xxx: { power: 1.05, speed: 0.95, note: '铝镁硅系，常用，需清理氧化层' },
+  al_7xxx: { power: 1.15, speed: 0.85, note: '铝锌系，焊接难度大，高温裂纹风险' },
+  pure_cu:      { power: 1.00, speed: 1.00, note: '纯铜，高反材料，建议高功率+摆头' },
+  brass:        { power: 0.90, speed: 1.05, note: '黄铜，注意锌蒸发，需良好通风' },
+  bronze:       { power: 1.05, speed: 0.95, note: '青铜，含锡元素，热裂敏感' },
+  phos_bronze:  { power: 1.10, speed: 0.90, note: '磷铜，含磷元素，流动性好但脆性' },
+  cupronickel:  { power: 1.00, speed: 1.00, note: '白铜，含镍，焊接性中等' },
+};
+
+// ====================================================================
+// 激光参数数据库（完整）
+// ====================================================================
+(function fillParams() {
+  const p = {
+    ss304: {
+      cw: {
+        0.1: { power:[200,350], speed:[60,90], focus:[0,0.5], gas_flow:[10,12] },
+        0.2: { power:[300,500], speed:[40,70], focus:[0,0.5], gas_flow:[12,15] },
+        0.3: { power:[400,650], speed:[35,60], focus:[0,0.5], gas_flow:[12,15] },
+        0.5: { power:[500,800], speed:[30,50], focus:[0,0], gas_flow:[12,15] },
+        0.8: { power:[800,1200], speed:[25,40], focus:[-0.5,0], gas_flow:[15,18] },
+        1.0: { power:[1000,1500], speed:[20,35], focus:[-0.5,0], gas_flow:[15,18] },
+        1.5: { power:[1500,2200], speed:[15,28], focus:[-0.5,-0.5], gas_flow:[18,20] },
+        2.0: { power:[2000,3000], speed:[10,22], focus:[-1,-0.5], gas_flow:[18,20] },
+        3.0: { power:[3000,4000], speed:[8,15], focus:[-1.5,-1], gas_flow:[20,25] },
+        4.0: { power:[3500,5000], speed:[6,12], focus:[-2,-1.5], gas_flow:[20,25] },
+        5.0: { power:[4000,6000], speed:[5,10], focus:[-2.5,-2], gas_flow:[22,28] },
+        6.0: { power:[5000,8000], speed:[4,8], focus:[-3,-2.5], gas_flow:[25,30] },
+        8.0: { power:[6000,10000], speed:[3,6], focus:[-4,-3], gas_flow:[25,35] },
+        10.0:{ power:[8000,12000], speed:[2,5], focus:[-5,-4], gas_flow:[30,40] },
+      },
+      pulse: {
+        0.2: { power:[800,1200], speed:[25,40], focus:[0,0.5], gas_flow:[12,15], freq:[30,50], duty:[40,60], ppk:[1200,2000] },
+        0.5: { power:[1000,1500], speed:[20,35], focus:[0,0], gas_flow:[12,15], freq:[25,40], duty:[40,60], ppk:[1500,2500] },
+        1.0: { power:[1500,2500], speed:[15,28], focus:[-0.5,0], gas_flow:[15,18], freq:[20,35], duty:[45,55], ppk:[2500,3500] },
+        2.0: { power:[2500,4000], speed:[8,18], focus:[-1,-0.5], gas_flow:[18,20], freq:[15,30], duty:[40,50], ppk:[3500,5000] },
+        3.0: { power:[3500,5500], speed:[6,12], focus:[-1.5,-1], gas_flow:[20,25], freq:[10,20], duty:[35,50], ppk:[4500,6500] },
+        4.0: { power:[4500,6500], speed:[4,10], focus:[-2,-1.5], gas_flow:[22,28], freq:[8,15], duty:[30,45], ppk:[5500,8000] },
+        5.0: { power:[5500,8000], speed:[3,7], focus:[-2.5,-2], gas_flow:[25,30], freq:[5,12], duty:[30,40], ppk:[7000,10000] },
+      },
+    },
+    carbon: {
+      cw: {
+        0.1: { power:[180,300], speed:[50,80], focus:[0,0.5], gas_flow:[8,10] },
+        0.2: { power:[250,450], speed:[40,65], focus:[0,0.5], gas_flow:[8,10] },
+        0.5: { power:[400,700], speed:[35,55], focus:[0,0.5], gas_flow:[10,12] },
+        0.8: { power:[600,1000], speed:[25,45], focus:[0,0], gas_flow:[10,12] },
+        1.0: { power:[800,1200], speed:[20,35], focus:[-0.5,0], gas_flow:[12,15] },
+        1.5: { power:[1200,1800], speed:[15,28], focus:[-0.5,-0.5], gas_flow:[12,15] },
+        2.0: { power:[1500,2500], speed:[10,22], focus:[-1,-0.5], gas_flow:[15,18] },
+        3.0: { power:[2500,4000], speed:[8,15], focus:[-1.5,-1], gas_flow:[18,20] },
+        4.0: { power:[3000,5000], speed:[6,12], focus:[-2,-1.5], gas_flow:[18,22] },
+        5.0: { power:[4000,6000], speed:[5,10], focus:[-2.5,-2], gas_flow:[20,25] },
+        6.0: { power:[5000,8000], speed:[4,8], focus:[-3,-2.5], gas_flow:[22,28] },
+        8.0: { power:[6000,10000], speed:[3,6], focus:[-4,-3], gas_flow:[25,32] },
+        10.0:{ power:[8000,12000], speed:[2,4], focus:[-5,-4], gas_flow:[28,35] },
+      },
+      pulse: {
+        0.5: { power:[800,1200], speed:[25,40], focus:[0,0], gas_flow:[10,12], freq:[30,50], duty:[45,60], ppk:[1200,2000] },
+        1.0: { power:[1200,2000], speed:[15,30], focus:[-0.5,0], gas_flow:[12,15], freq:[20,40], duty:[40,55], ppk:[2000,3500] },
+        2.0: { power:[2000,3500], speed:[8,18], focus:[-1,-0.5], gas_flow:[15,18], freq:[15,30], duty:[40,50], ppk:[3500,5000] },
+        3.0: { power:[3000,5000], speed:[5,12], focus:[-1.5,-1], gas_flow:[18,20], freq:[10,20], duty:[35,45], ppk:[5000,7000] },
+        5.0: { power:[4500,7000], speed:[3,8], focus:[-2.5,-2], gas_flow:[20,25], freq:[5,15], duty:[30,40], ppk:[7000,10000] },
+      },
+    },
+    galvanized: {
+      cw: {
+        0.2: { power:[300,450], speed:[40,60], focus:[0,0.5], gas_flow:[10,12] },
+        0.3: { power:[400,600], speed:[35,55], focus:[0,0.5], gas_flow:[10,12] },
+        0.5: { power:[500,800], speed:[30,50], focus:[0,0], gas_flow:[12,15] },
+        0.8: { power:[700,1200], speed:[25,40], focus:[-0.5,0], gas_flow:[12,15] },
+        1.0: { power:[1000,1500], speed:[20,35], focus:[-0.5,0], gas_flow:[12,15] },
+        1.2: { power:[1200,1800], speed:[18,30], focus:[-0.5,0], gas_flow:[15,18] },
+        1.5: { power:[1500,2200], speed:[15,25], focus:[-0.5,-0.5], gas_flow:[15,18] },
+        2.0: { power:[2000,3000], speed:[10,20], focus:[-1,-0.5], gas_flow:[15,18] },
+        2.5: { power:[2500,3500], speed:[8,16], focus:[-1,-0.5], gas_flow:[18,20] },
+        3.0: { power:[3000,4500], speed:[6,12], focus:[-1.5,-1], gas_flow:[18,22] },
+      },
+      pulse: {
+        0.5: { power:[800,1200], speed:[25,40], focus:[0,0], gas_flow:[12,15], freq:[30,50], duty:[40,55], ppk:[1200,2000] },
+        0.8: { power:[1000,1800], speed:[18,32], focus:[-0.5,0], gas_flow:[12,15], freq:[25,40], duty:[40,55], ppk:[1500,2800] },
+        1.0: { power:[1500,2200], speed:[15,28], focus:[-0.5,0], gas_flow:[15,18], freq:[20,35], duty:[40,50], ppk:[2500,3500] },
+        1.5: { power:[2000,3000], speed:[10,20], focus:[-0.5,-0.5], gas_flow:[15,18], freq:[15,30], duty:[35,50], ppk:[3000,4500] },
+        2.0: { power:[2500,4000], speed:[7,15], focus:[-1,-0.5], gas_flow:[18,20], freq:[12,25], duty:[35,45], ppk:[4000,6000] },
+      },
+    },
+    copper: {
+      cw: {
+        0.1: { power:[600,900], speed:[45,65], focus:[0,0.5], gas_flow:[10,12] },
+        0.2: { power:[800,1200], speed:[35,55], focus:[0,0.5], gas_flow:[12,15] },
+        0.3: { power:[1200,1800], speed:[30,50], focus:[0,0.5], gas_flow:[12,15] },
+        0.5: { power:[1800,2500], speed:[25,40], focus:[0,0], gas_flow:[15,18] },
+        0.8: { power:[2500,3500], speed:[18,30], focus:[-0.5,0], gas_flow:[15,18] },
+        1.0: { power:[3000,4500], speed:[12,25], focus:[-0.5,-0.5], gas_flow:[18,20] },
+        1.5: { power:[3500,5500], speed:[10,20], focus:[-1,-0.5], gas_flow:[18,22] },
+        2.0: { power:[4500,6500], speed:[8,18], focus:[-1,-0.5], gas_flow:[20,25] },
+        3.0: { power:[6000,8000], speed:[5,12], focus:[-1.5,-1], gas_flow:[22,28] },
+        4.0: { power:[7000,10000], speed:[4,10], focus:[-2,-1.5], gas_flow:[25,30] },
+        5.0: { power:[8000,12000], speed:[3,7], focus:[-2.5,-2], gas_flow:[28,35] },
+      },
+      pulse: {
+        0.2: { power:[1000,1500], speed:[30,50], focus:[0,0.5], gas_flow:[12,15], freq:[40,60], duty:[30,50], ppk:[2000,3000] },
+        0.3: { power:[1500,2500], speed:[25,40], focus:[0,0], gas_flow:[12,15], freq:[35,55], duty:[30,50], ppk:[3000,4000] },
+        0.5: { power:[2000,3500], speed:[20,35], focus:[0,0], gas_flow:[15,18], freq:[25,45], duty:[30,45], ppk:[3500,5000] },
+        1.0: { power:[3500,5000], speed:[12,25], focus:[-0.5,0], gas_flow:[18,20], freq:[20,35], duty:[30,45], ppk:[5000,7000] },
+        1.5: { power:[4000,6000], speed:[8,18], focus:[-0.5,-0.5], gas_flow:[18,22], freq:[15,30], duty:[30,40], ppk:[6000,8000] },
+        2.0: { power:[5000,7500], speed:[7,15], focus:[-1,-0.5], gas_flow:[20,25], freq:[15,25], duty:[30,40], ppk:[7000,10000] },
+        3.0: { power:[6500,9000], speed:[4,10], focus:[-1.5,-1], gas_flow:[22,28], freq:[10,20], duty:[25,35], ppk:[9000,12000] },
+      },
+    },
+    brass: {
+      cw: {
+        0.3: { power:[800,1200], speed:[30,50], focus:[0,0.5], gas_flow:[12,15] },
+        0.5: { power:[1200,1800], speed:[25,40], focus:[0,0], gas_flow:[12,15] },
+        0.8: { power:[1800,2500], speed:[18,30], focus:[-0.5,0], gas_flow:[15,18] },
+        1.0: { power:[2200,3500], speed:[15,25], focus:[-0.5,0], gas_flow:[15,18] },
+        1.5: { power:[2800,4500], speed:[10,20], focus:[-0.5,-0.5], gas_flow:[18,22] },
+        2.0: { power:[3500,5500], speed:[8,18], focus:[-1,-0.5], gas_flow:[18,22] },
+      },
+      pulse: {
+        0.3: { power:[1000,1500], speed:[28,45], focus:[0,0.5], gas_flow:[12,15], freq:[35,55], duty:[35,50], ppk:[2000,3000] },
+        0.5: { power:[1500,2500], speed:[20,35], focus:[0,0], gas_flow:[12,15], freq:[30,45], duty:[35,50], ppk:[3000,4500] },
+        1.0: { power:[2500,4000], speed:[12,22], focus:[-0.5,0], gas_flow:[15,18], freq:[20,35], duty:[30,45], ppk:[4500,6500] },
+      },
+    },
+    aluminum: {
+      cw: {
+        0.1: { power:[500,800], speed:[50,70], focus:[0,0.5], gas_flow:[12,15] },
+        0.2: { power:[700,1100], speed:[40,60], focus:[0,0.5], gas_flow:[12,15] },
+        0.3: { power:[800,1300], speed:[38,58], focus:[0,0.5], gas_flow:[15,18] },
+        0.5: { power:[1000,1500], speed:[35,55], focus:[0,0.5], gas_flow:[15,18] },
+        0.8: { power:[1500,2200], speed:[28,45], focus:[0,0], gas_flow:[15,18] },
+        1.0: { power:[2000,3000], speed:[22,38], focus:[-0.5,0], gas_flow:[18,20] },
+        1.5: { power:[2500,4000], speed:[18,30], focus:[-0.5,-0.5], gas_flow:[18,22] },
+        2.0: { power:[3000,4500], speed:[15,25], focus:[-1,-0.5], gas_flow:[20,22] },
+        3.0: { power:[4000,6000], speed:[10,18], focus:[-1.5,-1], gas_flow:[22,25] },
+        4.0: { power:[5000,8000], speed:[6,12], focus:[-2,-1.5], gas_flow:[25,30] },
+        5.0: { power:[6000,10000], speed:[5,10], focus:[-2.5,-2], gas_flow:[25,32] },
+        6.0: { power:[6000,10000], speed:[4,8], focus:[-3,-2.5], gas_flow:[28,35] },
+        8.0: { power:[8000,12000], speed:[3,6], focus:[-4,-3], gas_flow:[30,40] },
+        10.0:{ power:[10000,15000], speed:[2,4], focus:[-5,-4], gas_flow:[35,45] },
+      },
+      pulse: {
+        0.5: { power:[1500,2200], speed:[28,45], focus:[0,0.5], gas_flow:[15,18], freq:[30,50], duty:[40,55], ppk:[2500,3500] },
+        1.0: { power:[2500,4000], speed:[18,30], focus:[-0.5,0], gas_flow:[18,20], freq:[20,40], duty:[40,50], ppk:[4000,6000] },
+        1.5: { power:[3000,5000], speed:[12,24], focus:[-0.5,-0.5], gas_flow:[18,22], freq:[18,35], duty:[35,50], ppk:[5000,7000] },
+        2.0: { power:[4000,6000], speed:[10,20], focus:[-1,-0.5], gas_flow:[20,25], freq:[15,30], duty:[35,50], ppk:[6000,8000] },
+        3.0: { power:[5000,8000], speed:[6,14], focus:[-1.5,-1], gas_flow:[22,28], freq:[10,20], duty:[35,45], ppk:[8000,12000] },
+        4.0: { power:[6500,10000], speed:[4,10], focus:[-2,-1.5], gas_flow:[25,30], freq:[8,15], duty:[30,40], ppk:[10000,14000] },
+      },
+    },
+    titanium: {
+      cw: {
+        0.2: { power:[200,350], speed:[40,60], focus:[0,0.5], gas_flow:[15,18] },
+        0.3: { power:[250,400], speed:[35,55], focus:[0,0.5], gas_flow:[18,20] },
+        0.5: { power:[300,500], speed:[30,50], focus:[0,0.5], gas_flow:[18,22] },
+        0.8: { power:[500,800], speed:[25,40], focus:[0,0], gas_flow:[18,22] },
+        1.0: { power:[800,1200], speed:[20,35], focus:[-0.5,0], gas_flow:[20,25] },
+        1.5: { power:[1200,1800], speed:[15,28], focus:[-0.5,-0.5], gas_flow:[20,25] },
+        2.0: { power:[1500,2500], speed:[10,22], focus:[-1,-0.5], gas_flow:[22,28] },
+        3.0: { power:[2500,4000], speed:[8,15], focus:[-1.5,-1], gas_flow:[25,30] },
+        4.0: { power:[3000,5000], speed:[6,12], focus:[-2,-1.5], gas_flow:[25,30] },
+        5.0: { power:[4000,6000], speed:[4,8], focus:[-2.5,-2], gas_flow:[28,35] },
+        6.0: { power:[5000,8000], speed:[3,6], focus:[-3,-2.5], gas_flow:[30,38] },
+      },
+      pulse: {
+        0.5: { power:[500,900], speed:[25,40], focus:[0,0.5], gas_flow:[18,22], freq:[30,50], duty:[40,60], ppk:[900,1500] },
+        1.0: { power:[1000,1800], speed:[15,28], focus:[-0.5,0], gas_flow:[20,25], freq:[20,40], duty:[40,55], ppk:[1800,3000] },
+        1.5: { power:[1500,2500], speed:[10,22], focus:[-0.5,-0.5], gas_flow:[20,25], freq:[18,35], duty:[35,50], ppk:[2500,4000] },
+        2.0: { power:[2000,3500], speed:[8,18], focus:[-1,-0.5], gas_flow:[22,28], freq:[15,30], duty:[35,50], ppk:[3500,5000] },
+        3.0: { power:[3000,5000], speed:[5,12], focus:[-1.5,-1], gas_flow:[25,30], freq:[10,20], duty:[30,45], ppk:[5000,7000] },
+      },
+    },
+  };
+  Object.assign(PARAMS, p);
+})();
+
+// ====================================================================
+// 接头修正
+// ====================================================================
+const JOINT_FACTOR = {
+  butt:   { power: 1.0, speed: 1.0 },
+  lap:    { power: 1.15, speed: 0.85 },
+  fillet: { power: 1.1,  speed: 0.9 },
+  edge:   { power: 1.0, speed: 1.0 },
+};
+
+// ====================================================================
+// 气体备注
+// ====================================================================
+const GAS_NOTES = {
+  Ar:  { name: '氩气', note: '通用保护气体，性价比最优' },
+  N2:  { name: '氮气', note: '适合不锈钢，可提升耐腐蚀性' },
+  He:    { name: '氦气', note: '高热导率，适合厚板/铝合金，成本较高' },
+  vacuum: { name: '真空', note: '极高洁净度，无氧化，需真空室设备，适用于高反材料（铜、铝）' },
+  air:    { name: '空气', note: '低成本，仅限粗焊/非关键件，焊缝易氧化发黑，不建议用于精密焊接' },
+};
+
+// ====================================================================
+// 送丝推荐
+// ====================================================================
+function getWireRecommendation(matId, thickness) {
+  const t = thickness;
+  let wireDiam = '', wireType = '';
+  const isAl = matId === 'aluminum' || (matId && matId.startsWith('al_'));
+  const isCu = matId === 'copper' || matId === 'pure_cu' || matId === 'brass' || matId === 'bronze' || matId === 'phos_bronze' || matId === 'cupronickel';
+  if (isAl) {
+    if (t <= 0.5)      { wireDiam = 'φ0.8 mm';  wireType = 'ER4043 / ER5356'; }
+    else if (t <= 1.5) { wireDiam = 'φ1.0 mm';  wireType = 'ER4043 / ER5356'; }
+    else if (t <= 3.0) { wireDiam = 'φ1.2 mm';  wireType = 'ER5356'; }
+    else               { wireDiam = 'φ1.6 mm';  wireType = 'ER5356'; }
+  } else if (isCu) {
+    if (t <= 0.5)      { wireDiam = 'φ0.6 mm';  wireType = 'S201 / S211'; }
+    else if (t <= 1.5) { wireDiam = 'φ0.8 mm';  wireType = 'S201 / S211'; }
+    else if (t <= 3.0) { wireDiam = 'φ1.0 mm';  wireType = 'S201'; }
+    else               { wireDiam = 'φ1.2 mm';  wireType = 'S201'; }
+  } else {
+    if (t <= 0.5)      { wireDiam = 'φ0.6 mm';  wireType = 'ER308L / ER70S-6'; }
+    else if (t <= 1.0) { wireDiam = 'φ0.8 mm';  wireType = 'ER308L / ER70S-6'; }
+    else if (t <= 2.0) { wireDiam = 'φ1.0 mm';  wireType = 'ER308L / ER70S-6'; }
+    else if (t <= 5.0) { wireDiam = 'φ1.2 mm';  wireType = 'ER308L / ER70S-6'; }
+    else               { wireDiam = 'φ1.6 mm';  wireType = 'ER308L / ER70S-6'; }
+  }
+  return { wireDiam, wireType, desc: `推荐焊丝直径 ${wireDiam}，牌号 ${wireType}` };
+}
+
+// ====================================================================
+// 摆头推荐
+// ====================================================================
+function getOscRecommendation(matId, thickness, joint) {
+  const t = thickness;
+  let shape = '', size = '', desc = '';
+  const isCu = matId === 'copper' || matId === 'pure_cu';
+  if (t <= 1.0) {
+    if (joint === 'butt' || joint === 'edge') {
+      shape = '一字形摆动 (Linear)';
+      size = '振幅 0.5~1.0 mm，频率 100~200 Hz';
+      desc = '薄板对接推荐一字形摆动，有效增加熔宽，降低装配要求';
+    } else {
+      shape = '圆形摆动 (Circular)';
+      size = 'φ 0.8~1.5 mm，频率 80~150 Hz';
+      desc = '薄板搭接/角接推荐圆形摆动，均匀热分布';
+    }
+  } else if (t <= 3.0) {
+    if (joint === 'butt') {
+      shape = '一字形摆动 (Linear)';
+      size = '振幅 1.0~2.5 mm，频率 80~150 Hz';
+      desc = '中板对接推荐一字形摆动，增加熔宽提高效率';
+    } else {
+      shape = '圆形摆动 (Circular)';
+      size = 'φ 1.5~3.0 mm，频率 60~120 Hz';
+      desc = '中板搭接/角接推荐圆形摆动，促进熔池流动';
+    }
+  } else {
+    if (t >= 5.0 && isCu) {
+      shape = '八字形摆动 (Figure-8)';
+      size = '振幅 2.0~4.0 mm，频率 30~80 Hz';
+      desc = '厚板+高导热材料推荐八字形摆动，保证熔深同时改善熔池搅动';
+    } else {
+      shape = '一字/圆形组合摆动';
+      size = '振幅 1.5~3.5 mm，频率 40~100 Hz';
+      desc = '厚板推荐组合摆动模式，兼顾熔深与熔宽';
+    }
+  }
+  if (isCu) {
+    shape = '高频圆形摆动 (H-F Circular)';
+    size = 'φ 1.0~2.0 mm，频率 200~400 Hz';
+    desc = '铜材高反推荐高频摆动，抑制飞溅，提高能量耦合效率';
+  }
+  return { shape, size, desc };
+}
+
+// ====================================================================
+// 高难度判定
+// ====================================================================
+function isHighDifficulty(matA, subA, matB, subB, thickness) {
+  const t = thickness;
+  const same = (matA === matB && (!subA || !subB || subA === subB));
+
+  /* 订阅条件 — 满足任一即锁定 */
+
+  // 条件①：≤0.3mm 薄板焊接
+  if (t <= 0.3) return true;
+
+  // 条件②：钛金属焊接（任意含钛组合）
+  if (matA === 'titanium' || (matB && matB === 'titanium')) return true;
+
+  // 条件③：异种材料焊接
+  if (!same) return true;
+
+  // 原厚度超限判定（厚板焊接）
+  const key = SUB_TO_PARENT[matA] || matA;
+  const c = { copper:1.5, aluminum:3, titanium:3, ss304:6, carbon:8, galvanized:2.5 };
+  const thresh = c[key] || 99;
+  if (t >= thresh) return true;
+
+  const sub2 = matA === 'aluminum' ? subA : null;
+  if ((sub2 === 'al_2xxx' || sub2 === 'al_7xxx') && t >= 2.0) return true;
+  return false;
+}
+
+// ====================================================================
+// 其他要求 → 工艺优化建议
+// ====================================================================
+function getReqAdvice(text, weldLevel) {
+  if (!text || !text.trim()) return null;
+  const lower = text.toLowerCase();
+  const tips = [];
+  if (lower.includes('美观') || lower.includes('漂亮') || lower.includes('表面') || lower.includes('光滑')) {
+    tips.push('🔹 美观要求：建议降低焊接速度10-15%，适当增加离焦量至正离焦，保护气流量增加2-3L/min');
+  }
+  if (lower.includes('气密') || lower.includes('密封') || lower.includes('漏水') || lower.includes('泄露')) {
+    tips.push('🔹 气密性要求：建议采用穿透焊或全熔透参数，焊接速度降低15-20%，可使用搭接接头+连续密封焊道');
+    tips.push('🔹 气密性要求：建议焊后进行气密性测试，必要时增加背面保护气');
+  }
+  if (lower.includes('变形') || lower.includes('精度') || lower.includes('翘曲') || lower.includes('不平')) {
+    tips.push('🔹 变形控制：建议使用夹具加大压紧力，采用跳焊/分段焊顺序，热输入控制在推荐范围下限');
+  }
+  if (lower.includes('效率') || lower.includes('速度') || lower.includes('产能') || lower.includes('产量') || lower.includes('快')) {
+    tips.push('🔹 效率优先：建议在功率上限运行，提高焊接速度至推荐范围上限，配合摆动头提高熔宽容差');
+  }
+  if (lower.includes('真空') || lower.includes('高温') || lower.includes('腐蚀') || lower.includes('低温')) {
+    tips.push('🔹 环境特殊要求：请确保焊接环境满足工艺要求，必要时采用保护气氛箱或真空室');
+  }
+  if (lower.includes('深熔') || lower.includes('穿透') || lower.includes('全熔透') || lower.includes('单面焊双面')) {
+    tips.push('🔹 深熔要求：建议负离焦（-2～-4mm），大功率密度，可配合送丝填充间隙');
+  }
+  if (lower.includes('自动') || lower.includes('机器人') || lower.includes('编程') || lower.includes('自动线')) {
+    tips.push('🔹 自动化要求：请确保工装定位精度≤0.2mm，焊缝追踪传感器可选配');
+  }
+
+  // 异种/高难度自适应
+  if (weldLevel === 'hard' || weldLevel === 'challenging') {
+    tips.push('🔹 ⚠ 当前组合焊接难度大，强烈建议先做工艺试验验证，条件允许可使用过渡层/中间层材料改善焊接性');
+  }
+
+  if (tips.length === 0) {
+    tips.push('🔹 已根据您的要求，在推荐参数范围内选用更保守/更激进的方案');
+    tips.push('🔹 如需更精准的优化建议，请描述具体要求：焊缝美观、气密性、变形控制、效率优先等');
+  }
+  return tips;
+}
+
+// ====================================================================
+// State
+// ====================================================================
+let state = {
+  materialA: null, materialB: null,
+  subA: null, subB: null,
+  sameMaterial: true,
+  selectingFor: 'A', // 'A' or 'B' for sub-material modal context
+  wire: 'self', osc: 'no',
+  process: 'cw', thickness: 1.0,
+  joint: 'butt', gas: 'Ar',
+  otherReq: '', subscribed: false,
+};
+
+// ====================================================================
+// Render Materials
+// ====================================================================
+function renderMaterials() {
+  const grid = document.getElementById('materialGrid');
+  grid.innerHTML = MATERIALS.map(m => {
+    const hasSub = m.hasSub ? 'has-sub' : '';
+    const arrow = m.hasSub ? '<span class="arrow">▶</span>' : '';
+    return `<div class="material-card ${hasSub}" data-id="${m.id}" onclick="onMaterialClick('${m.id}')">
+      <span class="icon">${m.icon}</span>
+      <div class="name">${m.name}</div>
+      <div class="sub">${m.sub}</div>
+      ${arrow}
+    </div>`;
+  }).join('');
+}
+
+// ====================================================================
+// Same / Diff Material Toggle
+// ====================================================================
+function setSameMaterial(val) {
+  state.sameMaterial = val;
+  document.querySelectorAll('#sameToggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.val === (val ? 'same' : 'diff'));
+    btn.classList.toggle('active-b', btn.dataset.val === (val ? '' : 'diff'));
+  });
+  // Show/hide B slot
+  document.getElementById('slotB').style.display = val ? 'none' : 'block';
+  document.getElementById('vsSymbol').style.display = val ? 'none' : 'block';
+  // Reset B if same
+  if (val) {
+    state.materialB = state.materialA;
+    state.subB = state.subA;
+  }
+  updatePairDisplay();
+  updateResults();
+}
+
+// ====================================================================
+// Material Click (dual mode)
+// ====================================================================
+function onMaterialClick(id) {
+  const mat = MATERIALS.find(m => m.id === id);
+  if (!mat) return;
+
+  if (mat.hasSub) {
+    state.selectingFor = state.sameMaterial ? 'A' : 'A'; // always select A first
+    showSubModal(mat);
+    return;
+  }
+
+  // Set material A (always)
+  const oldA = state.materialA;
+  state.materialA = id;
+  state.subA = null;
+
+  // If same material mode, B follows A
+  if (state.sameMaterial) {
+    state.materialB = id;
+    state.subB = null;
+  }
+
+  // Update visual selection with labels
+  document.querySelectorAll('.material-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === id);
+    // Remove any B labels not for this
+    const label = el.querySelector('.mat-label');
+    if (label && el.dataset.id !== id) label.remove();
+  });
+
+  // Add A label
+  const cardA = document.querySelector(`.material-card[data-id="${id}"]`);
+  removeLabels(cardA);
+  const labelA = document.createElement('span');
+  labelA.className = 'mat-label mat-label-a';
+  labelA.textContent = 'A';
+  cardA.style.position = 'relative';
+  cardA.appendChild(labelA);
+
+  updatePairDisplay();
+  updateResults();
+}
+
+// ====================================================================
+// Sub-Material Modal (handles both A and B)
+// ====================================================================
+let subModalParent = null;
+
+function showSubModal(mat) {
+  subModalParent = mat;
+  document.getElementById('subModalTitle').textContent = `选择 ${mat.name} 牌号`;
+  const grid = document.getElementById('subModalGrid');
+  const currentSub = state.selectingFor === 'A' ? state.subA
+    : (state.selectingFor === 'B' ? state.subB : state.subA);
+  grid.innerHTML = mat.subMaterials.map(s => {
+    const isSelected = state.materialA === mat.id && currentSub === s.id;
+    return `<div class="sub-option ${isSelected ? 'selected' : ''}" data-sub-id="${s.id}" onclick="selectSubMaterial('${s.id}')">
+      <div class="name">${s.name}</div>
+      <div class="desc">${s.sub}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('subModal').classList.add('visible');
+}
+
+function closeSubModal() {
+  document.getElementById('subModal').classList.remove('visible');
+}
+
+function selectSubMaterial(subId) {
+  if (!subModalParent) return;
+  const matId = subModalParent.id;
+
+  // We always set A's sub-material in the same/diff toggle
+  state.materialA = matId;
+  state.subA = subId;
+
+  if (state.sameMaterial) {
+    state.materialB = matId;
+    state.subB = subId;
+  }
+
+  document.querySelectorAll('.material-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === matId);
+    const label = el.querySelector('.mat-label');
+    if (label && el.dataset.id !== matId) label.remove();
+  });
+  const card = document.querySelector(`.material-card[data-id="${matId}"]`);
+  if (card) {
+    removeLabels(card);
+    const label = document.createElement('span');
+    label.className = 'mat-label mat-label-a';
+    label.textContent = 'A';
+    card.style.position = 'relative';
+    card.appendChild(label);
+  }
+
+  updatePairDisplay();
+  closeSubModal();
+  updateResults();
+}
+
+function removeLabels(el) {
+  if (!el) return;
+  const lbls = el.querySelectorAll('.mat-label');
+  lbls.forEach(l => l.remove());
+}
+
+// ====================================================================
+// Update Pair Display
+// ====================================================================
+function updatePairDisplay() {
+  const slotA = document.querySelector('#slotA .mat-name');
+  const slotB = document.querySelector('#slotB .mat-name');
+  const slotASub = document.querySelector('#slotA .mat-sub');
+  const slotBSub = document.querySelector('#slotB .mat-sub');
+
+  const nameA = getMatDisplayName(state.materialA, state.subA);
+  slotA.textContent = nameA || '—';
+
+  if (!state.sameMaterial) {
+    const nameB = getMatDisplayName(state.materialB, state.subB);
+    slotB.textContent = nameB || '—';
+  } else {
+    slotB.textContent = nameA || '—';
+  }
+}
+
+function getMatDisplayName(matId, subId) {
+  if (!matId) return null;
+  const mat = MATERIALS.find(m => m.id === matId);
+  if (!mat) return matId;
+  if (subId && mat.subMaterials) {
+    const sub = mat.subMaterials.find(s => s.id === subId);
+    return sub ? `${mat.name} > ${sub.name}` : mat.name;
+  }
+  return mat.name;
+}
+
+function getMatNameShort(matId, subId) {
+  if (!matId) return '';
+  const mat = MATERIALS.find(m => m.id === matId);
+  if (!mat) return matId;
+  if (subId && mat.subMaterials) {
+    const sub = mat.subMaterials.find(s => s.id === subId);
+    return sub ? sub.name : mat.name;
+  }
+  return mat.name;
+}
+
+// ====================================================================
+function selectWire(val) {
+  state.wire = val;
+  document.querySelectorAll('#wireGrid .toggle-opt').forEach(el => el.classList.toggle('selected', el.dataset.value === val));
+  updateResults();
+}
+function selectOsc(val) {
+  state.osc = val;
+  document.querySelectorAll('#oscGrid .toggle-opt').forEach(el => el.classList.toggle('selected', el.dataset.value === val));
+  updateResults();
+}
+function selectProcess(val) {
+  state.process = val;
+  document.querySelectorAll('#processGrid .process-opt').forEach(el => el.classList.toggle('selected', el.dataset.value === val));
+  updateResults();
+}
+function selectJoint(val) {
+  state.joint = val;
+  document.querySelectorAll('#jointGrid .joint-opt').forEach(el => el.classList.toggle('selected', el.dataset.value === val));
+  updateResults();
+}
+function selectGas(val) {
+  state.gas = val;
+  document.querySelectorAll('#gasGrid .gas-opt').forEach(el => el.classList.toggle('selected', el.dataset.value === val));
+  updateResults();
+}
+
+// ====================================================================
+function onThicknessChange(val) {
+  state.thickness = parseFloat(val);
+  document.getElementById('thicknessValue').textContent = state.thickness.toFixed(1);
+  document.querySelectorAll('#thicknessPresets button').forEach(btn => btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.val) - state.thickness) < 0.05));
+  updateResults();
+}
+function renderThicknessPresets() {
+  const presets = [0.2, 0.3, 0.5, 0.8, 1.0, 1.5, 2.0, 3.0, 5.0, 8.0];
+  document.getElementById('thicknessPresets').innerHTML = presets.map(t => `<button data-val="${t}" onclick="setThicknessPreset(${t})">${t}</button>`).join('');
+}
+function setThicknessPreset(val) {
+  state.thickness = val;
+  document.getElementById('thicknessSlider').value = val;
+  document.getElementById('thicknessValue').textContent = val.toFixed(1);
+  document.querySelectorAll('#thicknessPresets button').forEach(btn => btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.val) - val) < 0.05));
+  updateResults();
+}
+function onOtherReqChange() {
+  const ta = document.getElementById('otherReq');
+  document.getElementById('charCount').textContent = ta.value.length;
+  state.otherReq = ta.value;
+  updateResults();
+}
+
+// ====================================================================
+// ====================================================================
+// Banner Carousel
+// ====================================================================
+let bannerIndex = 0;
+let bannerTimer = null;
+
+function startBanner() {
+  const slides = document.querySelectorAll('.banner-slide');
+  const dots = document.querySelectorAll('.banner-dots .dot');
+  if (!slides.length) return;
+  function goTo(idx) {
+    slides.forEach(s => s.classList.remove('active'));
+    dots.forEach(d => d.classList.remove('active'));
+    bannerIndex = (idx + slides.length) % slides.length;
+    slides[bannerIndex].classList.add('active');
+    dots[bannerIndex].classList.add('active');
+  }
+  function next() { goTo(bannerIndex + 1); }
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => { goTo(i); resetBannerTimer(); });
+  });
+  bannerTimer = setInterval(next, 4000);
+  window.resetBannerTimer = function() {
+    clearInterval(bannerTimer);
+    bannerTimer = setInterval(next, 4000);
+  };
+}
+
+// ====================================================================
+// Payment Functions
+// ====================================================================
+let selectedPayMethod = null;
+
+function showPayment() {
+  document.getElementById('paymentPanel').style.display = 'block';
+}
+
+function selectPay(method) {
+  selectedPayMethod = method;
+  document.querySelectorAll('.pay-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('pay' + (method === 'wechat' ? 'Wechat' : 'Alipay')).classList.add('selected');
+}
+
+function confirmPay() {
+  if (!selectedPayMethod) {
+    alert('请先选择支付方式（微信支付或支付宝）');
+    return;
+  }
+  state.subscribed = true;
+  document.getElementById('subStatus').style.display = 'block';
+  document.querySelector('#subGate .btn-sub').style.display = 'none';
+  document.getElementById('paymentPanel').style.display = 'none';
+  updateResults();
+}
+
+// ====================================================================
+// Original subscribe (kept for backward compat)
+// ====================================================================
+function subscribeUnlock() {
+  state.subscribed = true;
+  document.getElementById('subStatus').style.display = 'block';
+  document.querySelector('#subGate .btn-sub').style.display = 'none';
+  updateResults();
+}
+
+// ====================================================================
+// Get effective material key for PARAMS lookup
+// ====================================================================
+function getEffectiveMatKey(matId, subId) {
+  if (!matId) return null;
+  if (subId) {
+    if (subId.startsWith('al_')) return 'aluminum';
+    if (subId === 'brass') return 'brass';
+    if (subId === 'pure_cu' || subId === 'bronze' || subId === 'phos_bronze' || subId === 'cupronickel') return 'copper';
+  }
+  return matId;
+}
+
+function findClosestThicknessKey(keysArr, target) {
+  const keys = [...keysArr].map(Number).sort((a,b)=>a-b);
+  let best = keys[0], bestDiff = Math.abs(best - target);
+  for (const k of keys) {
+    const d = Math.abs(k - target);
+    if (d < bestDiff) { best = k; bestDiff = d; }
+  }
+  return best;
+}
+
+function getMatGroup(id) {
+  if (SUB_TO_PARENT[id]) id = SUB_TO_PARENT[id];
+  const m = MATERIALS.find(x => x.id === id);
+  return m ? m.group : '';
+}
+
+// ====================================================================
+// Main: Update Results
+// ====================================================================
+function updateResults() {
+  const {
+    materialA, materialB, subA, subB, sameMaterial,
+    thickness, joint, gas, wire, osc, otherReq, subscribed,
+  } = state;
+
+  if (!materialA) { hideResults(); return; }
+  const effKey = getEffectiveMatKey(materialA, subA);
+  if (!effKey || !PARAMS[effKey]) { hideResults(); return; }
+
+  // Get primary material params
+  const modeData = PARAMS[effKey][state.process];
+  if (!modeData) { hideResults(); return; }
+  const avail = Object.keys(modeData).map(Number);
+  const closest = findClosestThicknessKey(avail, thickness);
+  const raw = modeData[closest];
+  if (!raw) { hideResults(); return; }
+
+  // Sub-factor
+  let subFactor = { power: 1.0, speed: 1.0, note: '' };
+  if (subA && SUB_FACTORS[subA]) subFactor = SUB_FACTORS[subA];
+
+  const jf = JOINT_FACTOR[joint] || JOINT_FACTOR.butt;
+  const powerMin = Math.round(raw.power[0] * jf.power * subFactor.power);
+  const powerMax = Math.round(raw.power[1] * jf.power * subFactor.power);
+  const speedMin = Math.round((raw.speed[0] * jf.speed * subFactor.speed) * 10) / 10;
+  const speedMax = Math.round((raw.speed[1] * jf.speed * subFactor.speed) * 10) / 10;
+  const flowMin = raw.gas_flow[0]; const flowMax = raw.gas_flow[1];
+  const gasInfo = GAS_NOTES[gas] || GAS_NOTES.Ar;
+  const isPulse = state.process === 'pulse';
+
+  // Material names
+  const nameA = getMatDisplayName(materialA, subA);
+  const nameAShort = getMatNameShort(materialA, subA);
+  const nameBShort = getMatNameShort(materialB || materialA, sameMaterial ? subA : subB);
+  const isDiff = !sameMaterial && materialB && materialB !== materialA;
+
+  // Weldability
+  const weldAssess = assessWeldability(materialA, subA, materialB || materialA, sameMaterial ? subA : subB);
+
+  // Summary
+  const procName = isPulse ? '脉冲激光' : '连续激光';
+  const jointName = {butt:'对接',lap:'搭接',fillet:'角接',edge:'边接'}[joint] || joint;
+  const wireName = wire === 'feed' ? '【送丝】' : '【自熔】';
+  const oscName = osc === 'yes' ? '【有摆头】' : '';
+  const pairName = isDiff ? `${nameAShort} ⟷ ${nameBShort}` : nameA;
+  const sameNote = isDiff ? '异种焊接' : '同种焊接';
+
+  document.getElementById('summaryMat').textContent = `${pairName} · ${closest}mm`;
+  document.getElementById('summaryDetail').textContent =
+    `${sameNote} · ${wireName}${oscName} ${procName} · ${jointName} · ${gasInfo.name}`;
+
+  // ===== Weldability Assessment Card =====
+  const wCard = document.getElementById('weldabilityCard');
+  const levelCss = {
+    easy: 'w-card-green',
+    moderate: 'w-card-yellow',
+    challenging: 'w-card-orange',
+    hard: 'w-card-red',
+  };
+  const levelIcons = {
+    easy: '🟢',
+    moderate: '🟡',
+    challenging: '🟠',
+    hard: '🔴',
+  };
+
+  let wItems = [];
+  if (weldAssess.level === 'easy') {
+    wItems.push('强度：满足常规要求');
+    wItems.push('金相：熔合良好，无不利相');
+    wItems.push('外观：易于控制，成型美观');
+  } else if (weldAssess.level === 'moderate') {
+    wItems.push('强度：可满足一般工况要求，建议考虑过渡层');
+    wItems.push('金相：需要管控稀释率和热循环');
+    wItems.push('外观：可通过工艺参数优化获得合格外观');
+  } else if (weldAssess.level === 'challenging') {
+    wItems.push('强度：可能不满足高强度工况，需要加试板验证');
+    wItems.push('金相：界面可能生成不利金属间化合物');
+    wItems.push('外观：需精确控制参数窗口才能获得可接受外观');
+    wItems.push('💡 推荐使用过渡层/中间层材料改善焊接性');
+  } else if (weldAssess.level === 'hard') {
+    wItems.push('强度：界面结合强度低，不满足常规焊接结构要求');
+    wItems.push('金相：产生大量脆性金属间化合物');
+    wItems.push('外观：焊缝成形困难，易开裂');
+    wItems.push('❌ 不建议直接用激光焊接，推荐替代方案：钎焊、扩散焊、机械连接等');
+  }
+  // Diff material specific
+  if (isDiff) {
+    wItems.push(`⚡ 材料组合：${getMatDisplayName(materialA, subA)} ⟷ ${getMatDisplayName(materialB, subB)}`);
+  }
+
+  wCard.style.display = 'block';
+  wCard.className = `weldability-card ${levelCss[weldAssess.level] || 'w-card-yellow'}`;
+  wCard.innerHTML = `
+    <div class="w-icon">${levelIcons[weldAssess.level] || '🟡'}</div>
+    <div class="w-title">${weldAssess.title}</div>
+    <div class="w-desc">${weldAssess.desc}</div>
+    <ul class="w-items">
+      ${wItems.map(i => `<li>${i}</li>`).join('')}
+    </ul>
+  `;
+
+  // ===== Subscription gate =====
+  const highDiff = isHighDifficulty(materialA, subA, materialB, subB, thickness);
+  // 条件④：有气密性要求的焊接
+  const hasAirtight = state.otherReq && /气密|密封|漏水|泄露/i.test(state.otherReq);
+  const needsSub = highDiff || weldAssess.level === 'hard' || hasAirtight;
+  const subGate = document.getElementById('subGate');
+
+  // 构造订阅原因描述
+  let subReasons = [];
+  if (thickness <= 0.3) subReasons.push('≤0.3mm 薄板焊接');
+  if (materialA === 'titanium' || (materialB && materialB === 'titanium')) subReasons.push('钛金属焊接');
+  if (hasAirtight) subReasons.push('气密性要求');
+  if (materialA && materialB && materialA !== materialB) subReasons.push('异种材料焊接');
+  if (subReasons.length === 0 && (highDiff || weldAssess.level === 'hard')) subReasons.push('该焊接组合难度较高');
+
+  if (needsSub && !subscribed) {
+    subGate.style.display = 'block';
+    document.getElementById('subDesc').innerHTML =
+      `🔒 需订阅 · 触发条件：${subReasons.join('、')}<br><span style="font-size:11px;opacity:0.7;">订阅后解锁全部焊接参数，含送丝/摆头/工艺建议</span>`;
+    document.getElementById('subStatus').style.display = 'none';
+    document.querySelector('#subGate .btn-sub').style.display = '';
+    document.getElementById('resultsInner').style.display = 'none';
+  } else {
+    subGate.style.display = 'none';
+    document.getElementById('resultsInner').style.display = 'block';
+  }
+
+  // ===== Result Cards =====
+  const grid = document.getElementById('resultGrid');
+  let html = `
+    <div class="result-card param-power">
+      <div class="label">激光功率</div>
+      <div class="value">${powerMin} <span class="range">~ ${powerMax} W</span></div>
+      <div class="hint" style="color:${powerMax > 8000 ? 'var(--orange)' : 'var(--text2)'};font-size:11px;">${powerMax > 8000 ? '⚠ 建议10kW以上激光器' : '推荐功率范围'}</div>
+    </div>
+    <div class="result-card param-speed">
+      <div class="label">焊接速度</div>
+      <div class="value">${speedMin} <span class="range">~ ${speedMax} mm/s</span></div>
+      <div class="hint" style="font-size:11px;color:var(--text2);">${speedMax > 30 ? '高速焊接' : speedMax > 15 ? '中速焊接' : '低速深熔焊'}</div>
+    </div>
+    <div class="result-card param-focus">
+      <div class="label">焦平面位置</div>
+      <div class="value">${raw.focus[0].toFixed(1)} <span class="range">~ ${raw.focus[1].toFixed(1)} mm</span></div>
+      <div class="hint" style="font-size:11px;color:var(--text2);">${raw.focus[0] < 0 ? '负离焦（深熔焊）' : '零/正离焦（热传导焊）'}</div>
+    </div>
+    <div class="result-card param-gas">
+      <div class="label">保护气体 · ${gasInfo.name}</div>
+      <div class="value">${flowMin} <span class="range">~ ${flowMax} L/min</span></div>
+      <div class="hint" style="font-size:11px;color:var(--text2);">${gasInfo.note}</div>
+    </div>`;
+
+  if (subFactor.note) {
+    html += `<div class="result-card full" style="border-left:3px solid var(--accent);">
+      <div class="label">材料提示</div>
+      <div class="value" style="font-size:13px;font-weight:400;">💡 ${subFactor.note}</div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+
+  // ===== Pulse Panel =====
+  const pulsePanel = document.getElementById('pulsePanel');
+  const pulseGrid = document.getElementById('pulseGrid');
+  if (isPulse && raw.freq && raw.duty && raw.ppk) {
+    pulsePanel.classList.add('visible');
+    const avgMin = Math.round(raw.ppk[0] * raw.duty[0] / 100);
+    const avgMax = Math.round(raw.ppk[1] * raw.duty[1] / 100);
+    pulseGrid.innerHTML = `
+      <div class="pulse-item"><div class="plabel">脉冲频率</div><div class="pvalue">${raw.freq[0]} ~ ${raw.freq[1]} Hz</div></div>
+      <div class="pulse-item"><div class="plabel">占空比</div><div class="pvalue">${raw.duty[0]}% ~ ${raw.duty[1]}%</div></div>
+      <div class="pulse-item"><div class="plabel">峰值功率</div><div class="pvalue">${raw.ppk[0]} ~ ${raw.ppk[1]} W</div></div>
+      <div class="pulse-item"><div class="plabel">平均功率</div><div class="pvalue">${avgMin} ~ ${avgMax} W</div></div>`;
+  } else {
+    pulsePanel.classList.remove('visible');
+  }
+
+  // ===== Wire Recommendation =====
+  const wireArea = document.getElementById('wireRecArea');
+  const wireContent = document.getElementById('wireRecContent');
+  if (wire === 'feed' && (!highDiff || subscribed)) {
+    const wr = getWireRecommendation(effKey, thickness);
+    wireArea.style.display = 'block';
+    wireContent.innerHTML = `
+      <div class="title">📎 送丝推荐</div>
+      <div class="item">${wr.desc}</div>
+      <div class="item">送丝速度：${thickness <= 1.0 ? '2~4' : thickness <= 3.0 ? '3~6' : '4~8'} m/min</div>
+      <div class="item">推荐角度：前送丝 30~45°</div>`;
+  } else if (wire === 'feed') {
+    wireArea.style.display = 'block';
+    wireContent.innerHTML = `<div class="title">📎 送丝推荐</div><div class="item" style="color:var(--orange);">🔒 订阅后解锁详细参数</div>`;
+  } else {
+    wireArea.style.display = 'none';
+  }
+
+  // ===== Osc Recommendation =====
+  const oscArea = document.getElementById('oscRecArea');
+  const oscContent = document.getElementById('oscRecContent');
+  if (osc === 'yes' && (!highDiff || subscribed)) {
+    const or = getOscRecommendation(effKey, thickness, joint);
+    oscArea.style.display = 'block';
+    oscContent.innerHTML = `
+      <div class="title">🌀 摆头推荐</div>
+      <div class="item">摆头形状：${or.shape}</div>
+      <div class="item">摆动参数：${or.size}</div>
+      <div class="item">${or.desc}</div>`;
+  } else if (osc === 'yes') {
+    oscArea.style.display = 'block';
+    oscContent.innerHTML = `<div class="title">🌀 摆头推荐</div><div class="item" style="color:var(--orange);">🔒 订阅后解锁详细参数</div>`;
+  } else {
+    oscArea.style.display = 'none';
+  }
+
+  // ===== Other Requirements =====
+  const reqArea = document.getElementById('reqAdviceArea');
+  const reqContent = document.getElementById('reqAdviceContent');
+  if (otherReq && otherReq.trim() && (!highDiff || subscribed)) {
+    const advice = getReqAdvice(otherReq, weldAssess.level);
+    if (advice && advice.length > 0) {
+      reqArea.style.display = 'block';
+      reqContent.innerHTML = `<div class="title">📋 其他要求 · 工艺优化建议</div>${advice.map(a => `<div class="item">${a}</div>`).join('')}`;
+    } else { reqArea.style.display = 'none'; }
+  } else if (otherReq && otherReq.trim()) {
+    reqArea.style.display = 'block';
+    reqContent.innerHTML = `<div class="title">📋 其他要求 · 工艺优化建议</div><div class="item" style="color:var(--orange);">🔒 订阅后解锁个性化优化建议</div>`;
+  } else {
+    reqArea.style.display = 'none';
+  }
+
+  document.querySelector('.results-section').classList.add('visible');
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideResults() {
+  document.querySelector('.results-section').classList.remove('visible');
+  document.getElementById('weldabilityCard').style.display = 'none';
+}
+
+// ====================================================================
+// 技术文章点击弹窗
+// ====================================================================
+function openArticle(id) {
+  const articles = {
+    art1: {
+      title: '激光焊接常见缺陷分析与对策',
+      body: '激光焊接过程中常见气孔、裂纹、飞溅、咬边四大缺陷。\n\n气孔：主要由保护气不足或材料表面污染引起，可通过增大气流量、清洁母材表面、降低焊接速度来改善。\n\n裂纹：多源于应力集中或材料成分不当，可通过预热、缓冷、选用匹配焊丝等方式控制。\n\n飞溅：多因功率密度过高或材料表面状态不佳，适当降低峰值功率、调整离焦量可有效减少。\n\n咬边：通常与焊接速度过快或送丝不足有关，适当降低速度、增加送丝量即可改善。'
+    },
+    art2: {
+      title: '铜材激光焊接：纯铜 vs 黄铜 vs 青铜',
+      body: '铜材对近红外激光吸收率极低（约5%），是高反材料焊接的代表性难题。\n\n纯铜：热导率最高，需高功率密度（>1×10⁶ W/cm²），建议使用蓝光/绿光激光器或高频脉冲辅助。\n\n黄铜（铜锌合金）：锌元素低沸点易蒸发造成气孔，需控制热输入，推荐振荡焊接工艺。\n\n青铜（铜锡合金）：焊接性相对较好，流动性适中，适用于中等功率激光器。\n\n磷铜/白铜：含P或Ni，熔池流动性有差异，需针对性调整焊丝成分。'
+    },
+    art3: {
+      title: '薄板精密焊接工艺要点（≤0.5mm）',
+      body: '超薄板材的激光焊接核心挑战是热变形控制和熔透稳定。\n\n功率控制：建议采用脉冲模式或低功率连续模式（≤500W），功率波动需控制在±2%以内。\n\n工装夹具：建议使用真空吸盘或磁性夹具，确保接触面平整，减少间隙。\n\n保护气：流量不宜过大（5-8L/min），避免吹偏熔池。\n\n焊接速度：0.5mm以下推荐30-60mm/s，焊后需进行变形检测。'
+    },
+    art4: {
+      title: '保护气体选择指南',
+      body: '保护气体直接影响焊缝成形、熔深和氧化控制。\n\nAr（氩气）：最常用，电离能低，价格适中，适用于不锈钢、碳钢、铝合金等多数材料。\n\nN₂（氮气）：适用于不锈钢，可提高焊缝强度但可能造成氮气孔。\n\nHe（氦气）：热导率高，适合厚板/铝合金深熔焊，但价格较高。\n\n真空环境：无氧环境，焊接质量最高但设备成本高，适用于铜/铝等高反材料。\n\n空气：仅限非关键件粗焊，焊缝易氧化发黑。'
+    },
+    art5: {
+      title: '异种材料激光焊接：组合评估与工艺设计',
+      body: '异种材料焊接的核心难点在于热物理性能差异和金属间化合物控制。\n\n不锈钢-铜：推荐加Ni基过渡层，采用铜侧偏置光束。\n\n钢-铝：推荐Al-Si焊丝，控制金属间化合物层厚度<10μm。\n\n钛-其他金属：钛与多数金属形成脆性金属间化合物，推荐钎焊或扩散焊。\n\n铜-铝：宜在铜侧镀Ni层，选用铝基焊丝。\n\n设计原则：熔点差<200°C可直接焊，差>200°C需加过渡层。'
+    }
+  };
+  const a = articles[id];
+  if (!a) return;
+  alert(`📖 ${a.title}\n\n${a.body}`);
+}
+
+// ====================================================================
+// Reset
+// ====================================================================
+function resetAll() {
+  state = {
+    materialA: null, materialB: null,
+    subA: null, subB: null,
+    sameMaterial: true, selectingFor: 'A',
+    wire: 'self', osc: 'no',
+    process: 'cw', thickness: 1.0,
+    joint: 'butt', gas: 'Ar',
+    otherReq: '', subscribed: false,
+  };
+  document.getElementById('thicknessSlider').value = 1.0;
+  document.getElementById('thicknessValue').textContent = '1.0';
+  document.getElementById('otherReq').value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('subTagArea').innerHTML = '';
+
+  document.querySelectorAll('.material-card, .toggle-opt, .process-opt, .joint-opt, .gas-opt').forEach(el => {
+    el.classList.remove('selected', 'selected-b');
+    removeLabels(el);
+  });
+
+  // Reset toggles
+  document.querySelector('#wireGrid .toggle-opt[data-value="self"]')?.classList.add('selected');
+  document.querySelector('#oscGrid .toggle-opt[data-value="no"]')?.classList.add('selected');
+  document.querySelector('#processGrid .process-opt[data-value="cw"]')?.classList.add('selected');
+  document.querySelector('#jointGrid .joint-opt[data-value="butt"]')?.classList.add('selected');
+  document.querySelector('#gasGrid .gas-opt[data-value="Ar"]')?.classList.add('selected');
+
+  // Same/diff toggle
+  document.querySelectorAll('#sameToggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.val === 'same');
+    btn.classList.toggle('active-b', false);
+  });
+  document.getElementById('slotB').style.display = 'none';
+  document.getElementById('vsSymbol').style.display = 'none';
+  document.querySelector('#slotA .mat-name').textContent = '—';
+  document.querySelector('#slotB .mat-name').textContent = '—';
+
+  hideResults();
+  setTimeout(() => document.getElementById('materialGrid').scrollIntoView({ behavior: 'smooth' }), 100);
+}
+
+// ====================================================================
+// Init
+// ====================================================================
+function init() {
+  renderMaterials();
+  renderThicknessPresets();
+  startBanner();
+}
+init();
+</script>
+</body>
+</html>
