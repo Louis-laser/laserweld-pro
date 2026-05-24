@@ -2502,13 +2502,12 @@ function _updateResultsNow() {
   
   function recommendLaserType(t, lvl) {
     if (t <= 0.5) return '点环';
-    if (t > 5 || lvl === 'hard' || lvl === 'challenging') return '复合';
+    if (t > 5 || lvl === 'hard') return '复合';
     return '普通';
   }
   function recommendCoreDia(t, lvl) {
     if (t <= 0.3) return '14um';
     if (t <= 0.5) return '20um';
-    if (lvl === 'hard' || lvl === 'challenging') return '50/150um';
     if (t <= 1.0) return '30um';
     if (t <= 2.0) return '50um';
     if (t <= 4.0) return '100um';
