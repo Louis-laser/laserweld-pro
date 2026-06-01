@@ -4199,9 +4199,16 @@ if ('serviceWorker' in navigator) {
   var modal = document.getElementById('installModal');
   if (!guide || !modal) return;
   
+  var deferredPrompt = null;
+  
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  
   var t = setTimeout(function(){ guide.style.display = 'block'; }, 4000);
   
-  guide.onclick = function(){
+  function openModal() {
     clearTimeout(t);
     modal.style.display = 'flex';
     var i = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -4212,15 +4219,39 @@ if ('serviceWorker' in navigator) {
       document.getElementById('installGuideIOS').style.display = 'block';
       document.getElementById('installGuideAndroid').style.display = 'block';
     }
-  };
+  }
   
-  document.getElementById('installModalClose').onclick = function(){ modal.style.display = 'none'; };
-  document.getElementById('installLater').onclick = function(){ modal.style.display = 'none'; };
-  document.getElementById('installDismiss').onclick = function(){
+  function closeModal() {
+    modal.style.display = 'none';
+  }
+  
+  function dismissAll() {
     modal.style.display = 'none';
     guide.style.display = 'none';
     localStorage.setItem(key, '1');
-  };
+  }
+  
+  listen(guide, 'click', openModal);
+  listen(document.getElementById('installModalClose'), 'click', closeModal);
+  listen(document.getElementById('installLater'), 'click', closeModal);
+  listen(document.getElementById('installDismiss'), 'click', dismissAll);
+  
+  // 点击弹窗外部关闭
+  listen(modal, 'click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+  
+  // 兼容微信浏览器：用touch事件确保可点击
+  function listen(el, event, fn) {
+    if (!el) return;
+    el.addEventListener(event, fn, false);
+    // 移动端touch转click辅助
+    if (event === 'click') {
+      el.addEventListener('touchend', function(e) {
+        if (!e._clicked) { e._clicked = true; fn.call(el, e); }
+      }, {passive: true});
+    }
+  }
 })();
 </script>
 </body>
