@@ -2176,7 +2176,7 @@ const LANG = {
     'laser.rec.type.single': '标准激光器',
     'laser.rec.type.ring': '环形光斑',
     'laser.rec.type.hybrid': '混合光斑',
-    'sub.reason.thin': '≤0.3mm薄板',
+    'sub.reason.thin': '≤0.5mm薄板',
     'sub.reason.titanium': '钛合金焊接',
     'sub.reason.airtight': '气密性要求',
     'sub.reason.diff': '异种材料焊接',
@@ -2306,7 +2306,7 @@ const LANG = {
     'laser.rec.type.single': 'Standard',
     'laser.rec.type.ring': 'Ring',
     'laser.rec.type.hybrid': 'Hybrid',
-    'sub.reason.thin': '≤0.3mm thin plate',
+    'sub.reason.thin': '≤0.5mm thin plate',
     'sub.reason.titanium': 'Titanium welding',
     'sub.reason.airtight': 'Airtightness requirements',
     'sub.reason.diff': 'Dissimilar material welding',
@@ -2711,8 +2711,8 @@ function isHighDifficulty(matA, subA, matB, subB, thickness) {
 
   /* 订阅条件 — 满足任一即锁定 */
 
-  // 条件①：≤0.3mm 薄板焊接
-  if (t <= 0.3) return true;
+  // 条件①：≤0.5mm 薄板焊接
+  if (t <= 0.5) return true;
 
   // 条件②：钛金属焊接（任意含钛组合）
   if (matA === 'titanium' || (matB && matB === 'titanium')) return true;
@@ -3742,7 +3742,7 @@ function _updateResultsNow() {
 
   // 构造订阅原因描述
   let subReasons = [];
-  if (thickness <= 0.3) subReasons.push(t('sub.reason.thin'));
+  if (thickness <= 0.5) subReasons.push(t('sub.reason.thin'));
   if (materialA === 'titanium' || (materialB && materialB === 'titanium')) subReasons.push(t('sub.reason.titanium'));
   if (hasAirtight) subReasons.push(t('sub.reason.airtight'));
   if (materialA && materialB && materialA !== materialB) subReasons.push(t('sub.reason.diff'));
