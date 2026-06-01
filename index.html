@@ -1144,18 +1144,6 @@ input[type="range"]::-moz-range-thumb {
   opacity: 0.9;
 }
 
-/* ============ Payment Panel ============ */
-#paymentPanel {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.3s ease;
-  padding: 0 0;
-}
-#paymentPanel.open {
-  max-height: 600px;
-  padding: 14px 0 0;
-}
-
 /* ============ Amount Input ============ */
 #payAmountInput {
   -moz-appearance: textfield;
@@ -3333,7 +3321,6 @@ function showPayment() {
   document.getElementById('paymentPanel').classList.add('open');
   document.getElementById('payMethodArea').style.display = 'none';
   document.getElementById('confirmArea').style.display = 'none';
-  document.getElementById('contactFormArea').style.display = 'none';
   document.getElementById('payConfirmBtn').disabled = false;
   document.getElementById('payConfirmBtn').textContent = t('pay.confirm');
   document.getElementById('payCancelBtn').style.display = '';
@@ -3351,7 +3338,6 @@ function selectPlan(plan) {
   payAmountInput = null;
   document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('plan' + (plan === 'once' ? 'Once' : 'Monthly')).classList.add('selected');
-  document.getElementById('contactFormArea').style.display = 'none';
   document.getElementById('confirmArea').style.display = 'none';
   // Show payment methods
   payState = 'PAYMENT_SELECT';
@@ -3469,7 +3455,6 @@ function cancelPay() {
   document.getElementById('paymentPanel').classList.remove('open');
   document.getElementById('payMethodArea').style.display = 'none';
   document.getElementById('confirmArea').style.display = 'none';
-  document.getElementById('contactFormArea').style.display = 'none';
   document.getElementById('payStatusMsg').textContent = '';
 }
 
