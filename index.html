@@ -1092,6 +1092,85 @@ input[type="range"]::-moz-range-thumb {
   background: rgba(255,255,255,0.15);
   border-color: var(--accent);
 }
+
+/* ============ Contact Form Overlay ============ */
+#contactFormOverlay {
+  animation: fadeIn 0.2s ease;
+}
+#contactFormOverlay > div {
+  animation: slideUp 0.25s ease;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 360px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+#contactFormOverlay input,
+#contactFormOverlay textarea {
+  padding: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+#contactFormOverlay input:focus,
+#contactFormOverlay textarea:focus {
+  border-color: var(--accent);
+}
+#contactFormOverlay textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+#contactFormOverlay button {
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  padding: 12px;
+  transition: opacity 0.2s;
+}
+#contactFormOverlay button:hover {
+  opacity: 0.9;
+}
+
+/* ============ Payment Panel ============ */
+#paymentPanel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  padding: 0 0;
+}
+#paymentPanel.open {
+  max-height: 600px;
+  padding: 14px 0 0;
+}
+
+/* ============ Amount Input ============ */
+#payAmountInput {
+  -moz-appearance: textfield;
+}
+#payAmountInput::-webkit-outer-spin-button,
+#payAmountInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ============ Animations ============ */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 </style>
   <script src="data/params.js"></script>
   <script src="data/sub-factors.js"></script>
@@ -1321,27 +1400,27 @@ input[type="range"]::-moz-range-thumb {
       <div class="icon">🔒</div>
       <div class="title" data-i18n="sub.gate.title">高难度焊接参数</div>
       <div class="desc" id="subDesc" data-i18n="sub.gate.desc">当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。</div>
-      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;" data-i18n="sub.gate.price">🔑 单次¥20 · 📅 月度¥6/月</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;" data-i18n="sub.gate.price">🔑 单次¥20 · 📅 月度¥38/月</div>
       <button class="btn-sub" onclick="showPayment()" aria-label="订阅解锁高级焊接参数" data-i18n="sub.gate.btn">🔓 订阅解锁</button>
       <div class="sub-status" id="subStatus" style="display:none;">✅ <span data-i18n="sub.status.default">已订阅 · 全部参数已解锁</span></div>
 
       <!-- 支付窗口 -->
       <div id="paymentPanel" style="border-top:1px solid var(--border);">
         <div style="font-size:14px; font-weight:700; margin-bottom:2px; color:var(--green);">💰 选择订阅方案</div>
-        <div style="font-size:11px; color:var(--text2); margin-bottom:10px;">订阅后解锁全部焊接参数与深度工艺指导</div>
+        <div style="font-size:11px; color:var(--text2); margin-bottom:10px;">单次解锁—余额累积，月度订阅含线下打样服务</div>
         <!-- Plan selector -->
         <div id="planSelector" style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
           <div class="plan-opt" id="planOnce" onclick="selectPlan('once')" tabindex="0" role="button" aria-label="单次解锁20元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
             <div style="font-size:22px;margin-bottom:2px;">🔑</div>
             <div style="font-size:13px;font-weight:600;" data-i18n="pay.once">单次解锁</div>
             <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥20</div>
-            <div style="font-size:10px;color:var(--text2);" data-i18n="pay.permanent">永久有效</div>
+            <div style="font-size:10px;color:var(--text2);">余额可累积</div>
           </div>
-          <div class="plan-opt" id="planMonthly" onclick="selectPlan('monthly')" tabindex="0" role="button" aria-label="月度订阅6元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
+          <div class="plan-opt" id="planMonthly" onclick="selectPlan('monthly')" tabindex="0" role="button" aria-label="月度订阅38元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
             <div style="font-size:22px;margin-bottom:2px;">📅</div>
             <div style="font-size:13px;font-weight:600;" data-i18n="pay.monthly">月度订阅</div>
-            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥6<small style="font-size:12px;font-weight:400;">/<span data-i18n="pay.month">月</span></small></div>
-            <div style="font-size:10px;color:var(--text2);" data-i18n="pay.cancel.anytime">随时取消</div>
+            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥38<small style="font-size:12px;font-weight:400;">/<span data-i18n="pay.month">月</span></small></div>
+            <div style="font-size:10px;color:var(--text2);">含线下打样服务</div>
           </div>
         </div>
         <!-- Payment methods -->
@@ -1363,11 +1442,46 @@ input[type="range"]::-moz-range-thumb {
               </div>
             </div>
           </div>
-          <div id="payActions" style="margin-top:10px; display:flex; gap:8px; justify-content:center;">
-            <button class="btn-sub" style="padding:10px 24px; font-size:13px; flex:1;" onclick="confirmPay()" id="payConfirmBtn" data-i18n="pay.confirm">✅ 我已支付</button>
-            <button class="btn-sub" style="padding:10px 16px; font-size:13px; background:transparent; border:1px solid var(--border); color:var(--text2);" onclick="cancelPay()" id="payCancelBtn" data-i18n="pay.cancel">取消</button>
+          <div id="confirmArea" style="display:none; margin-top:10px;">
+            <div id="amountInputArea" style="display:none; margin-bottom:8px;">
+              <div style="font-size:12px; color:var(--text2); margin-bottom:4px;">支付金额（至少¥20，多付余额累积）：</div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <span style="font-size:16px;font-weight:700;color:var(--green);">¥</span>
+                <input type="number" id="payAmountInput" value="20" min="20" step="1"
+                  style="flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:16px;text-align:center;outline:none;"
+                  onfocus="this.select()">
+              </div>
+            </div>
+            <div id="payActions" style="display:flex; gap:8px; justify-content:center;">
+              <button class="btn-sub" style="padding:10px 24px; font-size:13px; flex:1;" onclick="confirmPay()" id="payConfirmBtn">✅ 我已支付</button>
+              <button class="btn-sub" style="padding:10px 16px; font-size:13px; background:transparent; border:1px solid var(--border); color:var(--text2);" onclick="cancelPay()" id="payCancelBtn">取消</button>
+            </div>
           </div>
-          <div id="payStatusMsg" style="font-size:11px; color:var(--text2); margin-top:8px; text-align:center; min-height:16px;" data-i18n="pay.select.plan">请先选择订阅方案</div>
+          <div id="payStatusMsg" style="font-size:11px; color:var(--text2); margin-top:8px; text-align:center; min-height:16px;">请先选择订阅方案</div>
+          <div id="walletBalance" style="font-size:11px;color:var(--accent);margin-top:6px;text-align:center;display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 线下打样留言弹窗 -->
+    <div id="contactFormOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:360px;width:90%;margin:0 auto;">
+        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px;">✅ 月度订阅成功</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">请填写联系方式，我们将安排人员对接线下打样服务</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input type="text" id="contactName" placeholder="姓名 *"
+            style="padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:14px;outline:none;">
+          <input type="tel" id="contactPhone" placeholder="电话"
+            style="padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:14px;outline:none;">
+          <input type="text" id="contactCompany" placeholder="公司名称"
+            style="padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:14px;outline:none;">
+          <textarea id="contactNote" placeholder="备注（打样材料、数量等）" rows="3"
+            style="padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:14px;outline:none;resize:vertical;"></textarea>
+          <div id="contactFormMsg" style="font-size:11px;color:var(--orange);min-height:16px;"></div>
+          <button onclick="submitContactForm()"
+            style="padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">确认提交</button>
+          <button onclick="document.getElementById('contactFormOverlay').style.display='none';"
+            style="padding:8px;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:10px;font-size:12px;cursor:pointer;">稍后再说</button>
         </div>
       </div>
     </div>
@@ -3123,18 +3237,18 @@ function getQueryKey() {
           state.thickness, state.joint, state.gas, state.wire, state.osc, state.otherReq].join('|');
 }
 
-function saveSubscription(type) {
+function saveMonthlySubscription() {
   var data = {
     subscribed: true,
-    type: type || 'once',  // 'once' (单次/按次) or 'monthly' (月度)
+    type: 'monthly',
     savedAt: Date.now()
   };
-  // 单次解锁：保存当前查询指纹
-  if (type === 'once') {
-    data.queryKey = getQueryKey();
-  }
   try { localStorage.setItem(SUB_STORAGE_KEY, JSON.stringify(data)); }
   catch(e) { console.warn('localStorage save failed'); }
+}
+
+function clearMonthlySubscription() {
+  try { localStorage.removeItem(SUB_STORAGE_KEY); } catch(e) {}
 }
 
 function loadSubscription() {
@@ -3153,7 +3267,52 @@ function getSubPlanName(type) {
 }
 
 function getSubPrice(type) {
-  return type === 'monthly' ? '¥6/月' : '¥20';
+  return type === 'monthly' ? '¥38/月' : '¥20';
+}
+
+// ====================================================================
+// Wallet System (单次解锁余额累积)
+// ====================================================================
+var WALLET_KEY = 'laserweld_wallet';
+
+function getWallet() {
+  try { var raw = localStorage.getItem(WALLET_KEY); return raw ? JSON.parse(raw) : { balance: 0, totalTopUp: 0 }; }
+  catch(e) { return { balance: 0, totalTopUp: 0 }; }
+}
+
+function saveWallet(w) {
+  try { localStorage.setItem(WALLET_KEY, JSON.stringify(w)); } catch(e) {}
+}
+
+function addToWallet(amount) {
+  var w = getWallet();
+  w.balance += amount;
+  w.totalTopUp += amount;
+  saveWallet(w);
+  return w;
+}
+
+function deductWallet() {
+  var w = getWallet();
+  if (w.balance < 20) return false;
+  w.balance -= 20;
+  saveWallet(w);
+  return true;
+}
+
+// ====================================================================
+// Contact Form (月度订阅线下打样)
+// ====================================================================
+var CONTACT_STORAGE_KEY = 'laserweld_contact';
+
+function getContactInfo() {
+  try { var raw = localStorage.getItem(CONTACT_STORAGE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch(e) { return null; }
+}
+
+function saveContactInfo(info) {
+  info.savedAt = Date.now();
+  try { localStorage.setItem(CONTACT_STORAGE_KEY, JSON.stringify(info)); } catch(e) {}
 }
 
 // ====================================================================
@@ -3162,33 +3321,47 @@ function getSubPrice(type) {
 var selectedPayMethod = null;
 var selectedPlan = null;
 var payState = 'IDLE';
+var payAmountInput = null;  // 单次解锁：用户输入的金额
 
 function showPayment() {
   payState = 'PLAN_SELECT';
   selectedPayMethod = null;
   selectedPlan = null;
+  payAmountInput = null;
   document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
   document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('paymentPanel').classList.add('open');
   document.getElementById('payMethodArea').style.display = 'none';
+  document.getElementById('confirmArea').style.display = 'none';
+  document.getElementById('contactFormArea').style.display = 'none';
   document.getElementById('payConfirmBtn').disabled = false;
   document.getElementById('payConfirmBtn').textContent = t('pay.confirm');
   document.getElementById('payCancelBtn').style.display = '';
   document.getElementById('payStatusMsg').textContent = t('pay.select.plan');
   document.getElementById('payStatusMsg').style.color = 'var(--text2)';
+  // 显示余额
+  var w = getWallet();
+  document.getElementById('walletBalance').textContent = '钱包余额：¥' + w.balance;
+  document.getElementById('walletBalance').style.display = w.balance > 0 ? 'block' : 'none';
 }
 
 function selectPlan(plan) {
   if (payState !== 'PLAN_SELECT') return;
   selectedPlan = plan;
+  payAmountInput = null;
   document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('plan' + (plan === 'once' ? 'Once' : 'Monthly')).classList.add('selected');
+  document.getElementById('contactFormArea').style.display = 'none';
+  document.getElementById('confirmArea').style.display = 'none';
   // Show payment methods
   payState = 'PAYMENT_SELECT';
   document.getElementById('payMethodArea').style.display = 'block';
   var en = currentLang === 'en';
-  var label = plan === 'once' ? (en ? 'Single unlock ¥20' : '单次解锁¥20') : (en ? 'Monthly ¥6/mo' : '月度订阅¥6/月');
-  document.getElementById('payStatusMsg').textContent = label + (en ? ' · Select payment method & scan' : ' · 选择支付方式并扫码');
+  if (plan === 'once') {
+    document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay (min ¥20), extra balance rolls over' : '扫码支付（至少¥20），多付的余额自动累积';
+  } else {
+    document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay ¥38/month · includes offline sample service' : '扫码支付¥38/月 · 含线下打样服务';
+  }
 }
 
 function selectPay(method) {
@@ -3196,9 +3369,17 @@ function selectPay(method) {
   selectedPayMethod = method;
   document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('pay' + (method === 'wechat' ? 'Wechat' : 'Alipay')).classList.add('selected');
+  // 显示确认区域（含金额输入）
+  payState = 'CONFIRM';
+  document.getElementById('confirmArea').style.display = 'block';
+  if (selectedPlan === 'once') {
+    document.getElementById('amountInputArea').style.display = 'block';
+    document.getElementById('payAmountInput').value = '20';
+  } else {
+    document.getElementById('amountInputArea').style.display = 'none';
+  }
   var en = currentLang === 'en';
-  var label = selectedPlan === 'once' ? (en ? '¥20 total' : '¥20') : (en ? '¥6/month' : '¥6/月');
-  document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay ' + label + ', then click \'I have paid\' to confirm' : '扫码支付' + label + '后点击「我已支付」确认';
+  document.getElementById('payStatusMsg').textContent = en ? 'After payment, enter amount and click confirm' : '支付后输入金额并点击确认';
 }
 
 function confirmPay() {
@@ -3213,36 +3394,106 @@ function confirmPay() {
     document.getElementById('payStatusMsg').style.color = 'var(--orange)';
     return;
   }
-  payState = 'WAITING';
-  document.getElementById('payConfirmBtn').disabled = true;
-  document.getElementById('payConfirmBtn').textContent = '⏳ ' + t('pay.verifying');
-  document.getElementById('payCancelBtn').style.display = 'none';
-  document.getElementById('payStatusMsg').textContent = t('pay.verifying.wait');
-  document.getElementById('payStatusMsg').style.color = 'var(--accent)';
-  setTimeout(function(){
-    payState = 'VERIFIED';
-    state.subscribed = true;
-    saveSubscription(selectedPlan);
-    var planName = getSubPlanName(selectedPlan);
-    document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · ' + t('pay.unlocked');
-    document.querySelector('#subGate .btn-sub').style.display = 'none';
-    document.getElementById('paymentPanel').classList.remove('open');
-    document.getElementById('payStatusMsg').textContent = '✅ ' + planName + t('pay.success');
-    document.getElementById('payStatusMsg').style.color = 'var(--green)';
-    updateResults();
-  }, 1200);
+  
+  if (selectedPlan === 'once') {
+    // 单次解锁：处理充值金额
+    var inputEl = document.getElementById('payAmountInput');
+    var amount = parseFloat(inputEl.value) || 0;
+    if (amount < 20) {
+      document.getElementById('payStatusMsg').textContent = '⚠ ' + (currentLang === 'en' ? 'Minimum payment is ¥20' : '最低支付¥20');
+      document.getElementById('payStatusMsg').style.color = 'var(--orange)';
+      return;
+    }
+    payState = 'WAITING';
+    document.getElementById('payConfirmBtn').disabled = true;
+    document.getElementById('payConfirmBtn').textContent = '⏳ ' + t('pay.verifying');
+    document.getElementById('payCancelBtn').style.display = 'none';
+    document.getElementById('payStatusMsg').textContent = t('pay.verifying.wait');
+    document.getElementById('payStatusMsg').style.color = 'var(--accent)';
+    setTimeout(function(){
+      // 充值到钱包
+      var w = addToWallet(amount);
+      // 扣本次查询费用
+      deductWallet();
+      localStorage.setItem('laserweld_paid_query', getQueryKey());
+      payState = 'VERIFIED';
+      state.subscribed = true;
+      var planName = getSubPlanName('once');
+      document.getElementById('subStatus').style.display = 'block';
+      document.getElementById('subStatus').textContent = '✅ ' + planName + ' · ' + t('pay.unlocked') + ' | 余额：¥' + w.balance;
+      document.querySelector('#subGate .btn-sub').style.display = 'none';
+      document.getElementById('paymentPanel').classList.remove('open');
+      document.getElementById('payStatusMsg').textContent = '✅ ' + planName + t('pay.success') + ' 余额：¥' + w.balance;
+      document.getElementById('payStatusMsg').style.color = 'var(--green)';
+      updateResults();
+    }, 800);
+  } else {
+    // 月度订阅¥38
+    payState = 'WAITING';
+    document.getElementById('payConfirmBtn').disabled = true;
+    document.getElementById('payConfirmBtn').textContent = '⏳ ' + t('pay.verifying');
+    document.getElementById('payCancelBtn').style.display = 'none';
+    document.getElementById('payStatusMsg').textContent = t('pay.verifying.wait');
+    document.getElementById('payStatusMsg').style.color = 'var(--accent)';
+    setTimeout(function(){
+      // 激活月度订阅
+      saveMonthlySubscription();
+      payState = 'VERIFIED';
+      state.subscribed = true;
+      var planName = getSubPlanName('monthly');
+      document.getElementById('subStatus').style.display = 'block';
+      document.getElementById('subStatus').textContent = '✅ ' + planName + ' · ' + t('pay.unlocked');
+      document.querySelector('#subGate .btn-sub').style.display = 'none';
+      document.getElementById('paymentPanel').classList.remove('open');
+      document.getElementById('payStatusMsg').textContent = '✅ ' + planName + t('pay.success');
+      document.getElementById('payStatusMsg').style.color = 'var(--green)';
+      // 弹出留言窗口
+      var existing = getContactInfo();
+      if (!existing) {
+        setTimeout(function(){
+          document.getElementById('contactFormOverlay').style.display = 'flex';
+        }, 500);
+      }
+      updateResults();
+    }, 800);
+  }
 }
 
 function cancelPay() {
   payState = 'IDLE';
   selectedPayMethod = null;
   selectedPlan = null;
+  payAmountInput = null;
   document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
   document.querySelectorAll('.plan-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('paymentPanel').classList.remove('open');
   document.getElementById('payMethodArea').style.display = 'none';
+  document.getElementById('confirmArea').style.display = 'none';
+  document.getElementById('contactFormArea').style.display = 'none';
   document.getElementById('payStatusMsg').textContent = '';
+}
+
+// ====================================================================
+// Contact Form (线下打样留言)
+// ====================================================================
+function submitContactForm() {
+  var name = document.getElementById('contactName').value.trim();
+  var phone = document.getElementById('contactPhone').value.trim();
+  var company = document.getElementById('contactCompany').value.trim();
+  var note = document.getElementById('contactNote').value.trim();
+  if (!name) {
+    document.getElementById('contactFormMsg').textContent = '⚠ 请填写姓名';
+    document.getElementById('contactFormMsg').style.color = 'var(--orange)';
+    return;
+  }
+  if (!phone && !company) {
+    document.getElementById('contactFormMsg').textContent = '⚠ 请至少填写电话或公司';
+    document.getElementById('contactFormMsg').style.color = 'var(--orange)';
+    return;
+  }
+  saveContactInfo({ name: name, phone: phone, company: company, note: note });
+  document.getElementById('contactFormOverlay').style.display = 'none';
+  document.getElementById('subStatus').textContent = '✅ 留言已提交，工作人员将尽快联系您';
 }
 
 // ====================================================================
@@ -3283,19 +3534,33 @@ function _updateResultsNow() {
     thickness, joint, gas, wire, osc, otherReq,
   } = state;
 
-  // 订阅校验（动态）：区分单次解锁 vs 月度订阅
+  // 订阅校验：月度订阅优先，其次钱包余额
   var subscribed = false;
   var subData = loadSubscription();
-  if (subData) {
-    if (subData.type === 'once') {
-      // 单次解锁：查询指纹必须匹配
-      subscribed = subData.queryKey === getQueryKey();
-    } else if (subData.type === 'monthly') {
-      // 月度订阅：30天内有效
-      subscribed = (Date.now() - (subData.savedAt || 0)) < 30 * 24 * 60 * 60 * 1000;
-    } else {
-      // 兼容旧数据（无type字段视为永久有效）
+  if (subData && subData.type === 'monthly') {
+    // 月度订阅：30天内有效
+    subscribed = (Date.now() - (subData.savedAt || 0)) < 30 * 24 * 60 * 60 * 1000;
+  }
+  // 单次解锁：检查是否已为本查询付费（防重扣）
+  if (!subscribed) {
+    var paidQueryKey = localStorage.getItem('laserweld_paid_query');
+    if (paidQueryKey === getQueryKey()) {
       subscribed = true;
+    }
+  }
+  if (!subscribed) {
+    // 单次解锁：检查钱包余额
+    var w = getWallet();
+    if (w.balance >= 20) {
+      // 扣费并解锁本次查询
+      deductWallet();
+      localStorage.setItem('laserweld_paid_query', getQueryKey());
+      subscribed = true;
+      state.subscribed = true;
+      var bal = getWallet().balance;
+      document.getElementById('subStatus').textContent = '✅ 单次解锁 · 余额：¥' + bal + (bal < 20 ? '（余额不足下次查询）' : '');
+      document.getElementById('subStatus').style.display = 'block';
+      document.querySelector('#subGate .btn-sub').style.display = 'none';
     }
   }
 
