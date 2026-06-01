@@ -586,6 +586,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .empty-state {
+  display: none;
   text-align: center;
   padding: 40px 20px;
   background: var(--surface);
@@ -598,6 +599,7 @@ input[type="range"]::-moz-range-thumb {
 .empty-state .empty-desc { font-size: 12px; color: var(--text2); line-height: 1.6; max-width: 280px; margin: 0 auto; }
 
 .query-summary {
+  display: none;
   background: linear-gradient(135deg, var(--accent2) 0%, #0d4192 100%);
   border-radius: var(--radius);
   padding: 14px 16px;
@@ -764,6 +766,128 @@ input[type="range"]::-moz-range-thumb {
   font-size: 14px;
   color: var(--text2);
   align-self: center;
+  flex-shrink: 0;
+}
+
+/* ============ 文章阅读弹窗 ============ */
+.article-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.article-modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  animation: modalSlideIn 0.2s ease;
+}
+@keyframes modalSlideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.article-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+.article-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+.article-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  line-height: 1;
+  padding: 0 4px;
+}
+.article-modal-close:hover {
+  color: #333;
+}
+.article-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.article-modal-body h1 {
+  font-size: 20px;
+  color: #1a1a2e;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f0f0f0;
+}
+.article-modal-body h2 {
+  font-size: 17px;
+  color: #2d5a8e;
+  margin: 20px 0 10px;
+}
+.article-modal-body h3 {
+  font-size: 15px;
+  color: #3a7bd5;
+  margin: 16px 0 8px;
+}
+.article-modal-body h4 {
+  font-size: 14px;
+  color: #555;
+  margin: 12px 0 6px;
+}
+.article-modal-body p {
+  margin: 8px 0;
+}
+.article-modal-body li {
+  margin: 4px 0 4px 20px;
+  list-style: disc;
+}
+.article-modal-body hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
+}
+.article-modal-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.article-modal-body th,
+.article-modal-body td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  text-align: left;
+}
+.article-modal-body th {
+  background: #f5f7fa;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+.article-modal-body tr:nth-child(even) td {
+  background: #fafbfc;
+}
+.article-modal-footer {
+  padding: 10px 20px;
+  border-top: 1px solid #eee;
+  font-size: 12px;
+  color: #999;
+  text-align: right;
   flex-shrink: 0;
 }
 
@@ -948,6 +1072,26 @@ input[type="range"]::-moz-range-thumb {
   .material-card .icon { font-size: 24px; }
   .material-card .name { font-size: 12px; }
 }
+
+/* ============ Language Switcher ============ */
+.lang-btn {
+  margin-left: auto;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.lang-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--accent);
+}
 </style>
   <script src="data/params.js"></script>
   <script src="data/sub-factors.js"></script>
@@ -961,8 +1105,9 @@ input[type="range"]::-moz-range-thumb {
     <div class="header-icon">⚡</div>
     <div class="header-text">
       <h1>LaserWeld Pro</h1>
-      <span>激光焊接工艺参数查询 · v1.2</span>
+      <span data-i18n="header.subtitle">激光焊接工艺参数查询 · v1.2</span>
     </div>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()" data-i18n="lang.switch">EN</button>
   </div>
 </div>
 
@@ -1006,22 +1151,22 @@ input[type="range"]::-moz-range-thumb {
 
   <!-- Step 1: 材料选择 (dual) -->
   <div class="section">
-    <div class="section-title"><span class="step-num">1</span> 选择材料</div>
+    <div class="section-title"><span class="step-num">1</span> <span data-i18n="material.title">选择材料</span></div>
     <!-- 同种/异种 toggle -->
     <div class="same-toggle" id="sameToggle">
-      <button class="active" data-val="same" onclick="setSameMaterial(true)" aria-label="选择同种材料焊接">🔗 同种材料</button>
-      <button data-val="diff" onclick="setSameMaterial(false)" aria-label="选择异种材料焊接">🔀 异种材料</button>
+      <button class="active" data-val="same" onclick="setSameMaterial(true)" aria-label="选择同种材料焊接">🔗 <span data-i18n="material.same">同种材料</span></button>
+      <button data-val="diff" onclick="setSameMaterial(false)" aria-label="选择异种材料焊接">🔀 <span data-i18n="material.diff">异种材料</span></button>
     </div>
     <!-- Material A + B pair display -->
     <div class="mat-pair" id="matPair">
       <div class="slot" id="slotA">
-        <div class="label">⬤ 材料 A</div>
+        <div class="label">⬤ <span data-i18n="material.a">材料 A</span></div>
         <div class="mat-name" style="color:var(--accent2);">—</div>
         <div class="mat-sub" style="font-size:11px;color:var(--text2);"></div>
       </div>
       <div class="vs" id="vsSymbol" style="display:none;">⟷</div>
       <div class="slot" id="slotB" style="display:none;">
-        <div class="label">⬤ 材料 B</div>
+        <div class="label">⬤ <span data-i18n="material.b">材料 B</span></div>
         <div class="mat-name" style="color:var(--purple);">—</div>
         <div class="mat-sub" style="font-size:11px;color:var(--text2);"></div>
       </div>
@@ -1033,58 +1178,58 @@ input[type="range"]::-moz-range-thumb {
 
   <!-- Step 2: 是否送丝 -->
   <div class="section">
-    <div class="section-title"><span class="step-num">2</span> 是否送丝</div>
+    <div class="section-title"><span class="step-num">2</span> <span data-i18n="wire.title">是否送丝</span></div>
     <div class="toggle-options" id="wireGrid">
       <div class="toggle-opt selected" data-value="self" onclick="selectWire('self')" tabindex="0" role="button" aria-label="选择自熔焊接，不加焊丝">
         <span class="emoji">🔗</span>
-        <span class="label">自熔</span>
-        <span class="desc">不加焊丝，靠母材熔化</span>
+        <span class="label" data-i18n="wire.self">自熔</span>
+        <span class="desc" data-i18n="wire.self.desc">不加焊丝，靠母材熔化</span>
       </div>
       <div class="toggle-opt" data-value="feed" onclick="selectWire('feed')" tabindex="0" role="button" aria-label="选择送丝焊接，添加焊丝填充">
         <span class="emoji">📎</span>
-        <span class="label">送丝</span>
-        <span class="desc">添加焊丝填充</span>
+        <span class="label" data-i18n="wire.feed">送丝</span>
+        <span class="desc" data-i18n="wire.feed.desc">添加焊丝填充</span>
       </div>
     </div>
   </div>
 
   <!-- Step 3: 是否增加摆头 -->
   <div class="section">
-    <div class="section-title"><span class="step-num">3</span> 是否增加摆头</div>
+    <div class="section-title"><span class="step-num">3</span> <span data-i18n="osc.title">是否增加摆头</span></div>
     <div class="toggle-options" id="oscGrid">
       <div class="toggle-opt selected" data-value="no" onclick="selectOsc('no')" tabindex="0" role="button" aria-label="选择无摆头焊接，固定光束">
         <span class="emoji">➖</span>
-        <span class="label">无摆头</span>
-        <span class="desc">固定光束焊接</span>
+        <span class="label" data-i18n="osc.no">无摆头</span>
+        <span class="desc" data-i18n="osc.no.desc">固定光束焊接</span>
       </div>
       <div class="toggle-opt" data-value="yes" onclick="selectOsc('yes')" tabindex="0" role="button" aria-label="选择有摆头焊接，光束摆动">
         <span class="emoji">🌀</span>
-        <span class="label">有摆头</span>
-        <span class="desc">光束摆动焊接</span>
+        <span class="label" data-i18n="osc.yes">有摆头</span>
+        <span class="desc" data-i18n="osc.yes.desc">光束摆动焊接</span>
       </div>
     </div>
   </div>
 
   <!-- Step 4: 焊接模式 -->
   <div class="section">
-    <div class="section-title"><span class="step-num">4</span> 焊接模式</div>
+    <div class="section-title"><span class="step-num">4</span> <span data-i18n="process.title">焊接模式</span></div>
     <div class="process-options" id="processGrid">
       <div class="process-opt selected" data-value="cw" onclick="selectProcess('cw')" tabindex="0" role="button" aria-label="选择连续激光焊接模式">
         <span class="emoji">🔥</span>
-        <span class="label">连续激光 (CW)</span>
-        <span class="desc">恒定功率输出</span>
+        <span class="label" data-i18n="process.cw">连续激光 (CW)</span>
+        <span class="desc" data-i18n="process.cw.desc">恒定功率输出</span>
       </div>
       <div class="process-opt" data-value="pulse" onclick="selectProcess('pulse')" tabindex="0" role="button" aria-label="选择脉冲激光焊接模式">
         <span class="emoji">⚡</span>
-        <span class="label">脉冲激光 (Pulse)</span>
-        <span class="desc">脉冲能量输出</span>
+        <span class="label" data-i18n="process.pulse">脉冲激光 (Pulse)</span>
+        <span class="desc" data-i18n="process.pulse.desc">脉冲能量输出</span>
       </div>
     </div>
   </div>
 
   <!-- Step 5: 材料厚度 -->
   <div class="section">
-    <div class="section-title"><span class="step-num">5</span> 材料厚度</div>
+    <div class="section-title"><span class="step-num">5</span> <span data-i18n="thickness.title">材料厚度</span></div>
     <div class="thickness-control">
       <div class="thickness-display">
         <span class="value" id="thicknessValue">1.0</span>
@@ -1098,26 +1243,26 @@ input[type="range"]::-moz-range-thumb {
 
   <!-- Step 6: 接头类型 -->
   <div class="section">
-    <div class="section-title"><span class="step-num">6</span> 接头类型</div>
+    <div class="section-title"><span class="step-num">6</span> <span data-i18n="joint.title">接头类型</span></div>
     <div class="joint-options" id="jointGrid">
       <div class="joint-opt selected" data-value="butt" onclick="selectJoint('butt')" tabindex="0" role="button" aria-label="选择对接接头">
         <span class="emoji">⬜</span>
-        <span class="label">对接</span>
+        <span class="label" data-i18n="joint.butt">对接</span>
         <span class="desc">Butt Joint</span>
       </div>
       <div class="joint-opt" data-value="lap" onclick="selectJoint('lap')" tabindex="0" role="button" aria-label="选择搭接接头">
         <span class="emoji">▬</span>
-        <span class="label">搭接</span>
+        <span class="label" data-i18n="joint.lap">搭接</span>
         <span class="desc">Lap Joint</span>
       </div>
       <div class="joint-opt" data-value="fillet" onclick="selectJoint('fillet')" tabindex="0" role="button" aria-label="选择角接接头">
         <span class="emoji">◤</span>
-        <span class="label">角接</span>
+        <span class="label" data-i18n="joint.fillet">角接</span>
         <span class="desc">Fillet Joint</span>
       </div>
       <div class="joint-opt" data-value="edge" onclick="selectJoint('edge')" tabindex="0" role="button" aria-label="选择边接接头">
         <span class="emoji">▰</span>
-        <span class="label">边接</span>
+        <span class="label" data-i18n="joint.edge">边接</span>
         <span class="desc">Edge Joint</span>
       </div>
     </div>
@@ -1125,7 +1270,7 @@ input[type="range"]::-moz-range-thumb {
 
   <!-- Step 7: 保护气体 -->
   <div class="section">
-    <div class="section-title"><span class="step-num">7</span> 保护气体</div>
+    <div class="section-title"><span class="step-num">7</span> <span data-i18n="gas.title">保护气体</span></div>
     <div class="gas-options" id="gasGrid">
       <div class="gas-opt selected" data-value="Ar" onclick="selectGas('Ar')" tabindex="0" role="button" aria-label="选择保护气体：氩气">Ar 氩气</div>
       <div class="gas-opt" data-value="N2" onclick="selectGas('N2')" tabindex="0" role="button" aria-label="选择保护气体：氮气">N₂ 氮气</div>
@@ -1137,17 +1282,17 @@ input[type="range"]::-moz-range-thumb {
 
   <!-- Step 8: 其他要求说明 -->
   <div class="section other-req">
-    <div class="section-title"><span class="step-num">8</span> 其他要求说明</div>
-    <textarea id="otherReq" placeholder="例如：焊缝美观要求、气密性要求、焊接变形控制、生产效率优先、特殊环境要求……" maxlength="500" oninput="onOtherReqChange()"></textarea>
+    <div class="section-title"><span class="step-num">8</span> <span data-i18n="otherReq.title">其他要求说明</span></div>
+    <textarea id="otherReq" placeholder="例如：焊缝美观要求、气密性要求、焊接变形控制、生产效率优先、特殊环境要求……" data-i18n-placeholder="otherReq.placeholder" maxlength="500" oninput="onOtherReqChange()"></textarea>
     <div class="char-count"><span id="charCount">0</span>/500</div>
   </div>
 
   <!-- Step 9: 技术文章专栏 -->
   <div class="section" id="articleSection">
-    <div class="section-title"><span class="step-num">9</span> 技术文章专栏</div>
+    <div class="section-title"><span class="step-num">9</span> <span data-i18n="articles.title">技术文章专栏</span></div>
     <div class="articles-list" id="articlesList"></div>
     <div style="text-align:center; margin-top:10px;">
-      <span style="font-size:11px; color:var(--text2);">📚 文章持续更新中</span>
+      <span data-i18n="articles.updating" style="font-size:11px; color:var(--text2);">📚 文章持续更新中</span>
     </div>
   </div>
 
@@ -1159,12 +1304,12 @@ input[type="range"]::-moz-range-thumb {
     <!-- Empty state placeholder -->
     <div id="emptyState" class="empty-state">
       <div class="empty-icon">🔍</div>
-      <div class="empty-title">请先选择焊接材料</div>
-      <div class="empty-desc">选择焊接材料后自动计算参数</div>
+      <div class="empty-title" data-i18n="empty.title">请先选择焊接材料</div>
+      <div class="empty-desc" data-i18n="empty.sub">选择焊接材料后自动计算参数</div>
     </div>
 
     <div class="query-summary" id="querySummary">
-      <div class="mat" id="summaryMat">请选择材料</div>
+      <div class="mat" id="summaryMat" data-i18n="empty.select">请选择材料</div>
       <div class="detail" id="summaryDetail"></div>
     </div>
 
@@ -1174,11 +1319,11 @@ input[type="range"]::-moz-range-thumb {
     <!-- Subscription Gate -->
     <div id="subGate" class="sub-gate">
       <div class="icon">🔒</div>
-      <div class="title">高难度焊接参数</div>
-      <div class="desc" id="subDesc">当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。</div>
-      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">🔑 单次¥20 · 📅 月度¥6/月</div>
-      <button class="btn-sub" onclick="showPayment()" aria-label="订阅解锁高级焊接参数">🔓 订阅解锁</button>
-      <div class="sub-status" id="subStatus" style="display:none;">✅ 已订阅 · 全部参数已解锁</div>
+      <div class="title" data-i18n="sub.gate.title">高难度焊接参数</div>
+      <div class="desc" id="subDesc" data-i18n="sub.gate.desc">当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;" data-i18n="sub.gate.price">🔑 单次¥20 · 📅 月度¥6/月</div>
+      <button class="btn-sub" onclick="showPayment()" aria-label="订阅解锁高级焊接参数" data-i18n="sub.gate.btn">🔓 订阅解锁</button>
+      <div class="sub-status" id="subStatus" style="display:none;">✅ <span data-i18n="sub.status.default">已订阅 · 全部参数已解锁</span></div>
 
       <!-- 支付窗口 -->
       <div id="paymentPanel" style="border-top:1px solid var(--border);">
@@ -1188,47 +1333,41 @@ input[type="range"]::-moz-range-thumb {
         <div id="planSelector" style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
           <div class="plan-opt" id="planOnce" onclick="selectPlan('once')" tabindex="0" role="button" aria-label="单次解锁20元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
             <div style="font-size:22px;margin-bottom:2px;">🔑</div>
-            <div style="font-size:13px;font-weight:600;">单次解锁</div>
+            <div style="font-size:13px;font-weight:600;" data-i18n="pay.once">单次解锁</div>
             <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥20</div>
-            <div style="font-size:10px;color:var(--text2);">永久有效</div>
+            <div style="font-size:10px;color:var(--text2);" data-i18n="pay.permanent">永久有效</div>
           </div>
           <div class="plan-opt" id="planMonthly" onclick="selectPlan('monthly')" tabindex="0" role="button" aria-label="月度订阅6元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
             <div style="font-size:22px;margin-bottom:2px;">📅</div>
-            <div style="font-size:13px;font-weight:600;">月度订阅</div>
-            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥6<small style="font-size:12px;font-weight:400;">/月</small></div>
-            <div style="font-size:10px;color:var(--text2);">随时取消</div>
+            <div style="font-size:13px;font-weight:600;" data-i18n="pay.monthly">月度订阅</div>
+            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥6<small style="font-size:12px;font-weight:400;">/<span data-i18n="pay.month">月</span></small></div>
+            <div style="font-size:10px;color:var(--text2);" data-i18n="pay.cancel.anytime">随时取消</div>
           </div>
         </div>
         <!-- Payment methods -->
         <div id="payMethodArea" style="display:none;">
-          <div style="font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent);">💳 选择支付方式</div>
+          <div style="font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent);" data-i18n="pay.method">💳 选择支付方式</div>
           <div style="display:flex; gap:10px; justify-content:center;">
             <div class="pay-opt" onclick="selectPay('wechat')" id="payWechat" tabindex="0" role="button" aria-label="选择微信支付">
               <div class="pay-icon">💚</div>
-              <div class="pay-name">微信支付</div>
+              <div class="pay-name" data-i18n="pay.wechat">微信支付</div>
               <div class="pay-qr" id="qrWechat">
-                <div class="qr-placeholder">
-                  <span>📱 微信收款码</span>
-                  <span class="qr-hint">上线后替换</span>
-                </div>
+                <img src="assets/qr-wechat.png" alt="微信收款码" style="width:120px;height:120px;object-fit:contain;">
               </div>
             </div>
             <div class="pay-opt" onclick="selectPay('alipay')" id="payAlipay" tabindex="0" role="button" aria-label="选择支付宝支付">
               <div class="pay-icon">💙</div>
-              <div class="pay-name">支付宝</div>
+              <div class="pay-name" data-i18n="pay.alipay">支付宝</div>
               <div class="pay-qr" id="qrAlipay">
-                <div class="qr-placeholder">
-                  <span>📱 支付宝收款码</span>
-                  <span class="qr-hint">上线后替换</span>
-                </div>
+                <img src="assets/qr-alipay.png" alt="支付宝收款码" style="width:120px;height:120px;object-fit:contain;">
               </div>
             </div>
           </div>
           <div id="payActions" style="margin-top:10px; display:flex; gap:8px; justify-content:center;">
-            <button class="btn-sub" style="padding:10px 24px; font-size:13px; flex:1;" onclick="confirmPay()" id="payConfirmBtn" aria-label="确认已支付，解锁订阅">✅ 我已支付</button>
-            <button class="btn-sub" style="padding:10px 16px; font-size:13px; background:transparent; border:1px solid var(--border); color:var(--text2);" onclick="cancelPay()" id="payCancelBtn" aria-label="取消支付">取消</button>
+            <button class="btn-sub" style="padding:10px 24px; font-size:13px; flex:1;" onclick="confirmPay()" id="payConfirmBtn" data-i18n="pay.confirm">✅ 我已支付</button>
+            <button class="btn-sub" style="padding:10px 16px; font-size:13px; background:transparent; border:1px solid var(--border); color:var(--text2);" onclick="cancelPay()" id="payCancelBtn" data-i18n="pay.cancel">取消</button>
           </div>
-          <div id="payStatusMsg" style="font-size:11px; color:var(--text2); margin-top:8px; text-align:center; min-height:16px;">请先选择订阅方案</div>
+          <div id="payStatusMsg" style="font-size:11px; color:var(--text2); margin-top:8px; text-align:center; min-height:16px;" data-i18n="pay.select.plan">请先选择订阅方案</div>
         </div>
       </div>
     </div>
@@ -1262,10 +1401,13 @@ input[type="range"]::-moz-range-thumb {
     </div>
 
     <div style="font-size:10px;color:var(--text2);text-align:center;margin-top:16px;border-top:1px solid var(--border);padding-top:12px;">
-      本数据仅供参考，实际工艺需结合设备能力验证 · Demo v1.2
+      <span data-i18n="results.footer">本数据仅供参考，实际工艺需结合设备能力验证 · Demo v1.2</span>
+    </div>
+    <div style="font-size:11px;color:var(--text2);text-align:center;padding:10px 0 14px;">
+      <a href="https://beian.miit.gov.cn" target="_blank" style="color:var(--text2);text-decoration:none;">许可证编号为：粤ICP备2026067961号</a>
     </div>
 
-    <button class="btn-reset" onclick="resetAll()" aria-label="重置所有参数，重新查询">⟳ 重新查询</button>
+    <button class="btn-reset" onclick="resetAll()" aria-label="重置所有参数，重新查询" data-i18n="results.reset">⟳ 重新查询</button>
   </div>
 
 </div>
@@ -1273,41 +1415,923 @@ input[type="range"]::-moz-range-thumb {
 <!-- ============ Sub-Material Modal ============ -->
 <div class="sub-modal-overlay" id="subModal">
   <div class="sub-modal">
-    <div class="sub-modal-title" id="subModalTitle">选择子材料</div>
+    <div class="sub-modal-title" id="subModalTitle" data-i18n="sub.title">选择子材料</div>
     <div class="sub-grid" id="subModalGrid"></div>
-    <button class="btn-close" onclick="closeSubModal()" aria-label="关闭子材料选择弹窗">取消</button>
+    <button class="btn-close" onclick="closeSubModal()" aria-label="关闭子材料选择弹窗" data-i18n="sub.btn">取消</button>
   </div>
 </div>
 
 <script>
+// ════════════════════════════════════════════════════════════════
+// 技术文章完整内容（来源：IMA 个人知识库笔记）
+// 更新说明：修改 IMA 笔记 → 重新读取内容 → 更新此常量即可
+// 最后更新：2026-05-27
+// ════════════════════════════════════════════════════════════════
+var ARTICLE_FULL = {
+  art1: `# 激光焊接常见缺陷分析与对策
+
+## 一、气孔
+
+**成因：** 匙孔不稳定塌陷导致气体卷入、保护气体卷入熔池、材料表面污染物（油污、水分、氧化膜）高温分解产生气体。
+
+**对策：**
+
+* 优化功率-速度匹配，保持匙孔稳定
+* 焊前清洗：丙酮超声波清洗去除油污，不锈钢用酸洗钝化
+* 采用激光摆动焊接，光束振荡搅拌熔池促进气体逸出
+* 保护气体流量控制在15～25L/min，过大反而卷入空气
+* 厚板焊接推荐激光扫描焊接，圆轨迹扫描可显著降低气孔率
+
+## 二、热裂纹
+
+**成因：** 凝固过程中热应力集中，焊缝金属在固相线附近塑性低、收缩受阻，形成结晶裂纹。铝合金（尤其是2系、7系、6系）和某些高碳钢热裂纹敏感性强。
+
+**对策：**
+
+* 使用填充材料调节焊缝成分：焊接铝合金推荐4043/4047 Al-Si焊丝，降低凝固温度区间
+* 控制热输入：功率密度不宜过高，合理匹配焊接速度
+* 采用双光束或复合焊接技术降低温度梯度
+* 预热（铝合金100℃～200℃，高碳钢200℃～350℃）减少热应力
+* 焊接顺序设计：对称焊接、分段退焊分散应力
+
+## 三、飞溅
+
+**成因：** 匙孔内金属蒸汽压力过大、功率密度过高、焦点位置不当、材料表面状态不良。
+
+**对策：**
+
+* 优化焦点位置：焊接不锈钢推荐负离焦（焦点在工件表面下方1～2mm）
+* 降低峰值功率，适当提高焊接速度
+* 采用波形控制：脉冲激光用缓升/缓降波形减少飞溅
+* 使用摆动焊接分散能量密度
+* 材料表面清洁度控制，避免油污、镀层引起飞溅
+
+## 四、咬边
+
+**成因：** 焊接速度过快、填充金属不足、激光功率过高导致母材熔融过多但熔融金属回填不足。
+
+**对策：**
+
+* 降低焊接速度，增加熔融金属填充量
+* 提高送丝速度（填丝焊时）或增加光斑尺寸
+* 合理匹配功率-速度-离焦量三要素
+* 对接接头间隙控制在0.1～0.2mm最佳
+
+## 五、未熔合/未焊透
+
+**成因：** 能量输入不足、焦点偏离接头、材料总厚度超出激光穿透能力、装配间隙过大。
+
+**对策：**
+
+* 计算所需线能量：E = P/v（P为功率，v为焊接速度），根据材料厚度选择合适线能量范围
+* 确保焦点对准焊缝中心（偏差≤0.1mm）
+* 厚板焊接时适当扩大离焦量或采用双面焊
+* 夹具保证装配间隙≤0.1mm
+
+## 六、焊缝成形不良
+
+**成因：** 参数匹配不当、保护气体种类或流量不合适、材料表面状态差异。
+
+**对策：**
+
+* 纯Ar保护：焊缝宽而浅，适合薄板
+* He/Ar混合气：焊缝窄而深，适合厚板
+* 气体流量控制在15～25L/min
+* 清洁材料表面，去除氧化层
+
+## 小结
+
+| 缺陷类型 | 首要原因 | 核心对策 |
+|---------|---------|---------|
+| 气孔 | 匙孔塌陷/污染 | 摆动焊接+焊前清洗 |
+| 热裂纹 | 应力集中 | 填充材料+预热 |
+| 飞溅 | 蒸汽压力过大 | 优化焦点+波形控制 |
+| 咬边 | 填充不足 | 降低速度+匹配参数 |
+| 未熔合 | 能量不足 | 提高线能量+对准焦点 |
+| 成形不良 | 参数匹配 | 优化气体+清洁表面 |
+`,
+  art2: `# 铜材激光焊接：纯铜 vs 黄铜 vs 青铜
+
+## 一、铜材激光焊接的核心挑战
+
+铜对近红外激光（1064nm/1080nm）的室温吸收率仅约5%，是典型的"高反材料"。但一旦形成熔池，液态铜吸收率可骤升至60%~80%，这一"突然吸收"效应导致工艺窗口极窄，对功率稳定性要求极高。
+
+### 三大共性难题
+
+1. **高导热性**：铜导热系数约400 W/(m·K)，热量迅速扩散，需要高功率密度
+2. **高膨胀系数**：焊接热变形大，应力集中易开裂
+3. **气体敏感性**：铜液对氢溶解度随凝固急剧下降，易产生气孔
+
+## 二、纯铜（紫铜）
+
+**代表牌号：** T1、T2、TU1、TU2、C1100
+
+**特性：** 导电导热性最佳（导电率≥100% IACS），焊接时热传导最快，最难焊接。
+
+**工艺要点：**
+
+* 建议采用蓝光或绿光激光器（波长450nm/515nm），初始吸收率可达40%~60%
+* 红外激光焊接需极高功率密度（≥10⁷ W/cm²），推荐1500W以上
+* 强烈推荐激光摆动焊接，光束振荡促进熔池混合、稳定匙孔
+* 焦点控制：负离焦1~2mm，形成稳定的深熔焊通道
+* 预热100~200℃降低温度梯度
+* 保护气体：高纯Ar（纯度≥99.999%），流量15~20L/min
+
+## 三、黄铜
+
+**代表牌号：** H62、H65、H68、C26800
+
+**特性：** 铜锌合金（含Zn 20%~40%），锌的蒸发温度仅907℃，激光焊接时锌剧烈蒸发产生飞溅和气孔。
+
+**工艺要点：**
+
+* 这是最难焊接的铜材之一，关键是控制锌蒸汽：
+  * 采用摆动焊接让蒸汽有逸出通道
+  * 脉冲激光+缓降波形减少锌蒸汽爆发
+  * 适当降低热输入，推荐功率密度控制在5×10⁶~8×10⁶ W/cm²
+  * 焊接速度要快（≥50mm/s），缩短熔池存在时间
+* 焊后表面易出现锌氧化层，影响外观，可用酸洗处理
+* 安全警示：锌蒸汽有毒，必须配备强排烟系统
+
+## 四、青铜
+
+**代表牌号：** QSn6.5-0.1（锡青铜）、QAl9-4（铝青铜）、QBe2（铍青铜）
+
+**特性：** 铜锡/铜铝/铜铍合金，激光吸收率优于纯铜，焊接性在不同牌号间差异大。
+
+**工艺要点：**
+
+* **锡青铜**：相对好焊，推荐中等功率密度，控制热输入避免过热
+* **铝青铜**：表面致密Al₂O₃氧化膜干扰，类似铝合金焊接难点，需表面预处理
+* **铍青铜**：⚠️ 铍及其氧化物有剧毒，必须配备专业排烟系统，严禁无防护焊接
+* 青铜焊接气孔倾向低于黄铜，但热裂纹敏感
+* 推荐焊前预热100~150℃，焊后缓冷
+
+## 五、铜-铜焊接总结
+
+| 牌号 | 焊接难度 | 核心策略 | 推荐功率 |
+|------|---------|---------|---------|
+| 纯铜T2 | ⭐⭐⭐ | 蓝/绿光激光器或高功率红外+摆动 | ≥1500W |
+| 黄铜H62 | ⭐⭐⭐⭐⭐ | 摆动焊+脉冲波形+快焊速+排烟 | 1000~2000W |
+| 锡青铜QSn | ⭐⭐ | 中等参数，控热 | 800~1500W |
+| 铝青铜QAl | ⭐⭐⭐ | 预处理+类似铝焊工艺 | 1000~2000W |
+| 铍青铜QBe | ⭐⭐⭐⭐ | ⚠️ 必须排烟+安全防护 | 500~1000W |
+`,
+  art3: `# 薄板精密焊接工艺要点（≤0.5mm）
+
+## 一、薄板焊接的核心挑战
+
+厚度≤0.5mm的超薄板材激光焊接，与常规厚板焊接有本质区别：热输入稍大即焊穿，热输入不足则未熔合。"既要焊透，又不能焊穿"是核心矛盾。
+
+### 四大难点
+
+1. **热积累效应**：薄板热容量小，连续焊接时热量迅速积累导致熔池失控
+2. **变形敏感**：热应力极易导致薄板翘曲变形
+3. **间隙容忍度极低**：对接间隙超过板厚的10%即焊穿
+4. **支撑要求高**：缺乏足够刚性，需精密工装
+
+## 二、功率控制策略
+
+### 脉冲激光 vs 连续激光
+
+|  | 脉冲激光 | 连续激光 |
+|--|---------|---------|
+| 适用厚度 | 0.05~0.3mm | 0.2~0.5mm |
+| 热影响区 | 小（≤50μm） | 较大 |
+| 变形控制 | 优 | 良好 |
+| 焊接速度 | 慢 | 快 |
+
+### 关键参数窗口
+
+* **脉冲激光**：峰值功率500~1500W，脉宽1~5ms，频率20~100Hz
+* **连续激光**：功率200~500W，速度200~1000mm/s
+* **焦点位置**：正离焦+1~+3mm（光斑扩大，能量分布更均匀）
+* **光斑直径**：0.1~0.3mm（不宜过小，容易焊穿）
+
+### 特殊波形推荐
+
+* 脉冲下降沿采用缓降波形，防止收尾处烧穿
+* 连续焊时激光起止处功率缓升/缓降（0.1~0.3s ramp）
+* 薄板对接焊推荐"两点法"：起点和终点各增加一个定位点焊
+
+## 三、工装夹具要求
+
+精密焊接的成败往往不在参数，而在工装：
+
+1. **压紧方式**：气动均匀压紧，压强0.2~0.4MPa
+2. **背面支撑**：铜垫板（导热快，吸收多余热量）+ 保护气体通道
+3. **压条材料**：不锈钢或铜合金，与工件接触面平整度≤0.02mm
+4. **定位精度**：对接间隙≤0.05mm，搭接间隙0mm（完全贴合）
+5. **散热设计**：焊缝两侧铜块压紧散热，防止热变形累积
+
+## 四、热变形控制策略
+
+1. **分段焊接**：将长焊缝分成短段（每段10~30mm），间隔焊接冷却
+2. **对称焊接**：双面对称施焊平衡热应力
+3. **焊接顺序**：从中间向两端焊，或先焊定位点再焊满
+4. **预变形补偿**：夹具使工件预弯曲，焊后回弹至平直
+5. **随焊冷却**：焊缝背面通保护气体冷却（2~5L/min）
+
+## 五、保护气体选择
+
+* **Ar**：通用选择，流量8~15L/min（薄板不宜过大，防紊流）
+* **He/Ar混合（30%He+70%Ar）**：需要更高熔深时
+* **背面保护**：不锈钢薄板背面需保护气防止氧化变色
+
+## 六、典型工艺参数示例
+
+| 材料 | 厚度(mm) | 激光功率 | 速度 | 焦点 |
+|------|---------|---------|------|------|
+| 304不锈钢 | 0.1 | 150W脉冲 | 10mm/s | +2mm |
+| 304不锈钢 | 0.3 | 300W连续 | 30mm/s | +1.5mm |
+| 纯钛TA1 | 0.2 | 200W脉冲 | 8mm/s | +2mm |
+| 铜T2 | 0.3 | 500W连续 | 20mm/s | +1mm |
+| 铝5052 | 0.5 | 400W连续 | 50mm/s | +1mm |
+
+## 小结
+
+薄板精密焊接的黄金法则：**功率宁小勿大，焦点宁散勿聚，速度宁快勿慢，工装宁紧勿松。**
+`,
+  art4: `# 保护气体选择指南：Ar / N₂ / He / 真空 / 空气
+
+## 一、保护气体的作用
+
+激光焊接中保护气体的三大作用：
+
+1. **隔绝空气**：防止熔池与O₂、N₂、H₂O反应产生氧化、气孔
+2. **等离子体控制**：高功率焊接时抑制等离子体云（Plasma Shielding）
+3. **影响焊缝形貌**：气体电离能影响能量耦合效率，决定焊缝深宽比
+
+## 二、五种气体的详细对比
+
+### 1. 氩气（Ar）—— 通用首选
+
+**电离能：** 15.76eV
+
+**密度：** 1.78kg/m³（比空气重，保护效果好）
+
+**优势：**
+
+* 价格适中，通用性强
+* 比重大，沉在焊缝表面覆盖效果好
+* 适合大多数金属材料
+
+**劣势：**
+
+* 高功率（>4kW）时易形成等离子体云阻挡激光能量
+* 焊缝深宽比中等
+
+**适用场景：**
+
+* 不锈钢、铝合金、钛合金、低合金钢
+* 薄板至中厚板
+* 推荐流量：15~25L/min（同轴），8~15L/min（侧吹）
+
+### 2. 氦气（He）—— 高功率首选
+
+**电离能：** 24.59eV
+
+**密度：** 0.18kg/m³（比空气轻）
+
+**优势：**
+
+* 电离能最高，高功率下等离子体控制效果最佳
+* 可获得更深的熔深和更大的深宽比
+* 焊接速度可提高20%~50%
+
+**劣势：**
+
+* 价格昂贵（国内约Ar的5~10倍）
+* 比重轻，保护效果不如Ar，需要更大流量
+* 资源稀缺
+
+**适用场景：**
+
+* 高功率激光焊接（≥6kW）
+* 厚板深熔焊（>5mm）
+* 高速焊接生产线
+
+**推荐方案：** He/Ar混合气（30%~50% He + 70%~50% Ar），平衡成本与性能
+
+### 3. 氮气（N₂）—— 不锈钢的性价比之选
+
+**电离能：** 15.58eV
+
+**密度：** 1.25kg/m³
+
+**优势：**
+
+* 价格最低，供应广泛
+* 焊接不锈钢时表面呈金色/银白色氧化色（美观装饰性）
+* 焊缝力学性能良好
+
+**劣势：**
+
+* 对某些金属（如钛、铝）有强烈反应，会产生脆性氮化物
+* 不适合活性金属焊接
+
+**适用场景：**
+
+* 不锈钢薄板焊接（≤3mm）
+* 对焊缝颜色有要求的装饰性焊接
+* 🔴 禁忌：钛及钛合金、铝及铝合金、镁合金
+
+### 4. 真空环境—— 极致纯度
+
+**优势：**
+
+* 无气体污染物，焊缝纯度最高
+* 无等离子体屏蔽问题
+* 无气孔、无氧化
+
+**劣势：**
+
+* 成本极高，设备投资大
+* 工件尺寸受真空室限制
+* 生产效率低
+
+**适用场景：**
+
+* 航空航天关键部件
+* 高纯度要求的医疗器械
+* 研究实验
+
+### 5. 空气
+
+除非特殊原因，不建议激光焊接使用空气保护。空气中O₂导致氧化，N₂与金属反应，H₂O蒸汽引起氢气孔。
+
+## 三、选型决策树
+
+材料是什么？
+├── 不锈钢
+│   ├── 薄板、表面美观要求 → N₂（金色焊缝）
+│   ├── 厚板/高功率 → He/Ar混合气
+│   └── 一般用途 → Ar
+├── 铝合金（高功率用He/Ar，一般用Ar）
+├── 钛合金 → 高纯Ar（背面保护同样关键）
+├── 铜及铜合金 → Ar（高纯）
+├── 碳钢/低合金钢 → Ar 或 N₂
+└── 异种金属 → 按反应活性较高的一方选择
+
+## 四、流量参考
+
+| 厚度 | 同轴保护气 | 背面保护气 | 侧吹辅助 |
+|------|-----------|-----------|---------|
+| ≤1mm | 8~12 L/min | — | — |
+| 1~3mm | 12~18 L/min | 5~8 L/min | — |
+| 3~6mm | 15~25 L/min | 8~12 L/min | 10~15 L/min |
+| 6mm+ | 20~30 L/min | 10~15 L/min | 15~25 L/min |
+
+## 五、安全提示
+
+* He密度小，泄漏不易察觉，大量使用注意通风
+* N₂在密闭空间可能置换氧气造成窒息危险
+* 真空焊接设备必须严格安全联锁
+`,
+  art5: `# 异种材料激光焊接：组合评估与工艺设计
+
+## 一、异种材料焊接的核心挑战
+
+异种材料焊接的本质难题是：物理性质差异 + 冶金不相容。
+
+两项差异越大，焊接难度指数级上升：
+
+| 性质 | 差异带来的问题 |
+|------|--------------|
+| 熔点差 | 低熔点材料先熔化流失，高熔点材料未熔合 |
+| 热膨胀系数差 | 冷却后产生热应力，焊缝开裂 |
+| 导热率差 | 高导热侧热量散失快，熔合不均匀 |
+| 互溶性差 | 形成脆性金属间化合物（IMC），接头脆断 |
+| 电化学位差 | 服役中产生电化学腐蚀 |
+
+## 二、常见异种组合焊接评估
+
+### 不锈钢-铜（焊接难度：⭐⭐⭐）
+
+**应用场景：** 液冷板、散热器、电子封装
+
+**关键问题：**
+* 铜导热快，不锈钢侧熔合不足
+* 界面形成Fe-Cu互溶区，产生微裂纹
+* 热膨胀差异大，焊后变形
+
+**工艺设计：**
+* 激光束偏向不锈钢侧（偏移量0.1~0.3mm）
+* 铜侧预热至100~150℃平衡导热差异
+* 推荐摆动焊接（圆形轨迹，振幅0.5~1mm）
+* 过渡层设计：镍基合金中间层可改善界面结合
+* 参数窗口：功率1500~3000W，速度20~50mm/s
+
+### 钢-铝（焊接难度：⭐⭐⭐⭐）
+
+**应用场景：** 汽车车身轻量化（钢+铝混合结构）
+
+**关键问题：**
+* Fe-Al间形成脆性金属间化合物（FeAl₃、Fe₂Al₅）
+* IMC层厚度≥10μm即严重降低接头强度
+* 铝熔点低（660℃），钢熔化温度高（1500℃+）
+
+**工艺设计：**
+* 将激光束聚焦在钢侧，热传导熔化铝（"钢上铝下"搭接）
+* 精确控制热输入，IMC层控制在5μm以下
+* 快速冷却抑制IMC生长
+* 推荐添加Zn基或Al-Si填充材料
+* 参数窗口：功率2000~4000W，速度30~80mm/s
+
+### 钛-铝（焊接难度：⭐⭐⭐⭐⭐）
+
+**应用场景：** 航空航天结构件
+
+**关键问题：**
+* Ti-Al间形成极脆的TiAl₃、TiAl等金属间化合物
+* 熔点差大（Ti 1668℃ vs Al 660℃）
+* 钛高温下极易氧化
+
+**工艺设计：**
+* 必须使用中间过渡层（V、Cu、Ni箔，厚度0.1~0.3mm）
+* 激光偏移量偏向钛侧
+* 惰性气体保护要求极高（高纯Ar，双面保护）
+* 严格控制线能量，降低IMC生成
+* 焊接难度极高，推荐激光钎焊替代方案
+
+### 铜-铝（焊接难度：⭐⭐⭐⭐）
+
+**应用场景：** 动力电池汇流排、IGBT模块
+
+**关键问题：**
+* Cu-Al间形成CuAl₂、Cu₉Al₄等脆性IMC
+* 导热率差异大
+* 电化学腐蚀风险
+
+**工艺设计：**
+* 激光束偏向铝侧
+* 采用摆动焊接（∞轨迹或圆形轨迹）
+* 控制热输入使界面温度不超过550℃
+* 推荐使用Ni或Zn中间层
+* 短焊缝优先，避免热积累
+* 参数窗口：功率1500~3000W，速度40~80mm/s
+
+## 三、过渡层设计通用原则
+
+| 母材A | 母材B | 推荐中间层 | 厚度 | 作用机制 |
+|-------|-------|-----------|------|---------|
+| 钢 | 铝 | Zn、Al-Si(4047)、Ni | 0.1~0.5mm | 抑制Fe-Al反应 |
+| 钢 | 铜 | Ni、Cu-Mn | 0.1~0.3mm | 改善润湿性 |
+| 钛 | 铝 | V、Cu、Ni | 0.1~0.3mm | 阻断Ti-Al接触 |
+| 铜 | 铝 | Ni、Zn | 0.1~0.5mm | 抑制Cu-Al IMC |
+
+## 四、焊缝位置设计
+
+异种焊接的接头设计比参数更重要：
+
+* **搭接焊**（推荐）：激光从热导率低/熔点高的一侧入射
+* **对接焊**：两材料端部可设计台阶，增加熔合面积
+* **边缘焊**：异种金属不直接熔合，通过填充材料间接连接
+
+## 五、检查标准
+
+| 指标 | 合格标准 |
+|------|---------|
+| IMC层厚度 | ≤5μm（钢-铝），≤3μm（钛-铝） |
+| 抗拉强度 | ≥母材较弱一方的80% |
+| 气孔率 | ≤3% |
+| 焊后变形 | ≤0.1mm/100mm |
+`,
+};
+
+// ════════════════════════════════════════════════════════════════
+// 国际化 — 中英双语支持
+// ════════════════════════════════════════════════════════════════
+const LANG = {
+  zh: {
+    'header.subtitle': '激光焊接工艺参数查询 · v1.2',
+    'lang.switch': 'EN',
+    'material.title': '选择焊接材料',
+    'material.a': '材料 A',
+    'material.b': '材料 B',
+    'material.same': '同种材料',
+    'material.diff': '异种材料',
+    'empty.title': '请先选择焊接材料',
+    'empty.sub': '点击上方卡片选择焊接材料，即可获取焊接可行性评估与优化参数',
+    'pair.current': '当前选择：',
+    'results.title': '焊接参数推荐',
+    'results.compat': '焊接相容性',
+    'results.param': '推荐参数',
+    'results.speed': '焊接速度',
+    'results.power': '功率',
+    'results.freq': '频率',
+    'results.pulse': '脉冲宽度',
+    'results.focus': '离焦量',
+    'results.gas': '保护气体',
+    'results.gasFlow': '气流量',
+    'results.gap': '装配间隙',
+    'results.weld': '焊缝类型',
+    'results.cost': '工艺成本',
+    'results.difficulty': '操作难度',
+    'results.usability': '操作建议',
+    'sub.title': '选择子材料',
+    'sub.btn': '取消',
+    'articles.title': '技术文章',
+    'articles.read': '📖 点击阅读全文',
+    'req.hint': '提示：点击上方案例卡片查看详情',
+    'req.check': '可行性检查',
+    'extra.advice': '工艺建议',
+    'extra.param': '高级参数',
+    'extra.sheet': '快速参阅',
+    'extra.case': '行业案例',
+    'footer.text': 'LaserWeld Pro · 激光焊接参数查询工具',
+    'gas.none': '无需',
+    'matching.yes': '匹配',
+    'matching.no': '不推荐',
+    'matching.cond': '有条件匹配',
+    'same.mat': '同种材料焊接',
+    'diff.mat': '异种材料焊接',
+    'wire.title': '是否送丝',
+    'wire.self': '自熔',
+    'wire.self.desc': '不加焊丝，靠母材熔化',
+    'wire.feed': '送丝',
+    'wire.feed.desc': '添加焊丝填充',
+    'osc.title': '是否增加摆头',
+    'osc.no': '无摆头',
+    'osc.no.desc': '固定光束焊接',
+    'osc.yes': '有摆头',
+    'osc.yes.desc': '光束摆动焊接',
+    'process.title': '焊接模式',
+    'process.cw': '连续激光 (CW)',
+    'process.cw.desc': '恒定功率输出',
+    'process.pulse': '脉冲激光 (Pulse)',
+    'process.pulse.desc': '脉冲能量输出',
+    'thickness.title': '材料厚度',
+    'joint.title': '接头类型',
+    'joint.butt': '对接',
+    'joint.lap': '搭接',
+    'joint.fillet': '角接',
+    'joint.edge': '边接',
+    'gas.title': '保护气体',
+    'otherReq.title': '其他要求说明',
+    'otherReq.placeholder': '例如：焊缝美观要求、气密性要求、焊接变形控制、生产效率优先、特殊环境要求……',
+    'articles.updating': '📚 文章持续更新中',
+    'empty.select': '请选择材料',
+    'sub.gate.title': '高难度焊接参数',
+    'sub.gate.desc': '当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。',
+    'sub.gate.price': '🔑 单次¥20 · 📅 月度¥6/月',
+    'sub.gate.btn': '🔓 订阅解锁',
+    'results.footer': '本数据仅供参考，实际工艺需结合设备能力验证 · Demo v1.2',
+    'results.reset': '⟳ 重新查询',
+    'tip.select.a.b': '请先选择材料A，再选择材料B',
+    'tip.same.material': '两种材料不能相同',
+    'tip.no.data': '该组合数据不足，建议进行工艺试验',
+    'tip.thick.note': '⚠ 该厚度暂不支持，使用最接近值({thick}mm)',
+    'proc.pulse': '脉冲激光',
+    'proc.cw.label': '连续激光(CW)',
+    'wire.feed.label': '[送丝]',
+    'wire.self.label': '[自熔]',
+    'osc.yes.label': '[摆头]',
+    'weld.same': '同种材料',
+    'weld.diff': '异种材料',
+    'weld.easy.title': '🟢 易焊',
+    'weld.easy.items': '强度：满足一般要求##冶金：熔合良好，无有害相##外观：易控制，表面质量好',
+    'weld.moderate.title': '🟡 可焊',
+    'weld.moderate.items': '强度：满足一般使用条件，考虑过渡层##冶金：控制稀释率和热循环##外观：通过优化参数可达到',
+    'weld.challenging.title': '🟠 需注意',
+    'weld.challenging.items': '强度：可能不满足高强度条件，需试验##冶金：界面可能生成脆性金属间化合物##外观：需要精确控制参数##💡 使用过渡层/中间层材料改善可焊性',
+    'weld.hard.title': '🔴 难焊',
+    'weld.hard.items': '强度：界面结合强度低，不适用于结构焊缝##冶金：大量脆性金属间化合物##外观：成形困难，易开裂##❌ 不建议激光焊接。替代方案：钎焊、扩散焊、机械连接',
+    'weld.combo': '⚡ 材料组合：',
+    'result.pow.label': '激光功率',
+    'result.pow.high': '⚠ 建议使用10kW+激光器',
+    'result.pow.normal': '推荐功率范围',
+    'result.speed.label': '焊接速度',
+    'result.speed.fast': '高速焊',
+    'result.speed.med': '中速焊',
+    'result.speed.slow': '低速深熔焊',
+    'result.focus.label': '离焦量',
+    'result.focus.neg': '负离焦（深熔焊）',
+    'result.focus.pos': '零/正离焦（热导焊）',
+    'result.gas.label': '保护气体',
+    'result.hint.mat': '材料说明',
+    'pulse.freq': '脉冲频率',
+    'pulse.duty': '占空比',
+    'pulse.ppk': '峰值功率',
+    'pulse.avg': '平均功率',
+    'wire.title.rec': '📎 送丝推荐',
+    'wire.speed': '送丝速度',
+    'wire.angle': '推荐角度',
+    'wire.angle.val': '前送丝30~45°',
+    'wire.locked': '🔒 订阅后解锁详细参数',
+    'osc.title.rec': '🌀 摆头推荐',
+    'osc.shape': '摆动形状',
+    'osc.param': '摆动参数',
+    'osc.locked': '🔒 订阅后解锁详细参数',
+    'req.title': '📋 其他要求·工艺优化',
+    'req.locked': '🔒 订阅后解锁个性化优化建议',
+    'laser.title': '🔧 高级激光参数',
+    'laser.type': '激光器类型',
+    'laser.core': '芯径',
+    'laser.ratio': '准直/聚焦比',
+    'laser.locked': '🔒 订阅后解锁激光器类型/芯径/准直聚焦比',
+    'laser.rec.type.single': '标准激光器',
+    'laser.rec.type.ring': '环形光斑',
+    'laser.rec.type.hybrid': '混合光斑',
+    'sub.reason.thin': '≤0.3mm薄板',
+    'sub.reason.titanium': '钛合金焊接',
+    'sub.reason.airtight': '气密性要求',
+    'sub.reason.diff': '异种材料焊接',
+    'sub.reason.hard': '高难度组合',
+    'sub.desc.default': '🔒 需要订阅 · 触发条件：{reasons}<br><span style="font-size:11px;opacity:0.7;">解锁全部焊接参数（含送丝、摆头及工艺建议）</span>',
+    'sub.desc.changed': '🔒 参数已变更，需重新订阅<br><span style="font-size:11px;opacity:0.7;">单次解锁仅对上一步查询参数有效</span>',
+    'sub.desc.expired': '🔒 月度订阅已过期，需续费<br><span style="font-size:11px;opacity:0.7;">¥6/月，随时取消</span>',
+    'sub.status.default': '已订阅 · 全部参数已解锁',
+    'pay.once': '单次解锁',
+    'pay.monthly': '月度订阅',
+    'pay.month': '月',
+    'pay.auto': '自动续费',
+    'pay.permanent': '永久有效',
+    'pay.cancel.anytime': '随时取消',
+    'pay.wechat': '微信支付',
+    'pay.alipay': '支付宝',
+    'pay.wechat.qr': '📱 微信收款码',
+    'pay.alipay.qr': '📱 支付宝收款码',
+    'pay.confirm': '✅ 我已支付',
+    'pay.cancel': '取消',
+    'pay.select.plan': '请先选择订阅方案',
+    'pay.verifying': '验证中...',
+    'pay.verifying.wait': '正在验证，请稍候...',
+    'pay.unlocked': '全部参数已解锁',
+    'pay.success': '成功！刷新不会丢失',
+    'pay.method': '💳 选择支付方式',
+  },
+  en: {
+    'header.subtitle': 'Laser Welding Parameter Query · v1.2',
+    'lang.switch': '中',
+    'material.title': 'Select Material',
+    'material.a': 'Material A',
+    'material.b': 'Material B',
+    'material.same': 'Same Material',
+    'material.diff': 'Dissimilar',
+    'empty.title': 'Select a material first',
+    'empty.sub': 'Click a material card above to get welding feasibility assessment and optimized parameters',
+    'pair.current': 'Current: ',
+    'results.title': 'Welding Parameters',
+    'results.compat': 'Compatibility',
+    'results.param': 'Recommended Parameters',
+    'results.speed': 'Welding Speed',
+    'results.power': 'Power',
+    'results.freq': 'Frequency',
+    'results.pulse': 'Pulse Width',
+    'results.focus': 'Focus Position',
+    'results.gas': 'Shielding Gas',
+    'results.gasFlow': 'Gas Flow',
+    'results.gap': 'Joint Gap',
+    'results.weld': 'Joint Type',
+    'results.cost': 'Cost',
+    'results.difficulty': 'Difficulty',
+    'results.usability': 'Operation Tips',
+    'sub.title': 'Select Sub-material',
+    'sub.btn': 'Cancel',
+    'articles.title': 'Tech Articles',
+    'articles.read': '📖 Read Full Article',
+    'req.hint': 'Tip: Click a case card above for details',
+    'req.check': 'Welding Check',
+    'extra.advice': 'Process Advice',
+    'extra.param': 'Advanced Parameters',
+    'extra.sheet': 'Quick Reference',
+    'extra.case': 'Industry Cases',
+    'footer.text': 'LaserWeld Pro · Welding Parameter Tool',
+    'gas.none': 'None',
+    'matching.yes': 'Compatible',
+    'matching.no': 'Not Recommended',
+    'matching.cond': 'Conditional',
+    'same.mat': 'Same Material Welding',
+    'diff.mat': 'Dissimilar Material Welding',
+    'tip.select.a.b': 'Please select Material A first, then Material B',
+    'tip.same.material': 'Two materials cannot be the same',
+    'tip.no.data': 'Insufficient data for this combination, process testing recommended',
+    'tip.thick.note': '⚠ This thickness not supported, using closest value ({thick}mm)',
+    'proc.pulse': 'Pulsed Laser',
+    'proc.cw.label': 'Continuous Wave (CW)',
+    'joint.butt': 'Butt',
+    'joint.lap': 'Lap',
+    'joint.fillet': 'Fillet',
+    'joint.edge': 'Edge',
+    'wire.feed.label': '[Wire Feed]',
+    'wire.self.label': '[Self-fusion]',
+    'osc.yes.label': '[Oscillation]',
+    'weld.same': 'Same Material',
+    'weld.diff': 'Dissimilar',
+    'weld.easy.title': '🟢 Easy',
+    'weld.easy.items': 'Strength: meets general requirements##Metallurgy: good fusion, no detrimental phases##Appearance: easy to control, good surface quality',
+    'weld.moderate.title': '🟡 Weldable',
+    'weld.moderate.items': 'Strength: meets general service conditions, consider transition layer##Metallurgy: control dilution rate and thermal cycle##Appearance: achievable with optimized parameters',
+    'weld.challenging.title': '🟠 Challenging',
+    'weld.challenging.items': 'Strength: may not meet high-strength conditions, test required##Metallurgy: brittle intermetallic compounds may form at interface##Appearance: precise parameter control needed##💡 Use transition layer/interlayer material to improve weldability',
+    'weld.hard.title': '🔴 Difficult',
+    'weld.hard.items': 'Strength: low interfacial bond strength, not suitable for structural welds##Metallurgy: extensive brittle intermetallic compounds##Appearance: difficult weld formation, prone to cracking##❌ Laser welding not recommended. Alternatives: brazing, diffusion bonding, mechanical joining',
+    'weld.combo': '⚡ Material Pair:',
+    'result.pow.label': 'Laser Power',
+    'result.pow.high': '⚠ Recommend 10kW+ laser',
+    'result.pow.normal': 'Recommended power range',
+    'result.speed.label': 'Welding Speed',
+    'result.speed.fast': 'High-speed welding',
+    'result.speed.med': 'Medium-speed welding',
+    'result.speed.slow': 'Low-speed deep penetration',
+    'result.focus.label': 'Focus Position',
+    'result.focus.neg': 'Negative defocus (deep penetration)',
+    'result.focus.pos': 'Zero/positive defocus (conduction mode)',
+    'result.gas.label': 'Shielding Gas',
+    'result.hint.mat': 'Material Note',
+    'pulse.freq': 'Pulse Frequency',
+    'pulse.duty': 'Duty Cycle',
+    'pulse.ppk': 'Peak Power',
+    'pulse.avg': 'Average Power',
+    'wire.title.rec': '📎 Wire Feed Recommendation',
+    'wire.speed': 'Feed Speed',
+    'wire.angle': 'Recommended Angle',
+    'wire.angle.val': 'Leading feed 30~45°',
+    'wire.locked': '🔒 Subscribe to unlock detailed parameters',
+    'osc.title.rec': '🌀 Oscillation Recommendation',
+    'osc.shape': 'Shape',
+    'osc.param': 'Oscillation Parameters',
+    'osc.locked': '🔒 Subscribe to unlock detailed parameters',
+    'req.title': '📋 Other Requirements · Process Optimization',
+    'req.locked': '🔒 Subscribe to unlock personalized optimization suggestions',
+    'laser.title': '🔧 Advanced Laser Parameters',
+    'laser.type': 'Laser Type',
+    'laser.core': 'Core Diameter',
+    'laser.ratio': 'Collimation/Focus Ratio',
+    'laser.locked': '🔒 Subscribe to unlock laser type / core diameter / collimation-focus ratio',
+    'laser.rec.type.single': 'Standard',
+    'laser.rec.type.ring': 'Ring',
+    'laser.rec.type.hybrid': 'Hybrid',
+    'sub.reason.thin': '≤0.3mm thin plate',
+    'sub.reason.titanium': 'Titanium welding',
+    'sub.reason.airtight': 'Airtightness requirements',
+    'sub.reason.diff': 'Dissimilar material welding',
+    'sub.reason.hard': 'High difficulty combination',
+    'sub.desc.default': '🔒 Subscribe required · Triggers: {reasons}<br><span style="font-size:11px;opacity:0.7;">Unlock all welding parameters including wire feed, oscillation, and process advice</span>',
+    'sub.desc.changed': '🔒 Parameters changed, re-subscribe required<br><span style="font-size:11px;opacity:0.7;">Single unlock only covers the previous query parameters</span>',
+    'sub.desc.expired': '🔒 Monthly subscription expired, renew required<br><span style="font-size:11px;opacity:0.7;">¥6/month, cancel anytime</span>',
+    'wire.title': 'Wire Feeding',
+    'wire.self': 'Self-fusion',
+    'wire.self.desc': 'No filler wire added',
+    'wire.feed': 'Wire Feed',
+    'wire.feed.desc': 'Add filler wire',
+    'osc.title': 'Beam Oscillation',
+    'osc.no': 'No Oscillation',
+    'osc.no.desc': 'Fixed beam welding',
+    'osc.yes': 'With Oscillation',
+    'osc.yes.desc': 'Oscillating beam welding',
+    'process.title': 'Welding Mode',
+    'process.cw': 'Continuous Wave (CW)',
+    'process.cw.desc': 'Constant power output',
+    'process.pulse': 'Pulsed Laser',
+    'process.pulse.desc': 'Pulsed energy output',
+    'thickness.title': 'Thickness',
+    'joint.title': 'Joint Type',
+    'joint.butt': 'Butt',
+    'joint.lap': 'Lap',
+    'joint.fillet': 'Fillet',
+    'joint.edge': 'Edge',
+    'gas.title': 'Shielding Gas',
+    'otherReq.title': 'Other Requirements',
+    'pay.verifying': 'Verifying...',
+    'pay.verifying.wait': 'Verifying, please wait...',
+    'pay.unlocked': 'All parameters unlocked',
+    'pay.success': ' successful! Refreshing will persist',
+    'sub.status.default': 'Active · All parameters unlocked',
+    'pay.once': 'Single Unlock',
+    'pay.monthly': 'Monthly Subscription',
+    'pay.month': 'mo',
+    'pay.auto': 'Auto-renew',
+    'pay.permanent': 'Permanent',
+    'pay.cancel.anytime': 'Cancel anytime',
+    'pay.wechat': 'WeChat Pay',
+    'pay.alipay': 'Alipay',
+    'pay.wechat.qr': '📱 WeChat QR Code',
+    'pay.alipay.qr': '📱 Alipay QR Code',
+    'pay.confirm': '✅ I have paid',
+    'pay.cancel': 'Cancel',
+    'pay.select.plan': 'Please select a plan first',
+    'pay.method': '💳 Select payment method',
+    'pay.verifying': 'Verifying...',
+    'pay.verifying.wait': 'Verifying, please wait...',
+    'pay.unlocked': 'All parameters unlocked',
+    'pay.success': ' successful! Refreshing will persist',
+    'otherReq.placeholder': 'E.g.: weld appearance, gas tightness, distortion control, production efficiency…',
+    'articles.updating': '📚 More articles coming soon',
+    'empty.select': 'Select material',
+    'sub.gate.title': 'High-difficulty Welding',
+    'sub.gate.desc': 'Subscribe to unlock all welding parameters and in-depth process guidance.',
+    'sub.gate.price': '🔑 ¥20 single · 📅 ¥6/month',
+    'sub.gate.btn': '🔓 Subscribe & Unlock',
+    'results.footer': 'For reference only. Actual process depends on equipment capability. Demo v1.2',
+    'results.reset': '⟳ Reset',
+  }
+};
+
+// Current language
+var currentLang = localStorage.getItem('laserweld_lang') || 'zh';
+
+// I18n helper: translates a key
+function t(key, fallback, params) {
+  var val = (LANG[currentLang] || LANG.zh)[key];
+  var str = val || fallback || key;
+  if (params) {
+    for (var k in params) {
+      str = str.replace(new RegExp('\\{'+k+'\\}', 'g'), params[k]);
+    }
+  }
+  return str;
+}
+function tList(key) {
+  var val = (LANG[currentLang] || LANG.zh)[key];
+  return (val || '').split('##');
+}
+
+// Toggle language
+function toggleLang() {
+  currentLang = currentLang === 'zh' ? 'en' : 'zh';
+  localStorage.setItem('laserweld_lang', currentLang);
+  applyLang();
+}
+
+// Apply language to all DOM elements with data-i18n
+function applyLang() {
+  var btn = document.getElementById('langBtn');
+  if (btn) btn.textContent = t('lang.switch');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) {
+    var key = els[i].getAttribute('data-i18n');
+    els[i].textContent = t(key, els[i].textContent);
+  }
+  // Handle placeholders
+  var ph = document.querySelectorAll('[data-i18n-placeholder]');
+  for (var i = 0; i < ph.length; i++) {
+    var key = ph[i].getAttribute('data-i18n-placeholder');
+    ph[i].placeholder = t(key, ph[i].placeholder);
+  }
+  // Re-render dynamic content
+  renderMaterials();
+  renderArticles();
+  if (typeof updateResults === 'function') updateResults();
+  if (typeof updatePairDisplay === 'function') updatePairDisplay();
+  updateUIStrings();
+}
+
+// Update UI strings that are in JS-rendered content
+function updateUIStrings() {
+  // Section titles
+  var sections = {
+    'materialTitle': 'material.title',
+    'articlesTitle': 'articles.title',
+    'resultsTitle': 'results.title',
+    'extraAdviceTitle': 'extra.advice',
+    'extraParamTitle': 'extra.param',
+    'extraSheetTitle': 'extra.sheet',
+    'extraCaseTitle': 'extra.case',
+  };
+  for (var id in sections) {
+    var el = document.getElementById(id);
+    if (el) {
+      var k = sections[id];
+      el.textContent = t(k, el.textContent);
+    }
+  }
+  // Same/diff toggle buttons
+  var sameBtn = document.querySelector('[data-val="same"]');
+  var diffBtn = document.querySelector('[data-val="diff"]');
+  if (sameBtn) sameBtn.textContent = t('material.same');
+  if (diffBtn) diffBtn.textContent = t('material.diff');
+}
+
 // ====================================================================
 // 材料定义（含二级目录）
 // ====================================================================
 const MATERIALS = [
-  { id: 'ss304',      name: '不锈钢 304',  icon: '🔩', sub: 'SS304',           group: 'steel' },
-  { id: 'carbon',     name: '碳钢',        icon: '🔧', sub: 'Carbon Steel',     group: 'steel' },
-  { id: 'galvanized', name: '镀锌板',      icon: '🛡️', sub: 'Galvanized',       group: 'steel' },
-  { id: 'copper',     name: '铜',          icon: '🟤', sub: '▼ 选子类',          group: 'copper',
+  { id: 'ss304',      name: '不锈钢 304',  en_name: 'Stainless Steel 304', icon: '🔩', sub: 'SS304',         group: 'steel' },
+  { id: 'carbon',     name: '碳钢',        en_name: 'Carbon Steel',         icon: '🔧', sub: 'Carbon Steel',   group: 'steel' },
+  { id: 'galvanized', name: '镀锌板',      en_name: 'Galvanized Steel',     icon: '🛡️', sub: 'Galvanized',     group: 'steel' },
+  { id: 'copper',     name: '铜',          en_name: 'Copper',               icon: '🟤', sub: '▼ 选子类',      group: 'copper',
     hasSub: true,
     subMaterials: [
-      { id: 'pure_cu',      name: '纯铜',   sub: 'T2 / C1100' },
-      { id: 'brass',        name: '黄铜',   sub: 'H62 / H68' },
-      { id: 'bronze',       name: '青铜',   sub: 'QSn6.5-0.1' },
-      { id: 'phos_bronze',  name: '磷铜',   sub: 'QSn6.5-0.4' },
-      { id: 'cupronickel',  name: '白铜',   sub: 'B10 / B30' },
+      { id: 'pure_cu',      name: '纯铜',   en_name: 'Pure Copper T2',    sub: 'T2 / C1100' },
+      { id: 'brass',        name: '黄铜',   en_name: 'Brass H62',         sub: 'H62 / H68' },
+      { id: 'bronze',       name: '青铜',   en_name: 'Bronze QSn6.5-0.1', sub: 'QSn6.5-0.1' },
+      { id: 'phos_bronze',  name: '磷铜',   en_name: 'Phosphor Bronze',   sub: 'QSn6.5-0.4' },
+      { id: 'cupronickel',  name: '白铜',   en_name: 'Cupronickel B10',   sub: 'B10 / B30' },
     ] },
-  { id: 'aluminum',   name: '铝',          icon: '🪶', sub: '▼ 选牌号系列',      group: 'aluminum',
+  { id: 'aluminum',   name: '铝',          en_name: 'Aluminum',            icon: '🪶', sub: '▼ 选牌号系列',  group: 'aluminum',
     hasSub: true,
     subMaterials: [
-      { id: 'al_1xxx', name: '1系 纯铝',    sub: '1060 / 1100' },
-      { id: 'al_2xxx', name: '2系 铝铜',    sub: '2024' },
-      { id: 'al_3xxx', name: '3系 铝锰',    sub: '3003' },
-      { id: 'al_4xxx', name: '4系 铝硅',    sub: '4043' },
-      { id: 'al_5xxx', name: '5系 铝镁',    sub: '5052 / 5083' },
-      { id: 'al_6xxx', name: '6系 铝镁硅',  sub: '6061 / 6063' },
-      { id: 'al_7xxx', name: '7系 铝锌',    sub: '7075' },
+      { id: 'al_1xxx', name: '1系 纯铝',  en_name: '1xxx Pure Al',       sub: '1060 / 1100' },
+      { id: 'al_2xxx', name: '2系 铝铜',  en_name: '2xxx Al-Cu',         sub: '2024' },
+      { id: 'al_3xxx', name: '3系 铝锰',  en_name: '3xxx Al-Mn',         sub: '3003' },
+      { id: 'al_4xxx', name: '4系 铝硅',  en_name: '4xxx Al-Si',         sub: '4043' },
+      { id: 'al_5xxx', name: '5系 铝镁',  en_name: '5xxx Al-Mg',         sub: '5052 / 5083' },
+      { id: 'al_6xxx', name: '6系 铝镁硅',en_name: '6xxx Al-Mg-Si',      sub: '6061 / 6063' },
+      { id: 'al_7xxx', name: '7系 铝锌',  en_name: '7xxx Al-Zn',         sub: '7075' },
     ] },
-  { id: 'titanium',   name: '钛合金',      icon: '💎', sub: 'Ti-6Al-4V',       group: 'ti' },
+  { id: 'titanium',   name: '钛合金',      en_name: 'Titanium Alloy Ti64', icon: '💎', sub: 'Ti-6Al-4V',    group: 'ti' },
 ];
 
 // 子材料 → 主材料的映射
@@ -1317,6 +2341,8 @@ MATERIALS.forEach(m => {
     m.subMaterials.forEach(s => { SUB_TO_PARENT[s.id] = m.id; });
   }
 });
+
+
 
 // ====================================================================
 // 焊接参数数据库
@@ -1440,6 +2466,18 @@ const JOINT_FACTOR = {
 // ====================================================================
 // 气体备注
 // ====================================================================
+function getGasDisplay(gasKey) {
+  var en = currentLang === 'en';
+  var gases = {
+    Ar:  en ? { name: 'Argon', note: 'General-purpose shielding, best cost-performance' } : { name: '氩气', note: '通用保护气体，性价比最优' },
+    N2:  en ? { name: 'Nitrogen', note: 'Suitable for stainless steel, improves corrosion resistance' } : { name: '氮气', note: '适合不锈钢，可提升耐腐蚀性' },
+    He:    en ? { name: 'Helium', note: 'High thermal conductivity, for thick plate/Al alloy, higher cost' } : { name: '氦气', note: '高热导率，适合厚板/铝合金，成本较高' },
+    vacuum: en ? { name: 'Vacuum', note: 'Ultra-high cleanliness, no oxidation, requires vacuum chamber' } : { name: '真空', note: '极高洁净度，无氧化，需真空室设备，适用于高反材料（铜、铝）' },
+    air:    en ? { name: 'Air', note: 'Low cost, rough welds only, prone to oxidation, not for precision welding' } : { name: '空气', note: '低成本，仅限粗焊/非关键件，焊缝易氧化发黑，不建议用于精密焊接' },
+  };
+  return gases[gasKey] || gases.Ar;
+}
+
 const GAS_NOTES = {
   Ar:  { name: '氩气', note: '通用保护气体，性价比最优' },
   N2:  { name: '氮气', note: '适合不锈钢，可提升耐腐蚀性' },
@@ -1473,7 +2511,8 @@ function getWireRecommendation(matId, thickness) {
     else if (t <= 5.0) { wireDiam = 'φ1.2 mm';  wireType = 'ER308L / ER70S-6'; }
     else               { wireDiam = 'φ1.6 mm';  wireType = 'ER308L / ER70S-6'; }
   }
-  return { wireDiam, wireType, desc: `推荐焊丝直径 ${wireDiam}，牌号 ${wireType}` };
+  var wireDesc = currentLang === 'en' ? `Wire: ${wireDiam}, Type: ${wireType}` : `推荐焊丝直径 ${wireDiam}，牌号 ${wireType}`;
+  return { wireDiam, wireType, desc: wireDesc };
 }
 
 // ====================================================================
@@ -1481,43 +2520,41 @@ function getWireRecommendation(matId, thickness) {
 // ====================================================================
 function getOscRecommendation(matId, thickness, joint) {
   const t = thickness;
+  const en = typeof currentLang !== 'undefined' && currentLang === 'en';
   let shape = '', size = '', desc = '';
   const isCu = matId === 'copper' || matId === 'pure_cu';
+  var S = function(zhShape, zhSize, zhDesc, enShape, enSize, enDesc) {
+    if (en) { shape = enShape; size = enSize; desc = enDesc; }
+    else { shape = zhShape; size = zhSize; desc = zhDesc; }
+  };
   if (t <= 1.0) {
     if (joint === 'butt' || joint === 'edge') {
-      shape = '一字形摆动 (Linear)';
-      size = '振幅 0.5~1.0 mm，频率 100~200 Hz';
-      desc = '薄板对接推荐一字形摆动，有效增加熔宽，降低装配要求';
+      S('一字形摆动 (Linear)', '振幅 0.5~1.0 mm，频率 100~200 Hz', '薄板对接推荐一字形摆动，有效增加熔宽，降低装配要求',
+        'Linear oscillation', 'Amplitude 0.5~1.0 mm, Freq 100~200 Hz', 'Linear oscillation for butt/edge thin plate, increases weld width, reduces fit-up requirements');
     } else {
-      shape = '圆形摆动 (Circular)';
-      size = 'φ 0.8~1.5 mm，频率 80~150 Hz';
-      desc = '薄板搭接/角接推荐圆形摆动，均匀热分布';
+      S('圆形摆动 (Circular)', 'φ 0.8~1.5 mm，频率 80~150 Hz', '薄板搭接/角接推荐圆形摆动，均匀热分布',
+        'Circular oscillation', 'φ 0.8~1.5 mm, Freq 80~150 Hz', 'Circular oscillation for lap/fillet thin plate, uniform heat distribution');
     }
   } else if (t <= 3.0) {
     if (joint === 'butt') {
-      shape = '一字形摆动 (Linear)';
-      size = '振幅 1.0~2.5 mm，频率 80~150 Hz';
-      desc = '中板对接推荐一字形摆动，增加熔宽提高效率';
+      S('一字形摆动 (Linear)', '振幅 1.0~2.5 mm，频率 80~150 Hz', '中板对接推荐一字形摆动，增加熔宽提高效率',
+        'Linear oscillation', 'Amplitude 1.0~2.5 mm, Freq 80~150 Hz', 'Linear oscillation for medium plate butt, increases weld width and efficiency');
     } else {
-      shape = '圆形摆动 (Circular)';
-      size = 'φ 1.5~3.0 mm，频率 60~120 Hz';
-      desc = '中板搭接/角接推荐圆形摆动，促进熔池流动';
+      S('圆形摆动 (Circular)', 'φ 1.5~3.0 mm，频率 60~120 Hz', '中板搭接/角接推荐圆形摆动，促进熔池流动',
+        'Circular oscillation', 'φ 1.5~3.0 mm, Freq 60~120 Hz', 'Circular oscillation for medium plate lap/fillet, promotes pool flow');
     }
   } else {
     if (t >= 5.0 && isCu) {
-      shape = '八字形摆动 (Figure-8)';
-      size = '振幅 2.0~4.0 mm，频率 30~80 Hz';
-      desc = '厚板+高导热材料推荐八字形摆动，保证熔深同时改善熔池搅动';
+      S('八字形摆动 (Figure-8)', '振幅 2.0~4.0 mm，频率 30~80 Hz', '厚板+高导热材料推荐八字形摆动，保证熔深同时改善熔池搅动',
+        'Figure-8 oscillation', 'Amplitude 2.0~4.0 mm, Freq 30~80 Hz', 'Figure-8 for thick Cu plate, ensures penetration depth and pool agitation');
     } else {
-      shape = '一字/圆形组合摆动';
-      size = '振幅 1.5~3.5 mm，频率 40~100 Hz';
-      desc = '厚板推荐组合摆动模式，兼顾熔深与熔宽';
+      S('一字/圆形组合摆动', '振幅 1.5~3.5 mm，频率 40~100 Hz', '厚板推荐组合摆动模式，兼顾熔深与熔宽',
+        'Linear/Circular combined', 'Amplitude 1.5~3.5 mm, Freq 40~100 Hz', 'Combined oscillation for thick plate, balancing penetration and width');
     }
   }
   if (isCu) {
-    shape = '高频圆形摆动 (H-F Circular)';
-    size = 'φ 1.0~2.0 mm，频率 200~400 Hz';
-    desc = '铜材高反推荐高频摆动，抑制飞溅，提高能量耦合效率';
+    S('高频圆形摆动 (H-F Circular)', 'φ 1.0~2.0 mm，频率 200~400 Hz', '铜材高反推荐高频摆动，抑制飞溅，提高能量耦合效率',
+        'High-Freq Circular', 'φ 1.0~2.0 mm, Freq 200~400 Hz', 'High-frequency circular oscillation for Cu, suppresses spatter, improves energy coupling');
   }
   return { shape, size, desc };
 }
@@ -1556,39 +2593,51 @@ function isHighDifficulty(matA, subA, matB, subB, thickness) {
 // ====================================================================
 function getReqAdvice(text, weldLevel) {
   if (!text || !text.trim()) return null;
+  const en = typeof currentLang !== 'undefined' && currentLang === 'en';
+  const T = function(zh, enStr) { return en ? enStr : zh; };
   const lower = text.toLowerCase();
   const tips = [];
-  if (lower.includes('美观') || lower.includes('漂亮') || lower.includes('表面') || lower.includes('光滑')) {
-    tips.push('🔹 美观要求：建议降低焊接速度10-15%，适当增加离焦量至正离焦，保护气流量增加2-3L/min');
+  if (lower.includes('美观') || lower.includes('漂亮') || lower.includes('表面') || lower.includes('光滑') || lower.includes('appearance') || lower.includes('cosmetic') || lower.includes('smooth') || lower.includes('finish')) {
+    tips.push(T('🔹 美观要求：建议降低焊接速度10-15%，适当增加离焦量至正离焦，保护气流量增加2-3L/min',
+      '🔹 Appearance: Reduce speed 10-15%, increase defocus slightly positive, add 2-3L/min shielding gas'));
   }
-  if (lower.includes('气密') || lower.includes('密封') || lower.includes('漏水') || lower.includes('泄露')) {
-    tips.push('🔹 气密性要求：建议采用穿透焊或全熔透参数，焊接速度降低15-20%，可使用搭接接头+连续密封焊道');
-    tips.push('🔹 气密性要求：建议焊后进行气密性测试，必要时增加背面保护气');
+  if (lower.includes('气密') || lower.includes('密封') || lower.includes('漏水') || lower.includes('泄露') || lower.includes('airtight') || lower.includes('seal') || lower.includes('leak') || lower.includes('pressure')) {
+    tips.push(T('🔹 气密性要求：建议采用穿透焊或全熔透参数，焊接速度降低15-20%，可使用搭接接头+连续密封焊道',
+      '🔹 Airtightness: Use full-penetration parameters, reduce speed 15-20%, lap joint + continuous seal bead'));
+    tips.push(T('🔹 气密性要求：建议焊后进行气密性测试，必要时增加背面保护气',
+      '🔹 Airtightness: Conduct leak test after welding, add back-side shielding gas if needed'));
   }
-  if (lower.includes('变形') || lower.includes('精度') || lower.includes('翘曲') || lower.includes('不平')) {
-    tips.push('🔹 变形控制：建议使用夹具加大压紧力，采用跳焊/分段焊顺序，热输入控制在推荐范围下限');
+  if (lower.includes('变形') || lower.includes('精度') || lower.includes('翘曲') || lower.includes('不平') || lower.includes('distortion') || lower.includes('deformation') || lower.includes('warp') || lower.includes('precision')) {
+    tips.push(T('🔹 变形控制：建议使用夹具加大压紧力，采用跳焊/分段焊顺序，热输入控制在推荐范围下限',
+      '🔹 Distortion: Use stronger clamping, stitch/step welding sequence, keep heat input at lower recommended range'));
   }
-  if (lower.includes('效率') || lower.includes('速度') || lower.includes('产能') || lower.includes('产量') || lower.includes('快')) {
-    tips.push('🔹 效率优先：建议在功率上限运行，提高焊接速度至推荐范围上限，配合摆动头提高熔宽容差');
+  if (lower.includes('效率') || lower.includes('速度') || lower.includes('产能') || lower.includes('产量') || lower.includes('快') || lower.includes('efficiency') || lower.includes('productivity') || lower.includes('fast') || lower.includes('speed')) {
+    tips.push(T('🔹 效率优先：建议在功率上限运行，提高焊接速度至推荐范围上限，配合摆动头提高熔宽容差',
+      '🔹 Productivity: Run at max power, increase speed to upper range, use oscillation for wider tolerance'));
   }
-  if (lower.includes('真空') || lower.includes('高温') || lower.includes('腐蚀') || lower.includes('低温')) {
-    tips.push('🔹 环境特殊要求：请确保焊接环境满足工艺要求，必要时采用保护气氛箱或真空室');
+  if (lower.includes('真空') || lower.includes('高温') || lower.includes('腐蚀') || lower.includes('低温') || lower.includes('vacuum') || lower.includes('high temp') || lower.includes('corrosion') || lower.includes('cryo')) {
+    tips.push(T('🔹 环境特殊要求：请确保焊接环境满足工艺要求，必要时采用保护气氛箱或真空室',
+      '🔹 Special environment: Ensure process conditions are met, consider chamber or vacuum'));
   }
-  if (lower.includes('深熔') || lower.includes('穿透') || lower.includes('全熔透') || lower.includes('单面焊双面')) {
-    tips.push('🔹 深熔要求：建议负离焦（-2～-4mm），大功率密度，可配合送丝填充间隙');
+  if (lower.includes('深熔') || lower.includes('穿透') || lower.includes('全熔透') || lower.includes('单面焊双面') || lower.includes('keyhole') || lower.includes('penetration') || lower.includes('full penetration')) {
+    tips.push(T('🔹 深熔要求：建议负离焦（-2～-4mm），大功率密度，可配合送丝填充间隙',
+      '🔹 Keyhole/Deep penetration: Use negative defocus (-2~-4mm), high power density, wire feed for gap filling'));
   }
-  if (lower.includes('自动') || lower.includes('机器人') || lower.includes('编程') || lower.includes('自动线')) {
-    tips.push('🔹 自动化要求：请确保工装定位精度≤0.2mm，焊缝追踪传感器可选配');
+  if (lower.includes('自动') || lower.includes('机器人') || lower.includes('编程') || lower.includes('自动线') || lower.includes('robot') || lower.includes('auto') || lower.includes('automation')) {
+    tips.push(T('🔹 自动化要求：请确保工装定位精度≤0.2mm，焊缝追踪传感器可选配',
+      '🔹 Automation: Ensure fixturing accuracy ≤0.2mm, seam tracking sensor optional'));
   }
 
-  // 异种/高难度自适应
   if (weldLevel === 'hard' || weldLevel === 'challenging') {
-    tips.push('🔹 ⚠ 当前组合焊接难度大，强烈建议先做工艺试验验证，条件允许可使用过渡层/中间层材料改善焊接性');
+    tips.push(T('🔹 ⚠ 当前组合焊接难度大，强烈建议先做工艺试验验证，条件允许可使用过渡层/中间层材料改善焊接性',
+      '🔹 ⚠ Difficult combination. Strongly recommend process trials. Use interlayer/transition material if possible'));
   }
 
   if (tips.length === 0) {
-    tips.push('🔹 已根据您的要求，在推荐参数范围内选用更保守/更激进的方案');
-    tips.push('🔹 如需更精准的优化建议，请描述具体要求：焊缝美观、气密性、变形控制、效率优先等');
+    tips.push(T('🔹 已根据您的要求，在推荐参数范围内选用更保守/更激进的方案',
+      '🔹 Applied your requirements within recommended parameter range'));
+    tips.push(T('🔹 如需更精准的优化建议，请描述具体要求：焊缝美观、气密性、变形控制、效率优先等',
+      '🔹 For precise suggestions, describe: appearance, airtightness, distortion control, productivity, etc.'));
   }
   return tips;
 }
@@ -1596,6 +2645,7 @@ function getReqAdvice(text, weldLevel) {
 // ====================================================================
 // State
 // ====================================================================
+// 初始化 state（所有依赖 state 的渲染调用必须在此之后）
 let state = {
   materialA: null, materialB: null,
   subA: null, subB: null,
@@ -1606,19 +2656,36 @@ let state = {
   joint: 'butt', gas: 'Ar',
   otherReq: '', subscribed: (function(){try{return localStorage.getItem('laserweld_sub')?true:false;}catch(e){return false;}})(),
 };
+// 防抖计时器（需在所有 updateResults 调用前定义）
+let _updateTimer, _scrollTimer;
+
+// ====================================================================
+// 初始化渲染（所有前置依赖已就绪）
+renderMaterials();
+updatePairDisplay();
+updateResults();
 
 // ====================================================================
 // Render Materials
 // ====================================================================
 function renderMaterials() {
   const grid = document.getElementById('materialGrid');
+  const en = currentLang === 'en';
   grid.innerHTML = MATERIALS.map(m => {
     const hasSub = m.hasSub ? 'has-sub' : '';
     const arrow = m.hasSub ? '<span class="arrow">▶</span>' : '';
-    return `<div class="material-card ${hasSub}" data-id="${m.id}" onclick="onMaterialClick('${m.id}')" tabindex="0" role="button" aria-label="选择材料 ${m.name}">
+    const displayName = en && m.en_name ? m.en_name : m.name;
+    // 子目录材料名称显示在 sub-level
+    let subLevelHtml = '';
+    if (m.hasSub && m.subMaterials) {
+      const names = en ? m.subMaterials.map(s => s.en_name || s.name) : m.subMaterials.map(s => s.name);
+      subLevelHtml = `<div class="sub-level">${names.join(' · ')}</div>`;
+    }
+    return `<div class="material-card ${hasSub}" data-id="${m.id}" onclick="onMaterialClick('${m.id}')" tabindex="0" role="button" aria-label="Select ${displayName}">
       <span class="icon">${m.icon}</span>
-      <div class="name">${m.name}</div>
+      <div class="name">${displayName}</div>
       <div class="sub">${m.sub}</div>
+      ${subLevelHtml}
       ${arrow}
     </div>`;
   }).join('');
@@ -1788,7 +2855,9 @@ let subModalParent = null;
 
 function showSubModal(mat) {
   subModalParent = mat;
-  document.getElementById('subModalTitle').textContent = `选择 ${mat.name} 牌号`;
+  const en = currentLang === 'en';
+  const matName = en && mat.en_name ? mat.en_name : mat.name;
+  document.getElementById('subModalTitle').textContent = (en ? `Select ${matName}` : `选择 ${matName} 牌号`);
   const grid = document.getElementById('subModalGrid');
   const currentSub = state.selectingFor === 'A' ? state.subA
     : (state.selectingFor === 'B' ? state.subB : state.subA);
@@ -1935,22 +3004,32 @@ function getMatDisplayName(matId, subId) {
   if (!matId) return null;
   const mat = MATERIALS.find(m => m.id === matId);
   if (!mat) return matId;
+  const en = currentLang === 'en';
+  const matName = en && mat.en_name ? mat.en_name : mat.name;
   if (subId && mat.subMaterials) {
     const sub = mat.subMaterials.find(s => s.id === subId);
-    return sub ? `${mat.name} > ${sub.name}` : mat.name;
+    if (sub) {
+      const subName = en && sub.en_name ? sub.en_name : sub.name;
+      return `${matName} > ${subName}`;
+    }
+    return matName;
   }
-  return mat.name;
+  return matName;
 }
 
 function getMatNameShort(matId, subId) {
   if (!matId) return '';
   const mat = MATERIALS.find(m => m.id === matId);
   if (!mat) return matId;
+  const en = currentLang === 'en';
   if (subId && mat.subMaterials) {
     const sub = mat.subMaterials.find(s => s.id === subId);
-    return sub ? sub.name : mat.name;
+    if (sub) return en && sub.en_name ? sub.en_name : sub.name;
+    const matName = en && mat.en_name ? mat.en_name : mat.name;
+    return matName;
   }
-  return mat.name;
+  const matName = en && mat.en_name ? mat.en_name : mat.name;
+  return matName;
 }
 
 // ====================================================================
@@ -2068,6 +3147,8 @@ function clearSubscription() {
 }
 
 function getSubPlanName(type) {
+  var en = typeof currentLang !== 'undefined' && currentLang === 'en';
+  if (en) return type === 'monthly' ? '📅 Monthly' : '🔑 Single';
   return type === 'monthly' ? '📅 月度订阅' : '🔑 单次解锁';
 }
 
@@ -2091,9 +3172,9 @@ function showPayment() {
   document.getElementById('paymentPanel').classList.add('open');
   document.getElementById('payMethodArea').style.display = 'none';
   document.getElementById('payConfirmBtn').disabled = false;
-  document.getElementById('payConfirmBtn').textContent = '✅ 我已支付';
+  document.getElementById('payConfirmBtn').textContent = t('pay.confirm');
   document.getElementById('payCancelBtn').style.display = '';
-  document.getElementById('payStatusMsg').textContent = '请先选择订阅方案';
+  document.getElementById('payStatusMsg').textContent = t('pay.select.plan');
   document.getElementById('payStatusMsg').style.color = 'var(--text2)';
 }
 
@@ -2105,8 +3186,9 @@ function selectPlan(plan) {
   // Show payment methods
   payState = 'PAYMENT_SELECT';
   document.getElementById('payMethodArea').style.display = 'block';
-  var label = plan === 'once' ? '单次解锁¥20' : '月度订阅¥6/月';
-  document.getElementById('payStatusMsg').textContent = label + ' · 选择支付方式并扫码';
+  var en = currentLang === 'en';
+  var label = plan === 'once' ? (en ? 'Single unlock ¥20' : '单次解锁¥20') : (en ? 'Monthly ¥6/mo' : '月度订阅¥6/月');
+  document.getElementById('payStatusMsg').textContent = label + (en ? ' · Select payment method & scan' : ' · 选择支付方式并扫码');
 }
 
 function selectPay(method) {
@@ -2114,27 +3196,28 @@ function selectPay(method) {
   selectedPayMethod = method;
   document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('pay' + (method === 'wechat' ? 'Wechat' : 'Alipay')).classList.add('selected');
-  var label = selectedPlan === 'once' ? '¥20' : '¥6/月';
-  document.getElementById('payStatusMsg').textContent = '扫码支付' + label + '后点击「我已支付」确认';
+  var en = currentLang === 'en';
+  var label = selectedPlan === 'once' ? (en ? '¥20 total' : '¥20') : (en ? '¥6/month' : '¥6/月');
+  document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay ' + label + ', then click \'I have paid\' to confirm' : '扫码支付' + label + '后点击「我已支付」确认';
 }
 
 function confirmPay() {
   if (payState === 'WAITING') return;
   if (!selectedPlan) {
-    document.getElementById('payStatusMsg').textContent = '⚠ 请先选择订阅方案（单次或月度）';
+    document.getElementById('payStatusMsg').textContent = '⚠ ' + t('pay.select.plan') + ' (' + t('pay.once').toLowerCase() + '/' + t('pay.monthly').toLowerCase() + ')';
     document.getElementById('payStatusMsg').style.color = 'var(--orange)';
     return;
   }
   if (!selectedPayMethod) {
-    document.getElementById('payStatusMsg').textContent = '⚠ 请先选择支付方式';
+    document.getElementById('payStatusMsg').textContent = '⚠ ' + (currentLang === 'en' ? 'Please select a payment method' : '请先选择支付方式');
     document.getElementById('payStatusMsg').style.color = 'var(--orange)';
     return;
   }
   payState = 'WAITING';
   document.getElementById('payConfirmBtn').disabled = true;
-  document.getElementById('payConfirmBtn').textContent = '⏳ 验证中...';
+  document.getElementById('payConfirmBtn').textContent = '⏳ ' + t('pay.verifying');
   document.getElementById('payCancelBtn').style.display = 'none';
-  document.getElementById('payStatusMsg').textContent = '验证中，请稍候...';
+  document.getElementById('payStatusMsg').textContent = t('pay.verifying.wait');
   document.getElementById('payStatusMsg').style.color = 'var(--accent)';
   setTimeout(function(){
     payState = 'VERIFIED';
@@ -2142,10 +3225,10 @@ function confirmPay() {
     saveSubscription(selectedPlan);
     var planName = getSubPlanName(selectedPlan);
     document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · 全部参数已解锁';
+    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · ' + t('pay.unlocked');
     document.querySelector('#subGate .btn-sub').style.display = 'none';
     document.getElementById('paymentPanel').classList.remove('open');
-    document.getElementById('payStatusMsg').textContent = '✅ ' + planName + '成功！刷新后依然有效';
+    document.getElementById('payStatusMsg').textContent = '✅ ' + planName + t('pay.success');
     document.getElementById('payStatusMsg').style.color = 'var(--green)';
     updateResults();
   }, 1200);
@@ -2241,7 +3324,7 @@ function _updateResultsNow() {
 
   const effKey = getEffectiveMatKey(materialA, subA);
   if (!effKey || !PARAMS[effKey]) {
-    showInlineTip('该组合缺少评估数据，推荐进行工艺试验');
+    showInlineTip(t('tip.no.data'));
     hideResults();
     return;
   }
@@ -2249,7 +3332,7 @@ function _updateResultsNow() {
   // Get primary material params
   const modeData = PARAMS[effKey][state.process];
   if (!modeData) {
-    showInlineTip('该组合缺少评估数据，推荐进行工艺试验');
+    showInlineTip(t('tip.no.data'));
     hideResults();
     return;
   }
@@ -2257,10 +3340,10 @@ function _updateResultsNow() {
   const closest = findClosestThicknessKey(avail, thickness);
   // 厚度差距较大时给出提示
   const thickRatio = Math.abs(closest - thickness) / Math.max(closest, thickness);
-  const thickNote = thickRatio > 0.25 ? `⚠ 当前材料暂不支持该厚度，请参考相近厚度值 (已用 ${closest}mm 替代)` : '';
+  const thickNote = thickRatio > 0.25 ? t('tip.thick.note', '', {thick: closest}) : '';
   const raw = modeData[closest];
   if (!raw) {
-    showInlineTip('该组合缺少评估数据，推荐进行工艺试验');
+    showInlineTip(t('tip.no.data'));
     hideResults();
     return;
   }
@@ -2275,7 +3358,8 @@ function _updateResultsNow() {
   const speedMin = Math.round((raw.speed[0] * jf.speed * subFactor.speed) * 10) / 10;
   const speedMax = Math.round((raw.speed[1] * jf.speed * subFactor.speed) * 10) / 10;
   const flowMin = raw.gas_flow[0]; const flowMax = raw.gas_flow[1];
-  const gasInfo = GAS_NOTES[gas] || GAS_NOTES.Ar;
+  const en = currentLang === 'en';
+  const gasInfo = (typeof getGasDisplay === 'function' ? getGasDisplay(gas) : GAS_NOTES[gas]) || GAS_NOTES.Ar;
   const isPulse = state.process === 'pulse';
 
   // Material names
@@ -2286,14 +3370,22 @@ function _updateResultsNow() {
 
   // Weldability
   const weldAssess = assessWeldability(materialA, subA, materialB || materialA, sameMaterial ? subA : subB);
+  // Override title/desc for English
+  if (en) {
+    var enTitles = {easy: t('weld.easy.title'), moderate: t('weld.moderate.title'), challenging: t('weld.challenging.title'), hard: t('weld.hard.title')};
+    if (enTitles[weldAssess.level]) weldAssess.title = enTitles[weldAssess.level];
+    // Simple desc override - keep the emoji but use a generic English desc
+    var enDesc = {easy: 'Excellent weldability. High-quality joints achievable with standard parameters.', moderate: 'Weldable with proper parameter control. Consider specific process adjustments.', challenging: 'Difficult welding combination. Requires careful parameter optimization and possibly transition materials.', hard: 'Not recommended for direct laser welding. Consider alternative joining methods.'};
+    if (enDesc[weldAssess.level]) weldAssess.desc = enDesc[weldAssess.level];
+  }
 
   // Summary
-  const procName = isPulse ? '脉冲激光' : '连续激光';
-  const jointName = {butt:'对接',lap:'搭接',fillet:'角接',edge:'边接'}[joint] || joint;
-  const wireName = wire === 'feed' ? '【送丝】' : '【自熔】';
-  const oscName = osc === 'yes' ? '【有摆头】' : '';
+  const procName = isPulse ? t('proc.pulse') : 'CW';
+  const jointName = t('joint.'+joint);
+  const wireName = wire === 'feed' ? t('wire.feed.label') : t('wire.self.label');
+  const oscName = osc === 'yes' ? t('osc.yes.label') : '';
   const pairName = isDiff ? `${nameAShort} ⟷ ${nameBShort}` : nameA;
-  const sameNote = isDiff ? '异种焊接' : '同种焊接';
+  const sameNote = isDiff ? t('weld.diff') : t('weld.same');
 
   document.getElementById('summaryMat').textContent = `${pairName} · ${closest}mm`;
   document.getElementById('summaryDetail').textContent =
@@ -2319,13 +3411,9 @@ function _updateResultsNow() {
 
   let wItems = [];
   if (weldAssess.level === 'easy') {
-    wItems.push('强度：满足常规要求');
-    wItems.push('金相：熔合良好，无不利相');
-    wItems.push('外观：易于控制，成型美观');
+    wItems = tList('weld.easy.items');
   } else if (weldAssess.level === 'moderate') {
-    wItems.push('强度：可满足一般工况要求，建议考虑过渡层');
-    wItems.push('金相：需要管控稀释率和热循环');
-    wItems.push('外观：可通过工艺参数优化获得合格外观');
+    wItems = tList('weld.moderate.items');
   } else if (weldAssess.level === 'challenging') {
     wItems.push('强度：可能不满足高强度工况，需要加试板验证');
     wItems.push('金相：界面可能生成不利金属间化合物');
@@ -2335,11 +3423,12 @@ function _updateResultsNow() {
     wItems.push('强度：界面结合强度低，不满足常规焊接结构要求');
     wItems.push('金相：产生大量脆性金属间化合物');
     wItems.push('外观：焊缝成形困难，易开裂');
-    wItems.push('❌ 不建议直接用激光焊接，推荐替代方案：钎焊、扩散焊、机械连接等');
+  } else if (weldAssess.level === 'hard') {
+    wItems = tList('weld.hard.items');
   }
   // Diff material specific
   if (isDiff) {
-    wItems.push(`⚡ 材料组合：${getMatDisplayName(materialA, subA)} ⟷ ${getMatDisplayName(materialB, subB)}`);
+    wItems.push(t('weld.combo') + ' ' + getMatDisplayName(materialA, subA) + ' ⟷ ' + getMatDisplayName(materialB, subB));
   }
 
   wCard.style.display = 'block';
@@ -2356,28 +3445,28 @@ function _updateResultsNow() {
   // ===== Subscription gate =====
   const highDiff = isHighDifficulty(materialA, subA, materialB, subB, thickness);
   // 条件④：有气密性要求的焊接
-  const hasAirtight = state.otherReq && /气密|密封|漏水|泄露/i.test(state.otherReq);
+  const hasAirtight = state.otherReq && /气密|密封|漏水|泄露|airtight|seal|leak/i.test(state.otherReq);
   const needsSub = highDiff || weldAssess.level === 'hard' || hasAirtight;
   const subGate = document.getElementById('subGate');
 
   // 构造订阅原因描述
   let subReasons = [];
-  if (thickness <= 0.3) subReasons.push('≤0.3mm 薄板焊接');
-  if (materialA === 'titanium' || (materialB && materialB === 'titanium')) subReasons.push('钛金属焊接');
-  if (hasAirtight) subReasons.push('气密性要求');
-  if (materialA && materialB && materialA !== materialB) subReasons.push('异种材料焊接');
-  if (subReasons.length === 0 && (highDiff || weldAssess.level === 'hard')) subReasons.push('该焊接组合难度较高');
+  if (thickness <= 0.3) subReasons.push(t('sub.reason.thin'));
+  if (materialA === 'titanium' || (materialB && materialB === 'titanium')) subReasons.push(t('sub.reason.titanium'));
+  if (hasAirtight) subReasons.push(t('sub.reason.airtight'));
+  if (materialA && materialB && materialA !== materialB) subReasons.push(t('sub.reason.diff'));
+  if (subReasons.length === 0 && (highDiff || weldAssess.level === 'hard')) subReasons.push(t('sub.reason.hard'));
 
   if (needsSub && !subscribed) {
     subGate.classList.add('open');
     // 判断是否有旧订阅（单次已过期/改参数）
     var subDescHtml = '';
     if (subData && subData.type === 'once' && subData.queryKey) {
-      subDescHtml = '🔒 参数已变更，需重新付费解锁<br><span style="font-size:11px;opacity:0.7;">单次解锁仅覆盖上一次查询参数</span>';
+      subDescHtml = t('sub.desc.changed');
     } else if (subData && subData.type === 'monthly' && (Date.now() - (subData.savedAt || 0)) >= 30 * 24 * 60 * 60 * 1000) {
-      subDescHtml = '🔒 月度订阅已到期，需续费<br><span style="font-size:11px;opacity:0.7;">每月¥6，随时可取消</span>';
+      subDescHtml = t('sub.desc.expired');
     } else {
-      subDescHtml = `🔒 需订阅 · 触发条件：${subReasons.join('、')}<br><span style="font-size:11px;opacity:0.7;">订阅后解锁全部焊接参数，含送丝/摆头/工艺建议</span>`;
+      subDescHtml = t('sub.desc.default', '').replace('{reasons}', subReasons.join(' · '));
     }
     document.getElementById('subDesc').innerHTML = subDescHtml;
     document.getElementById('subStatus').style.display = 'none';
@@ -2392,22 +3481,22 @@ function _updateResultsNow() {
   const grid = document.getElementById('resultGrid');
   const newHtml = `
     <div class="result-card param-power">
-      <div class="label">激光功率</div>
+      <div class="label">${t('result.pow.label')}</div>
       <div class="value">${powerMin} <span class="range">~ ${powerMax} W</span></div>
-      <div class="hint" style="color:${powerMax > 8000 ? 'var(--orange)' : 'var(--text2)'};font-size:11px;">${powerMax > 8000 ? '⚠ 建议10kW以上激光器' : '推荐功率范围'}</div>
+      <div class="hint" style="color:${powerMax > 8000 ? 'var(--orange)' : 'var(--text2)'};font-size:11px;">${powerMax > 8000 ? t('result.pow.high') : t('result.pow.normal')}</div>
     </div>
     <div class="result-card param-speed">
-      <div class="label">焊接速度</div>
+      <div class="label">${t('result.speed.label')}</div>
       <div class="value">${speedMin} <span class="range">~ ${speedMax} mm/s</span></div>
-      <div class="hint" style="font-size:11px;color:var(--text2);">${speedMax > 30 ? '高速焊接' : speedMax > 15 ? '中速焊接' : '低速深熔焊'}</div>
+      <div class="hint" style="font-size:11px;color:var(--text2);">${speedMax > 30 ? t('result.speed.fast') : speedMax > 15 ? t('result.speed.med') : t('result.speed.slow')}</div>
     </div>
     <div class="result-card param-focus">
-      <div class="label">焦平面位置</div>
+      <div class="label">${t('result.focus.label')}</div>
       <div class="value">${raw.focus[0].toFixed(1)} <span class="range">~ ${raw.focus[1].toFixed(1)} mm</span></div>
-      <div class="hint" style="font-size:11px;color:var(--text2);">${raw.focus[0] < 0 ? '负离焦（深熔焊）' : '零/正离焦（热传导焊）'}</div>
+      <div class="hint" style="font-size:11px;color:var(--text2);">${raw.focus[0] < 0 ? t('result.focus.neg') : t('result.focus.pos')}</div>
     </div>
     <div class="result-card param-gas">
-      <div class="label">保护气体 · ${gasInfo.name}</div>
+      <div class="label">${t('result.gas.label')} · ${gasInfo.name}</div>
       <div class="value">${flowMin} <span class="range">~ ${flowMax} L/min</span></div>
       <div class="hint" style="font-size:11px;color:var(--text2);">${gasInfo.note}</div>
     </div>`;
@@ -2415,7 +3504,7 @@ function _updateResultsNow() {
   let subHtml = '';
   if (subFactor.note) {
     subHtml += `<div class="result-card full" style="border-left:3px solid var(--accent);">
-      <div class="label">材料提示</div>
+      <div class="label">${t('result.hint.mat')}</div>
       <div class="value" style="font-size:13px;font-weight:400;">💡 ${subFactor.note}</div>
     </div>`;
   }
@@ -2435,10 +3524,10 @@ function _updateResultsNow() {
     const avgMin = Math.round(raw.ppk[0] * raw.duty[0] / 100);
     const avgMax = Math.round(raw.ppk[1] * raw.duty[1] / 100);
     pulseGrid.innerHTML = `
-      <div class="pulse-item"><div class="plabel">脉冲频率</div><div class="pvalue">${raw.freq[0]} ~ ${raw.freq[1]} Hz</div></div>
-      <div class="pulse-item"><div class="plabel">占空比</div><div class="pvalue">${raw.duty[0]}% ~ ${raw.duty[1]}%</div></div>
-      <div class="pulse-item"><div class="plabel">峰值功率</div><div class="pvalue">${raw.ppk[0]} ~ ${raw.ppk[1]} W</div></div>
-      <div class="pulse-item"><div class="plabel">平均功率</div><div class="pvalue">${avgMin} ~ ${avgMax} W</div></div>`;
+      <div class="pulse-item"><div class="plabel">${t('pulse.freq')}</div><div class="pvalue">${raw.freq[0]} ~ ${raw.freq[1]} Hz</div></div>
+      <div class="pulse-item"><div class="plabel">${t('pulse.duty')}</div><div class="pvalue">${raw.duty[0]}% ~ ${raw.duty[1]}%</div></div>
+      <div class="pulse-item"><div class="plabel">${t('pulse.ppk')}</div><div class="pvalue">${raw.ppk[0]} ~ ${raw.ppk[1]} W</div></div>
+      <div class="pulse-item"><div class="plabel">${t('pulse.avg')}</div><div class="pvalue">${avgMin} ~ ${avgMax} W</div></div>`;
   } else {
     pulsePanel.classList.remove('visible');
   }
@@ -2450,13 +3539,13 @@ function _updateResultsNow() {
     const wr = getWireRecommendation(effKey, thickness);
     wireArea.style.display = 'block';
     wireContent.innerHTML = `
-      <div class="title">📎 送丝推荐</div>
+      <div class="title">${t('wire.title.rec')}</div>
       <div class="item">${wr.desc}</div>
-      <div class="item">送丝速度：${thickness <= 1.0 ? '2~4' : thickness <= 3.0 ? '3~6' : '4~8'} m/min</div>
-      <div class="item">推荐角度：前送丝 30~45°</div>`;
+      <div class="item">${t('wire.speed')}：${thickness <= 1.0 ? '2~4' : thickness <= 3.0 ? '3~6' : '4~8'} m/min</div>
+      <div class="item">${t('wire.angle')}：${t('wire.angle.val')}</div>`;
   } else if (wire === 'feed') {
     wireArea.style.display = 'block';
-    wireContent.innerHTML = `<div class="title">📎 送丝推荐</div><div class="item" style="color:var(--orange);">🔒 订阅后解锁详细参数</div>`;
+    wireContent.innerHTML = `<div class="title">${t('wire.title.rec')}</div><div class="item" style="color:var(--orange);">${t('wire.locked')}</div>`;
   } else {
     wireArea.style.display = 'none';
   }
@@ -2468,13 +3557,13 @@ function _updateResultsNow() {
     const or = getOscRecommendation(effKey, thickness, joint);
     oscArea.style.display = 'block';
     oscContent.innerHTML = `
-      <div class="title">🌀 摆头推荐</div>
-      <div class="item">摆头形状：${or.shape}</div>
-      <div class="item">摆动参数：${or.size}</div>
+      <div class="title">${t('osc.title.rec')}</div>
+      <div class="item">${t('osc.shape')}：${or.shape}</div>
+      <div class="item">${t('osc.param')}：${or.size}</div>
       <div class="item">${or.desc}</div>`;
   } else if (osc === 'yes') {
     oscArea.style.display = 'block';
-    oscContent.innerHTML = `<div class="title">🌀 摆头推荐</div><div class="item" style="color:var(--orange);">🔒 订阅后解锁详细参数</div>`;
+    oscContent.innerHTML = `<div class="title">${t('osc.title.rec')}</div><div class="item" style="color:var(--orange);">${t('osc.locked')}</div>`;
   } else {
     oscArea.style.display = 'none';
   }
@@ -2486,11 +3575,11 @@ function _updateResultsNow() {
     const advice = getReqAdvice(otherReq, weldAssess.level);
     if (advice && advice.length > 0) {
       reqArea.style.display = 'block';
-      reqContent.innerHTML = `<div class="title">📋 其他要求 · 工艺优化建议</div>${advice.map(a => `<div class="item">${a}</div>`).join('')}`;
+      reqContent.innerHTML = `<div class="title">${t('req.title')}</div>${advice.map(a => `<div class="item">${a}</div>`).join('')}`;
     } else { reqArea.style.display = 'none'; }
   } else if (otherReq && otherReq.trim()) {
     reqArea.style.display = 'block';
-    reqContent.innerHTML = `<div class="title">📋 其他要求 · 工艺优化建议</div><div class="item" style="color:var(--orange);">🔒 订阅后解锁个性化优化建议</div>`;
+    reqContent.innerHTML = `<div class="title">${t('req.title')}</div><div class="item" style="color:var(--orange);">${t('req.locked')}</div>`;
   } else {
     reqArea.style.display = 'none';
   }
@@ -2501,9 +3590,9 @@ function _updateResultsNow() {
   const effMatId = subA && SUB_TO_PARENT[subA] ? SUB_TO_PARENT[subA] : materialA;
   
   function recommendLaserType(t, lvl) {
-    if (t <= 0.5) return '点环';
-    if (t > 5 || lvl === 'hard') return '复合';
-    return '普通';
+    if (t <= 0.5) return t('laser.rec.type.ring');
+    if (t > 5 || lvl === 'hard') return t('laser.rec.type.hybrid');
+    return t('laser.rec.type.single');
   }
   function recommendCoreDia(t, lvl) {
     if (t <= 0.3) return '14um';
@@ -2527,29 +3616,33 @@ function _updateResultsNow() {
   if (subscribed) {
     laserArea.style.display = 'block';
     laserContent.innerHTML = `
-      <div class="title">🔧 高级激光参数</div>
+      <div class="title">${t('laser.title')}</div>
       <div class="laser-param-grid">
-        <div class="lparam"><span class="lplabel">激光器类型</span><span class="lpval">${recLaser}</span></div>
-        <div class="lparam"><span class="lplabel">芯径</span><span class="lpval">${recCore}</span></div>
-        <div class="lparam"><span class="lplabel">准直聚焦比</span><span class="lpval">${recRatio}</span></div>
+        <div class="lparam"><span class="lplabel">${t('laser.type')}</span><span class="lpval">${recLaser}</span></div>
+        <div class="lparam"><span class="lplabel">${t('laser.core')}</span><span class="lpval">${recCore}</span></div>
+        <div class="lparam"><span class="lplabel">${t('laser.ratio')}</span><span class="lpval">${recRatio}</span></div>
       </div>`;
   } else {
     laserArea.style.display = 'block';
     laserContent.innerHTML = `
-      <div class="title">🔧 高级激光参数</div>
-      <div class="item" style="color:var(--orange);">🔒 订阅后解锁激光器类型 / 芯径 / 准直聚焦比推荐</div>`;
+      <div class="title">${t('laser.title')}</div>
+      <div class="item" style="color:var(--orange);">${t('laser.locked')}</div>`;
   }
 
   document.querySelector('.results-section').classList.add('visible');
   hideEmptyState();
-  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(function() {
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 // Debounced wrapper (80ms 防抖，避免快速切换时频繁渲染)
-let _updateTimer;
 function updateResults() {
   clearTimeout(_updateTimer);
+  clearTimeout(_scrollTimer);
   _updateTimer = setTimeout(_updateResultsNow, 80);
+  // 等渲染完成后自动滚动到结果区
+  _scrollTimer = setTimeout(function(){ document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
 }
 
 function showInlineTip(msg) {
@@ -2590,15 +3683,16 @@ function renderArticles() {
   const list = document.getElementById('articlesList');
   if (!list) return;
   const icons = ['📘','🔬','⚡','🛡️','🤖','🔥','💡','📊','🛠️','⚙️'];
+  // 技术文章固定显示中文，不随语言切换
   list.innerHTML = (ARTICLES_DATA || []).map((a, i) => `
-    <div class="article-card" onclick="openArticle('${a.id}')" tabindex="0" role="button" aria-label="打开文章：${a.title}">
+    <div class="article-card" onclick="openArticle('${a.id}')" tabindex="0" role="button" aria-label="${a.title}">
       <div class="a-icon">${a.icon || icons[i % icons.length]}</div>
       <div class="a-body">
         <div class="a-title">${a.title}</div>
         <div class="a-desc">${a.desc || ''}</div>
-        <div class="a-meta">${a.badge ? '<span class="tag">'+a.badge+'</span>' : ''} ${a.url ? '' : '<span style="color:var(--warn);">⏳待设链接</span>'}</div>
+        <div class="a-meta"><span class="tag">IMA笔记</span> <span style="color:var(--text2);font-size:11px;">📖 点击阅读全文</span></div>
       </div>
-      <div class="a-arrow">${a.url ? '↗' : '→'}</div>
+      <div class="a-arrow">→</div>
     </div>
   `).join('');
 }
@@ -2606,14 +3700,65 @@ function renderArticles() {
 // ====================================================================
 // 技术文章 → 打开链接
 // ====================================================================
+// ====================================================================
+// 技术文章 → 弹窗阅读（内容来自 ARTICLE_FULL，源为 IMA 笔记）
+// ====================================================================
+// ====================================================================
+// 技术文章 → 弹窗阅读（内容来自 ARTICLE_FULL，源为 IMA 笔记）
+// ====================================================================
 function openArticle(id) {
   const a = (ARTICLES_DATA || []).find(x => x.id === id);
   if (!a) return;
-  if (!a.url) {
-    alert('📎 链接尚未设置，请告知 Louis 补充 URL');
+  const md = ARTICLE_FULL[id];
+  if (!md) {
+    alert('该文章内容暂未加载。请联系管理员更新 ARTICLE_FULL。');
     return;
   }
-  window.open(a.url, '_blank');
+  // 移除已有的弹窗
+  const old = document.getElementById('articleModal');
+  if (old) old.remove();
+
+  // 简单 Markdown → HTML
+  var lines = md.split('\n');
+  var html = '';
+  var inTable = false;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    if (/^\|.*\|$/.test(line)) {
+      if (!inTable) { html += '<table>'; inTable = true; }
+      var cells = line.split('|').filter(function(c) { return c.trim(); });
+      var tag = line.indexOf('---') >= 0 ? 't' : (inTable === true ? 'th' : 'td');
+      if (tag === 't') continue;
+      html += '<tr><' + tag + '>' + cells.map(function(c) { return c.trim().replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }).join('</' + tag + '><' + tag + '>') + '</' + tag + '></tr>';
+      continue;
+    }
+    if (inTable) { html += '</table>'; inTable = false; }
+    if (/^#{4} /.test(line)) { html += '<h4>' + line.replace(/^#{4} /, '') + '</h4>'; continue; }
+    if (/^#{3} /.test(line)) { html += '<h3>' + line.replace(/^#{3} /, '') + '</h3>'; continue; }
+    if (/^#{2} /.test(line)) { html += '<h2>' + line.replace(/^#{2} /, '') + '</h2>'; continue; }
+    if (/^#{1} /.test(line)) { html += '<h1>' + line.replace(/^#{1} /, '') + '</h1>'; continue; }
+    if (/^\* /.test(line)) { html += '<li>' + line.replace(/^\* /, '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>') + '</li>'; continue; }
+    if (/^\d+\. /.test(line)) { html += '<li>' + line.replace(/^\d+\. /, '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>') + '</li>'; continue; }
+    if (/^---/.test(line)) { html += '<hr>'; continue; }
+    var pl = line.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/```/g, '');
+    if (pl.trim()) html += '<p>' + pl.trim() + '</p>';
+  }
+  if (inTable) html += '</table>';
+
+  // 构建弹窗
+  var modal = document.createElement('div');
+  modal.id = 'articleModal';
+  modal.className = 'article-modal-overlay';
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = '<div class="article-modal">' +
+    '<div class="article-modal-header">' +
+      '<span class="article-modal-title">' + a.title + '</span>' +
+      '<button class="article-modal-close" onclick="this.closest(\'.article-modal-overlay\').remove()">&times;</button>' +
+    '</div>' +
+    '<div class="article-modal-body">' + html + '</div>' +
+    '<div class="article-modal-footer">📝 来源：IMA 个人知识库笔记</div>' +
+  '</div>';
+  document.body.appendChild(modal);
 }
 
 // ====================================================================
@@ -2668,7 +3813,7 @@ function resetAll() {
     var subData = loadSubscription();
     var planName = getSubPlanName(subData && subData.type);
     document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · 全部参数已解锁';
+    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · ' + t('pay.unlocked');
     document.querySelector('#subGate .btn-sub').style.display = 'none';
   }
 
@@ -2690,11 +3835,12 @@ function init() {
     var subData = loadSubscription();
     var planName = getSubPlanName(subData && subData.type);
     document.getElementById('subStatus').style.display = 'block';
-    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · 全部参数已解锁';
+    document.getElementById('subStatus').textContent = '✅ ' + planName + ' · ' + t('pay.unlocked');
     document.querySelector('#subGate .btn-sub').style.display = 'none';
   }
 }
 init();
+applyLang();
 </script>
 <script>
 // Register Service Worker for offline support
