@@ -3300,6 +3300,22 @@ function getSubPrice(type) {
 }
 
 // ====================================================================
+// Notification API (发邮件通知 Louis)
+// ====================================================================
+var NOTIFY_API_URL = '/api/notify';
+function notifyAPI(type, data) {
+  var payload = JSON.stringify({ type: type, data: data });
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', NOTIFY_API_URL, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function(){};
+    xhr.onerror = function(){};
+    xhr.send(payload);
+  } catch(e) { /* silent fail - 通知不影响用户体验 */ }
+}
+
+// ====================================================================
 // Wallet System (单次解锁余额累积)
 // ====================================================================
 var WALLET_KEY = 'laserweld_wallet';
@@ -3465,6 +3481,8 @@ function confirmPay() {
     setTimeout(function(){
       // 激活月度订阅
       saveMonthlySubscription();
+      // 通知邮件：新月度订阅
+      notifyAPI('subscribe', { name: '', phone: '', company: '', note: '' });
       payState = 'VERIFIED';
       state.subscribed = true;
       var planName = getSubPlanName('monthly');
@@ -3520,6 +3538,8 @@ function submitContactForm() {
   saveContactInfo({ name: name, phone: phone, company: company, note: note });
   document.getElementById('contactFormOverlay').style.display = 'none';
   document.getElementById('subStatus').textContent = '✅ 留言已提交，工作人员将尽快联系您';
+  // 通知邮件：打样需求
+  notifyAPI('contact', { name: name, phone: phone, company: company, note: note });
 }
 
 // ====================================================================
