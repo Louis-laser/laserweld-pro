@@ -1460,14 +1460,14 @@ input[type="range"]::-moz-range-thumb {
               <div class="pay-icon">💚</div>
               <div class="pay-name" data-i18n="pay.wechat">微信支付</div>
               <div class="pay-qr" id="qrWechat">
-                <img src="assets/qr-wechat.png" alt="微信收款码" style="width:120px;height:120px;object-fit:contain;">
+                <img src="assets/qr-wechat.png" alt="微信收款码" style="width:120px;height:120px;object-fit:contain;cursor:pointer;" onclick="onQrClicked('wechat')">
               </div>
             </div>
             <div class="pay-opt" onclick="selectPay('alipay')" id="payAlipay" tabindex="0" role="button" aria-label="选择支付宝支付">
               <div class="pay-icon">💙</div>
               <div class="pay-name" data-i18n="pay.alipay">支付宝</div>
               <div class="pay-qr" id="qrAlipay">
-                <img src="assets/qr-alipay.png" alt="支付宝收款码" style="width:120px;height:120px;object-fit:contain;">
+                <img src="assets/qr-alipay.png" alt="支付宝收款码" style="width:120px;height:120px;object-fit:contain;cursor:pointer;" onclick="onQrClicked('alipay')">
               </div>
             </div>
           </div>
@@ -3418,7 +3418,17 @@ function selectPay(method) {
   selectedPayMethod = method;
   document.querySelectorAll('.pay-opt').forEach(function(el){el.classList.remove('selected');});
   document.getElementById('pay' + (method === 'wechat' ? 'Wechat' : 'Alipay')).classList.add('selected');
-  // 显示确认区域（含金额输入）
+  // 隐藏确认区域，二维码显示后等待用户点击确认已付款
+  payState = 'PAID_WAIT';
+  document.getElementById('confirmArea').style.display = 'none';
+  var en = currentLang === 'en';
+  document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay, then tap QR code to confirm' : '扫码完成付款后，点击二维码确认';
+}
+
+function onQrClicked(method) {
+  // 用户点击二维码 = 确认已付款
+  if (payState !== 'PAID_WAIT') return;
+  if (selectedPayMethod !== method) return;
   payState = 'CONFIRM';
   document.getElementById('confirmArea').style.display = 'block';
   if (selectedPlan === 'once') {
@@ -3427,8 +3437,10 @@ function selectPay(method) {
   } else {
     document.getElementById('amountInputArea').style.display = 'none';
   }
+  document.getElementById('payConfirmBtn').disabled = false;
+  document.getElementById('payConfirmBtn').textContent = '✅ ' + t('pay.confirm');
   var en = currentLang === 'en';
-  document.getElementById('payStatusMsg').textContent = en ? 'After payment, enter amount and click confirm' : '支付后输入金额并点击确认';
+  document.getElementById('payStatusMsg').textContent = en ? 'Confirm payment and unlock' : '确认已付款，解锁参数';
 }
 
 function confirmPay() {
@@ -3475,7 +3487,7 @@ function confirmPay() {
       document.getElementById('payStatusMsg').textContent = '✅ ' + planName + t('pay.success') + ' 余额：¥' + w.balance;
       document.getElementById('payStatusMsg').style.color = 'var(--green)';
       updateResults();
-    }, 800);
+    }, 1200);
   } else {
     // 月度订阅¥38
     payState = 'WAITING';
@@ -3506,7 +3518,7 @@ function confirmPay() {
         }, 500);
       }
       updateResults();
-    }, 800);
+    }, 1200);
   }
 }
 
