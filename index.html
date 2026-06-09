@@ -3961,8 +3961,9 @@ function _updateResultsNow() {
   document.querySelector('.results-section').classList.add('visible');
   hideEmptyState();
   setTimeout(function() {
-    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+    var el = document.getElementById('resultsSection');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 300);
 }
 
 // Debounced wrapper (80ms 防抖，避免快速切换时频繁渲染)
