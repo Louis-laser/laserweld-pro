@@ -2717,8 +2717,8 @@ function isHighDifficulty(matA, subA, matB, subB, thickness) {
 
   /* 订阅条件 — 满足任一即锁定 */
 
-  // 条件①：≤0.5mm 薄板焊接
-  if (t <= 0.5) return true;
+  // 条件①：≤1mm 薄板焊接
+  if (t <= 1.0) return true;
 
   // 条件②：钛金属焊接（任意含钛组合）
   if (matA === 'titanium' || (matB && matB === 'titanium')) return true;
@@ -3780,7 +3780,7 @@ function _updateResultsNow() {
 
   // 构造订阅原因描述
   let subReasons = [];
-  if (thickness <= 0.5) subReasons.push(t('sub.reason.thin'));
+  if (thickness <= 1.0) subReasons.push(t('sub.reason.thin'));
   if (materialA === 'titanium' || (materialB && materialB === 'titanium')) subReasons.push(t('sub.reason.titanium'));
   if (hasAirtight) subReasons.push(t('sub.reason.airtight'));
   if (materialA && materialB && materialA !== materialB) subReasons.push(t('sub.reason.diff'));
