@@ -1429,7 +1429,7 @@ input[type="range"]::-moz-range-thumb {
       <div class="icon">🔒</div>
       <div class="title" data-i18n="sub.gate.title">高难度焊接参数</div>
       <div class="desc" id="subDesc" data-i18n="sub.gate.desc">当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。</div>
-      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;" data-i18n="sub.gate.price">🔑 单次¥20 · 📅 月度¥38/月</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:8px;" data-i18n="sub.gate.price">🔑 单次¥9.9 · 📅 月度¥38/月</div>
       <button class="btn-sub" onclick="showPayment()" aria-label="订阅解锁高级焊接参数" data-i18n="sub.gate.btn">🔓 订阅解锁</button>
       <div class="sub-status" id="subStatus" style="display:none;">✅ <span data-i18n="sub.status.default">已订阅 · 全部参数已解锁</span></div>
 
@@ -1439,10 +1439,10 @@ input[type="range"]::-moz-range-thumb {
         <div style="font-size:11px; color:var(--text2); margin-bottom:10px;">单次解锁—余额累积，月度订阅含线下打样服务</div>
         <!-- Plan selector -->
         <div id="planSelector" style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
-          <div class="plan-opt" id="planOnce" onclick="selectPlan('once')" tabindex="0" role="button" aria-label="单次解锁20元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
+          <div class="plan-opt" id="planOnce" onclick="selectPlan('once')" tabindex="0" role="button" aria-label="单次解锁9.9元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
             <div style="font-size:22px;margin-bottom:2px;">🔑</div>
             <div style="font-size:13px;font-weight:600;" data-i18n="pay.once">单次解锁</div>
-            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥20</div>
+            <div style="font-size:18px;font-weight:700;color:var(--green);margin:2px 0;">¥9.9</div>
             <div style="font-size:10px;color:var(--text2);">余额可累积</div>
           </div>
           <div class="plan-opt" id="planMonthly" onclick="selectPlan('monthly')" tabindex="0" role="button" aria-label="月度订阅38元" style="flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;">
@@ -1473,10 +1473,10 @@ input[type="range"]::-moz-range-thumb {
           </div>
           <div id="confirmArea" style="display:none; margin-top:10px;">
             <div id="amountInputArea" style="display:none; margin-bottom:8px;">
-              <div style="font-size:12px; color:var(--text2); margin-bottom:4px;">支付金额（至少¥20，多付余额累积）：</div>
+              <div style="font-size:12px; color:var(--text2); margin-bottom:4px;">支付金额（至少¥9.9，多付余额累积）：</div>
               <div style="display:flex; gap:6px; align-items:center;">
                 <span style="font-size:16px;font-weight:700;color:var(--green);">¥</span>
-                <input type="number" id="payAmountInput" value="20" min="20" step="1"
+                <input type="number" id="payAmountInput" value="9.9" min="9.9" step="0.1"
                   style="flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:16px;text-align:center;outline:none;"
                   onfocus="this.select()">
               </div>
@@ -1845,7 +1845,7 @@ const LANG = {
     'empty.select': '请选择材料',
     'sub.gate.title': '高难度焊接参数',
     'sub.gate.desc': '当前焊接组合难度较高，需订阅后解锁全部焊接参数与深度工艺指导。',
-    'sub.gate.price': '🔑 单次¥20 · 📅 月度¥38/月',
+    'sub.gate.price': '🔑 单次¥9.9 · 📅 月度¥38/月',
     'sub.gate.btn': '🔓 订阅解锁',
     'results.footer': '本数据仅供参考，实际工艺需结合设备能力验证 · Demo v1.2',
     'results.reset': '⟳ 重新查询',
@@ -2093,7 +2093,7 @@ const LANG = {
     'empty.select': 'Select material',
     'sub.gate.title': 'High-difficulty Welding',
     'sub.gate.desc': 'Subscribe to unlock all welding parameters and in-depth process guidance.',
-    'sub.gate.price': '🔑 ¥20 single · 📅 ¥38/month',
+    'sub.gate.price': '🔑 ¥9.9 single · 📅 ¥38/month',
     'sub.gate.btn': '🔓 Subscribe & Unlock',
     'results.footer': 'For reference only. Actual process depends on equipment capability. Demo v1.2',
     'results.reset': '⟳ Reset',
@@ -3024,7 +3024,7 @@ function getSubPlanName(type) {
 }
 
 function getSubPrice(type) {
-  return type === 'monthly' ? '¥38/月' : '¥20';
+  return type === 'monthly' ? '¥38/月' : '¥9.9';
 }
 
 // ====================================================================
@@ -3067,8 +3067,8 @@ function addToWallet(amount) {
 
 function deductWallet() {
   var w = getWallet();
-  if (w.balance < 20) return false;
-  w.balance -= 20;
+  if (w.balance < 9.9) return false;
+  w.balance -= 9.9;
   saveWallet(w);
   return true;
 }
@@ -3129,7 +3129,7 @@ function selectPlan(plan) {
   document.getElementById('payMethodArea').style.display = 'block';
   var en = currentLang === 'en';
   if (plan === 'once') {
-    document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay (min ¥20), extra balance rolls over' : '扫码支付（至少¥20），多付的余额自动累积';
+    document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay (min ¥9.9), extra balance rolls over' : '扫码支付（至少¥9.9），多付的余额自动累积';
   } else {
     document.getElementById('payStatusMsg').textContent = en ? 'Scan to pay ¥38/month · includes offline sample service' : '扫码支付¥38/月 · 含线下打样服务';
   }
@@ -3155,7 +3155,7 @@ function onQrClicked(method) {
   document.getElementById('confirmArea').style.display = 'block';
   if (selectedPlan === 'once') {
     document.getElementById('amountInputArea').style.display = 'block';
-    document.getElementById('payAmountInput').value = '20';
+    document.getElementById('payAmountInput').value = '9.9';
   } else {
     document.getElementById('amountInputArea').style.display = 'none';
   }
@@ -3182,8 +3182,8 @@ function confirmPay() {
     // 单次解锁：处理充值金额
     var inputEl = document.getElementById('payAmountInput');
     var amount = parseFloat(inputEl.value) || 0;
-    if (amount < 20) {
-      document.getElementById('payStatusMsg').textContent = '⚠ ' + (currentLang === 'en' ? 'Minimum payment is ¥20' : '最低支付¥20');
+    if (amount < 9.9) {
+      document.getElementById('payStatusMsg').textContent = '⚠ ' + (currentLang === 'en' ? 'Minimum payment is ¥9.9' : '最低支付¥9.9');
       document.getElementById('payStatusMsg').style.color = 'var(--orange)';
       return;
     }
@@ -3337,14 +3337,14 @@ function _updateResultsNow() {
   if (!subscribed) {
     // 单次解锁：检查钱包余额
     var w = getWallet();
-    if (w.balance >= 20) {
+    if (w.balance >= 9.9) {
       // 扣费并解锁本次查询
       deductWallet();
       localStorage.setItem('laserweld_paid_query', getQueryKey());
       subscribed = true;
       state.subscribed = true;
       var bal = getWallet().balance;
-      document.getElementById('subStatus').textContent = '✅ 单次解锁 · 余额：¥' + bal + (bal < 20 ? '（余额不足下次查询）' : '');
+      document.getElementById('subStatus').textContent = '✅ 单次解锁 · 余额：¥' + bal + (bal < 9.9 ? '（余额不足下次查询）' : '');
       document.getElementById('subStatus').style.display = 'block';
       document.querySelector('#subGate .btn-sub').style.display = 'none';
     }
@@ -3685,7 +3685,7 @@ function _updateResultsNow() {
   setTimeout(function() {
     var el = document.getElementById('resultsSection');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 300);
+  }, 200);
 }
 
 // Debounced wrapper (80ms 防抖，避免快速切换时频繁渲染)
