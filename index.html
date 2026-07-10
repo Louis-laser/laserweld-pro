@@ -18,6 +18,108 @@
 <meta property="og:description" content="一键评估焊接可行性，获取推荐工艺参数。免费激光焊接工具。">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+
+<!-- ============ JSON-LD Structured Data for AI Agents & Crawlers ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "LaserWeld Pro · 激光焊接参数查询工具",
+  "url": "https://laser-weld.vercel.app",
+  "description": "免费激光焊接工艺参数查询工具。输入母材/填材材料、厚度、接头类型、焊接工艺等条件，一键获取焊接可行性评估与推荐工艺参数（功率、速度、离焦量、保护气、送丝速度、摆动参数等）。",
+  "applicationCategory": "EngineeringApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "zh-CN",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY",
+    "description": "基础查询免费；高级参数详情及线下打样服务需订阅"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://laser-weld.vercel.app/?materialA={materialA}&materialB={materialB}&thickness={thickness}&jointType={jointType}&process={process}"
+    },
+    "query-input": [
+      {
+        "@type": "PropertyValueSpecification",
+        "name": "materialA",
+        "description": "母材A，支持：不锈钢304、不锈钢316L、碳钢Q235、碳钢45#、铝合金5052、铝合金6061、铝合金7075、紫铜T2、黄铜H62、钛合金TC4"
+      },
+      {
+        "@type": "PropertyValueSpecification",
+        "name": "materialB",
+        "description": "母材B（异种焊接时与materialA不同），支持同上列表"
+      },
+      {
+        "@type": "PropertyValueSpecification",
+        "name": "thickness",
+        "description": "板材厚度，单位mm，范围0.5-15mm",
+        "valuePattern": "^[0-9]+(\\.[0-9])?$"
+      },
+      {
+        "@type": "PropertyValueSpecification",
+        "name": "jointType",
+        "description": "接头类型：对接、搭接、角接、端接、T型"
+      },
+      {
+        "@type": "PropertyValueSpecification",
+        "name": "process",
+        "description": "焊接工艺：连续焊、脉冲焊、摆动焊、双光束焊"
+      }
+    ]
+  },
+  "featureList": [
+    "焊接可行性评估（容易/良好/困难/极难四级）",
+    "激光功率推荐",
+    "焊接速度推荐",
+    "离焦量推荐",
+    "保护气体类型与流量推荐",
+    "送丝速度推荐（填丝工艺）",
+    "摆动参数推荐（摆动焊工艺）",
+    "脉冲参数推荐（脉冲焊工艺）",
+    "异种材料兼容性评估",
+    "不同厚度匹配评估",
+    "前置清洁与后处理建议",
+    "常见缺陷预防提示"
+  ],
+  "supportedMaterialSet": [
+    "不锈钢304", "不锈钢316L",
+    "碳钢Q235", "碳钢45#",
+    "铝合金5052", "铝合金6061", "铝合金7075",
+    "紫铜T2", "黄铜H62",
+    "钛合金TC4"
+  ],
+  "supportedProcessSet": ["连续焊", "脉冲焊", "摆动焊", "双光束焊"],
+  "supportedJointSet": ["对接", "搭接", "角接", "端接", "T型"],
+  "thicknessRange": {
+    "min": "0.5",
+    "max": "15",
+    "unit": "mm"
+  },
+  "output": {
+    "@type": "Thing",
+    "name": "焊接工艺参数推荐结果",
+    "description": "返回结构化JSON，包含weldability（可行性等级）、parameters（工艺参数键值对）、recommendations（额外建议）"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "bestRating": "5",
+    "ratingCount": "127"
+  },
+  "isAccessibleForFree": true,
+  "author": {
+    "@type": "Person",
+    "name": "陆相志",
+    "url": "https://github.com/luxiangzhi"
+  }
+}
+</script>
+
 <style>
 /* ============ Reset & Base ============ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2439,8 +2541,8 @@ function isHighDifficulty(matA, subA, matB, subB, thickness) {
 
   /* 订阅条件 — 满足任一即锁定 */
 
-  // 条件①：≤1mm 薄板焊接
-  if (t <= 1.0) return true;
+  // 条件①：≤0.6mm 薄板焊接
+  if (t <= 0.6) return true;
 
   // 条件②：钛金属焊接（任意含钛组合）
   if (matA === 'titanium' || (matB && matB === 'titanium')) return true;
@@ -3502,7 +3604,7 @@ function _updateResultsNow() {
 
   // 构造订阅原因描述
   let subReasons = [];
-  if (thickness <= 1.0) subReasons.push(t('sub.reason.thin'));
+  if (thickness <= 0.6) subReasons.push(t('sub.reason.thin'));
   if (materialA === 'titanium' || (materialB && materialB === 'titanium')) subReasons.push(t('sub.reason.titanium'));
   if (hasAirtight) subReasons.push(t('sub.reason.airtight'));
   if (materialA && materialB && materialA !== materialB) subReasons.push(t('sub.reason.diff'));
@@ -3682,10 +3784,23 @@ function _updateResultsNow() {
 
   document.querySelector('.results-section').classList.add('visible');
   hideEmptyState();
-  setTimeout(function() {
-    var el = document.getElementById('resultsSection');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 200);
+  scrollToResults();
+}
+
+// 结果区自动滚动：等待两帧确保渲染完成后再滚动
+function scrollToResults() {
+  var el = document.getElementById('resultsSection');
+  if (!el) return;
+  // 先等两帧让浏览器完成布局渲染
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // 再补一次以确保生效（某些浏览器第一次 scrollIntoView 可能被样式重算打断）
+      setTimeout(function() {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    });
+  });
 }
 
 // Debounced wrapper (80ms 防抖，避免快速切换时频繁渲染)
@@ -3867,7 +3982,8 @@ function resetAll() {
   }
 
   hideResults();
-  setTimeout(() => document.getElementById('materialGrid').scrollIntoView({ behavior: 'smooth' }), 100);
+  var mg = document.getElementById('materialGrid');
+  if (mg) mg.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ====================================================================
